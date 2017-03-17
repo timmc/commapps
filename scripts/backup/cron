@@ -1,0 +1,4 @@
+# crontab for community data backups
+
+# Timing randomly chosen to reduce stress on Tarsnap servers
+39 4 * * * root /opt/commapps/utils/scripts/backup/run-backup.sh
