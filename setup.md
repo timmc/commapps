@@ -63,7 +63,7 @@ apt-get install ssh emacs screen curl cryptsetup git git-gui gitk nmap gnome-dis
 These will be used for backups, mounting, and other maintenance and
 administration.
 
-`mkdir /opt/commapps && git clone https://github.com/timmc/commapps-utils.git /opt/commapps/utils`
+`mkdir /opt/commapps && git clone https://github.com/timmc/commapps.git /opt/commapps/repo`
 
 
 # For each user:
@@ -145,7 +145,7 @@ We have systemd v215, but need at least v228 (?) in order to enable a
 symlinked unit file: https://github.com/systemd/systemd/issues/1836
 
 ```
-cp /opt/commapps/utils/scripts/encfs/systemd-service /etc/systemd/system/commapps.service
+cp /opt/commapps/repo/scripts/encfs/systemd-service /etc/systemd/system/commapps.service
 systemctl daemon-reload
 systemctl enable commapps.service
 ```
@@ -201,7 +201,7 @@ shred /opt/commdata/backups/tarsnap-full.key
 
 ## Automate
 ```
-ln -ns /opt/commapps/utils/scripts/backup/cron /etc/cron.d/commdata-backup
+ln -ns /opt/commapps/repo/scripts/backup/cron /etc/cron.d/commdata-backup
 ```
 
 

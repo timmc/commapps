@@ -5,8 +5,8 @@ Before=sandstorm.service
 [Service]
 Type=oneshot
 RemainAfterExit=True
-ExecStart=/opt/commapps/utils/scripts/encfs/open.sh
-ExecStop=/opt/commapps/utils/scripts/encfs/close.sh
+ExecStart=/opt/commapps/repo/scripts/encfs/open.sh
+ExecStop=/opt/commapps/repo/scripts/encfs/close.sh
 
 [Install]
 RequiredBy=sandstorm.service
