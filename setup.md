@@ -146,6 +146,7 @@ symlinked unit file: https://github.com/systemd/systemd/issues/1836
 
 ```
 cp /opt/commapps/utils/scripts/encfs/systemd-service /etc/systemd/system/commapps.service
+systemctl daemon-reload
 systemctl enable commapps.service
 ```
 
