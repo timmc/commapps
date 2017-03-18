@@ -14,7 +14,7 @@ function log {
 # Check if commdata is mounted before proceeding
 
 mountpoint -q /opt/commdata || {
-  log "Community data is not yet mounted"
+  log "ERROR: Community data is not yet mounted"
   exit 2
 }
 
@@ -35,7 +35,7 @@ snapshot_id="tarsnap-periodic-$(date --universal +%s%N)"
 
 log "Snapshotting community data: $snapshot_id"
 zfs snapshot commdata@"$snapshot_id" || {
-  log "Failed to take snapshot; did another backup start at exactly the same time?"
+  log "ERROR: Failed to take snapshot; did another backup start at exactly the same time?"
   exit 3
 }
 # That's the last place we can call exit without cleanup.
