@@ -45,7 +45,7 @@ log "Running backup on $snapshot_id"
 # This uses a write-only tarsnap key.
 
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
-        --keyfile /opt/commdata/backups/tarsnap-w.key \
+        --keyfile /opt/commdata/backups/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
         -C /opt/commdata/.zfs/snapshot/"$snapshot_id" \
         --humanize-numbers \
