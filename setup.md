@@ -221,7 +221,16 @@ ln -ns /opt/commapps/repo/scripts/backup/cron /etc/cron.d/commdata-backup
 
 # Encrypted swap space
 
-**TODO**, and stay the hell away from crypttab unless you use the
-tiny-fs UUID trick.
+Reference: https://wiki.archlinux.org/index.php/Dm-crypt/Swap_encryption
 
+Use the safest method, creating a tiny decoy filesystem and then
+placing a swap space just after it using offset. This allows naming of
+the swap location independent of hardware/drive order (pinning to
+"/dev/sda6" could lead to data loss after repartitioning, since swapon
+would overwrite a partition.)
 
+```
+mkfs.ext2 -L cryptswap /dev/sda6 1M
+echo 'swap  LABEL=cryptswap  /dev/urandom  swap,offset=2048,cipher=aes-xts-plain64,size=256' >> /etc/crypttab
+echo '/dev/mapper/swap  none  swap  defaults  0  0' >> /etc/fstab
+```
