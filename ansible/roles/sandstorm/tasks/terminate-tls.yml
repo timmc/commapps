@@ -1,3 +1,57 @@
 ---
 - name: Install nginx
   apt: name=nginx
+
+- name: Directory for nginx ssl params
+  file:
+    path: "/etc/nginx/ssl"
+    state: directory
+- name: Predefined Diffie-Hellman group
+  copy:
+    src: "{{ role_path }}/files/ffdhe4096.pem"
+    dest: "/etc/nginx/ssl/ffdhe4096.pem"
+  notify: restart nginx
+
+# TODO Tasks for creating commdata
+# TODO Tasks for ensuring nginx doesn't start until commdata partition unlocked
+
+# FIXME If commdata hasn't already been created, this might create it with
+# 0700 permissions, which isn't really a problem, but is a possible source
+# of non-determinism
+- name: Directory for TLS certs and private keys
+  file:
+    path: "{{ commdata_dir }}/secrets/tls"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+- name: "Certificate chain"
+  copy:
+    src: "{{ role_path }}/files/sandstorm-wildcard.chain.pem"
+    dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.chain.pem"
+  notify: restart nginx
+
+# TODO: Find satisfactory way to convey priate key; for now, nginx will fail
+# to reload, and you'll just have to write this file yourself and re-run.
+
+# # provide vars: sandstorm_tls_private_key
+# - include_vars: "{{ role_path }}/vars/vault.yml"
+#   no_log: true
+# - name: "Private key"
+#   copy:
+#     content: "{{ sandstorm_tls_private_key }}"
+#     dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.key"
+#   no_log: true
+#   notify: restart nginx
+
+- name: Sandstorm nginx configuration
+  template:
+    src: nginx-sites/sandstorm.conf.j2
+    dest: /etc/nginx/sites-available/sandstorm.conf
+  notify: restart nginx
+- name: Enable nginx configuration
+  file:
+    src: /etc/nginx/sites-available/sandstorm.conf
+    dest: /etc/nginx/sites-enabled/sandstorm.conf
+    state: link
+  notify: restart nginx

@@ -1,0 +1,11 @@
+---
+- name: restart nginx
+  service:
+    name=nginx
+    state=restarted
+    enabled=yes
+- name: restart sandstorm
+  service:
+    name=sandstorm
+    state=restarted
+    enabled=yes

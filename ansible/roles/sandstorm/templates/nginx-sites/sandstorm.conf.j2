@@ -1,0 +1,60 @@
+# This magic stanza is ESSENTIAL to avoid breaking WebSockets.
+#
+# Specifically, for WebSocket forwarding, we want to forward the `Connection` header.
+# This "map" declaration helps with that.
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  ''      close;
+}
+
+# HTTP -> HTTPS redirect
+server {
+  listen 80;
+  server_name {{ sandstorm_base_domain }} *.{{ sandstorm_base_domain }};
+  return 301 https://$host$request_uri$is_args$args;
+}
+
+# Configuration for Sandstorm shell and apps, over HTTPS.
+server {
+  listen 443;
+  server_name {{ sandstorm_base_domain }} *.{{ sandstorm_base_domain }};
+
+  ssl on;
+  ssl_certificate {{ commdata_dir }}/secrets/tls/sandstorm-wildcard.chain.pem;
+  ssl_certificate_key {{ commdata_dir }}/secrets/tls/sandstorm-wildcard.key;
+
+  ssl_session_timeout 5m;
+
+  # Configure SSL with forward secrecy and other goodies.
+  # Ciphersuite taken from https://wiki.mozilla.org/Security/Server_Side_TLS
+  # https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=nginx-1.6.2&openssl=1.0.1t&hsts=yes&profile=intermediate retrieved 2018-02-19
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+  ssl_prefer_server_ciphers on;
+  ssl_session_cache shared:SSL:50m;
+  # Don't allow old sessions to be decoded after breach, at expense of perf
+  ssl_session_tickets off;
+  ssl_dhparam /etc/nginx/ssl/ffdhe4096.pem;
+
+  # HSTS with a 365.25 days = 31557600 seconds expiration
+  add_header Strict-Transport-Security max-age=31557600;
+
+  location / {
+    proxy_pass http://127.0.0.1:6080;
+
+    # Forward the Host header, which is used to route requests for
+    # static content published from Sandstorm apps.
+    proxy_set_header Host $http_host;
+
+    # Forward WebSocket.
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  # Allow large spk uploads from the /install form and allow grains to receive large uploads.
+  client_max_body_size 1024m;
+}

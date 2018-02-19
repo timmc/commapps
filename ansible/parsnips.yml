@@ -3,4 +3,4 @@
   remote_user: root
   roles:
   - common
-  - sandstorm
+  - { role: sandstorm, sandstorm_base_domain: sandy.parsni.ps, commdata_dir: "/opt/commdata" }
