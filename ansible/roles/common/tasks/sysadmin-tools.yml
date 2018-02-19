@@ -1,3 +1,4 @@
+---
 - name: "Install basic sysadmin tools: ssh"
   apt: name=ssh
 - name: "Install basic sysadmin tools: emacs"
