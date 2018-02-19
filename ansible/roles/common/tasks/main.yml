@@ -1,3 +1,4 @@
 # FIXME: include is deprecated; use import_tasks when upgrade from
 # ansible 2.2 to 2.4
 - include: sysadmin.yml
+- include: unattended-upgrades.yml
