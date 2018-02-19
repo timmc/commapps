@@ -2,8 +2,10 @@
 
 - Control
     - **TODO**: Move to my own domain name; prerequisites follow:
-        - **TODO**: Buy wildcard cert
+        - Done: Buy wildcard cert
           ([$40–70/yr](https://www.ssl2buy.com/wildcard-ssl-certificate/))
+        - Set up nginx with reverse proxy terminating wildcard TLS for
+          Sandstorm
         - **TODO**: Set up or find DNS server (might use afraid.org at first)
 - Repeatability
     - Done: Server rebuilt from (manual) runbook
