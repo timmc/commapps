@@ -1,8 +1,8 @@
 ---
-- name: restart nginx
+- name: nginx reload config
   service:
     name=nginx
-    state=restarted
+    state=reloaded
     enabled=yes
 - name: restart sandstorm
   service:

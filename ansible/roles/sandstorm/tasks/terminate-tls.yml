@@ -10,7 +10,7 @@
   copy:
     src: "{{ role_path }}/files/ffdhe4096.pem"
     dest: "/etc/nginx/ssl/ffdhe4096.pem"
-  notify: restart nginx
+  notify: nginx reload config
 
 # TODO Tasks for creating commdata
 # TODO Tasks for ensuring nginx doesn't start until commdata partition unlocked
@@ -29,7 +29,7 @@
   copy:
     src: "{{ role_path }}/files/sandstorm-wildcard.chain.pem"
     dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.chain.pem"
-  notify: restart nginx
+  notify: nginx reload config
 
 # TODO: Find satisfactory way to convey priate key; for now, nginx will fail
 # to reload, and you'll just have to write this file yourself and re-run.
@@ -42,16 +42,16 @@
 #     content: "{{ sandstorm_tls_private_key }}"
 #     dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.key"
 #   no_log: true
-#   notify: restart nginx
+#   notify: nginx reload config
 
 - name: Sandstorm nginx configuration
   template:
     src: nginx-sites/sandstorm.conf.j2
     dest: /etc/nginx/sites-available/sandstorm.conf
-  notify: restart nginx
+  notify: nginx reload config
 - name: Enable nginx configuration
   file:
     src: /etc/nginx/sites-available/sandstorm.conf
     dest: /etc/nginx/sites-enabled/sandstorm.conf
     state: link
-  notify: restart nginx
+  notify: nginx reload config
