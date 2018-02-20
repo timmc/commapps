@@ -1,6 +1,9 @@
 [Unit]
 Description=Community Data partition
+# sandstorm runs entirely out of /opt/commdata/sandstorm
 Before=sandstorm.service
+# nginx is configured to look for TLS certs & keys in /opt/commdata/secrets
+Before=nginx.service
 
 [Service]
 Type=oneshot
@@ -10,3 +13,4 @@ ExecStop=/opt/commapps/repo/scripts/encfs/close.sh
 
 [Install]
 RequiredBy=sandstorm.service
+RequiredBy=nginx.service
