@@ -9,6 +9,8 @@
         - Done: Wildcard DNS via NFSN
 - Repeatability
     - Done: Server rebuilt from (manual) runbook
+    - **TODO**: Create automated runbook
+        - Partially complete, using Ansible
 - Privacy
     - Done: Sandstorm moved to encrypted partition (passphrase not on same disk)
     - Done: No other services present on rebuilt server
