@@ -1,0 +1,12 @@
+# Stock Debian configuration, minus comments
+
+ChallengeResponseAuthentication no
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem sftp /usr/lib/openssh/sftp-server
+UsePAM yes
+
+# Additions
+
+PasswordAuthentication no

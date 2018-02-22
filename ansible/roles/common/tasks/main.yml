@@ -3,3 +3,10 @@
 # ansible 2.2 to 2.4
 - include: sysadmin-tools.yml
 - include: unattended-upgrades.yml
+
+- name: SSH configuration
+  copy:
+    src: "{{ role_path }}/files/sshd_config"
+    dest: "/etc/ssh/sshd_config"
+    mode: 0644
+  notify: reload sshd config

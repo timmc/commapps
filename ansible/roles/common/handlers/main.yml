@@ -1,0 +1,6 @@
+---
+- name: reload sshd config
+  service:
+    name: sshd
+    enabled: yes
+    state: reloaded
