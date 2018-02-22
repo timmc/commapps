@@ -54,7 +54,7 @@ Now set up port forwarding in router and use SSH for remaining config.
 timedatectl set-timezone Etc/UTC
 apt-get update
 apt-get dist-upgrade
-apt-get install ssh emacs screen curl cryptsetup git git-gui gitk nmap gnome-disk-utility
+apt-get install cryptsetup git git-gui gitk nmap gnome-disk-utility
 ```
 
 

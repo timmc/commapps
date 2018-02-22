@@ -3,3 +3,5 @@ toster.internal
 
 [jabber]
 kibble.internal
+
+# TODO: Define kibble as a bastion host
