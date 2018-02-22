@@ -4,3 +4,7 @@
   roles:
   - common
   - { role: sandstorm, sandstorm_base_domain: sandy.parsni.ps, commdata_dir: "/opt/commdata" }
+- hosts: jabber
+  remote_user: root
+  roles:
+  - common
