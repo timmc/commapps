@@ -1,0 +1,7 @@
+---
+- name: "Ensure server doesn't go to sleep if lid closed without login session"
+  copy:
+    src: "{{ role_path }}/files/systemd/logind.conf"
+    dest: /etc/systemd/logind.conf
+    mode: 0644
+  notify: restart logind

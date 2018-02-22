@@ -8,3 +8,7 @@
   remote_user: root
   roles:
   - common
+- hosts: laptops
+  remote_user: root
+  roles:
+  - laptop

@@ -85,15 +85,6 @@ defscrollback 5000
 vbell off' >> ~/.screenrc
 ```
 
-
-# As laptop
-`apt-get install x11vnc xtightvncviewer`
-
-Prevent logind from suspending laptop when lid-close w/o desktop sesssion:
-
-`echo 'HandleLidSwitch=ignore' >> /etc/systemd/logind.conf`
-
-
 # Secrets store
 
 A meh place to store secrets like encryption passphrases required for

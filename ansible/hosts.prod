@@ -4,4 +4,7 @@ toster.internal
 [jabber]
 kibble.internal
 
+[laptops]
+toster.internal
+
 # TODO: Define kibble as a bastion host
