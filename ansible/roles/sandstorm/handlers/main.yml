@@ -1,11 +1,11 @@
 ---
 - name: nginx reload config
   service:
-    name=nginx
-    state=reloaded
-    enabled=yes
+    name: nginx
+    state: reloaded
+    enabled: yes
 - name: restart sandstorm
   service:
-    name=sandstorm
-    state=restarted
-    enabled=yes
+    name: sandstorm
+    state: restarted
+    enabled: yes
