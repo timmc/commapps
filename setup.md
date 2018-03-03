@@ -170,13 +170,7 @@ instructions:
 
 Created account `comm-tarsnap-commdata@brainonfire.net`
 
-## Install Tarsnap
-
-wget https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc
-apt-key add tarsnap-deb-packaging-key.asc
-echo 'deb http://pkg.tarsnap.com/deb/jessie ./' > /etc/apt/sources.list.d/tarsnap.list
-apt-get update
-apt-get install tarsnap
+Install tarsnap.
 
 ## Configure key
 

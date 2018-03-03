@@ -1,0 +1,18 @@
+---
+- name: "Install Tarsnap deb packaging key"
+  apt_key:
+    url: https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc
+    state: present
+    id: "8E64CEEC8767B49710E308F770BD6C50E82A9D99"
+
+# TODO Kind of unclean, since if you change the repo and re-run, it
+# just adds the new repo and leaves the old one in place in the same
+# file. Should probably just overwrite the entire file instead.
+- name: "Use Tarsnap package repository"
+  apt_repository:
+    repo: "deb http://pkg.tarsnap.com/deb/{{ debversion }} ./"
+    state: present
+    filename: tarsnap
+
+- name: "Install tarsnap"
+  apt: name=tarsnap
