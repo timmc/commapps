@@ -5,14 +5,12 @@
     state: present
     id: "8E64CEEC8767B49710E308F770BD6C50E82A9D99"
 
-# TODO Kind of unclean, since if you change the repo and re-run, it
-# just adds the new repo and leaves the old one in place in the same
-# file. Should probably just overwrite the entire file instead.
 - name: "Use Tarsnap package repository"
-  apt_repository:
-    repo: "deb http://pkg.tarsnap.com/deb/{{ debversion }} ./"
-    state: present
-    filename: tarsnap
+  copy:
+    content: |
+      # Ansible: remote-backup role
+      deb http://pkg.tarsnap.com/deb/{{ debversion }} ./
+    dest: /etc/apt/sources.list.d/tarsnap.list
 
 - name: "Install tarsnap"
   apt: name=tarsnap
