@@ -1,0 +1,57 @@
+---
+- name: Install prosody
+  apt: name=prosody
+
+- name: Install extra prosody modules
+  apt: name=prosody-modules
+  notify: Restart prosody
+
+- name: Directory for Jabber data in general
+  file:
+    state: directory
+    path: /opt/commdata/jabber
+    mode: 0750
+    owner: prosody
+    group: prosody
+
+- name: Directory for Prosody data
+  file:
+    state: directory
+    path: /opt/commdata/jabber/data
+    mode: 0750
+    owner: prosody
+    group: prosody
+
+- name: Directory for Jabber TLS secrets
+  file:
+    state: directory
+    path: /opt/commdata/jabber/tls
+    mode: 0750
+    owner: prosody
+    group: prosody
+    recurse: yes
+
+# TODO: Use rsync module to convey the conf.d files all at once
+
+- name: Directories for supporting configs
+  file:
+    state: directory
+    path: /etc/prosody/conf.d/vhosts
+
+- name: "Supporting prosody configs: brainonfire vhost"
+  copy:
+    src: "{{ role_path }}/files/prosody/vhosts/brainonfire.net.cfg.lua"
+    dest: /etc/prosody/conf.d/vhosts/brainonfire.net.cfg.lua
+  notify: Restart prosody
+
+- name: "Supporting prosody configs: parsnips vhost"
+  copy:
+    src: "{{ role_path }}/files/prosody/vhosts/parsni.ps.cfg.lua"
+    dest: /etc/prosody/conf.d/vhosts/parsni.ps.cfg.lua
+  notify: Restart prosody
+
+- name: Main prosody config
+  copy:
+    src: "{{ role_path }}/files/prosody/prosody.cfg.lua"
+    dest: /etc/prosody/prosody.cfg.lua
+  notify: Restart prosody

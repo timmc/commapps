@@ -9,6 +9,7 @@
   remote_user: root
   roles:
   - common
+  - jabber
 - hosts: laptops
   remote_user: root
   roles:

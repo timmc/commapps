@@ -1,0 +1,6 @@
+---
+- name: Restart prosody
+  service:
+    name: prosody
+    enabled: yes
+    state: restarted
