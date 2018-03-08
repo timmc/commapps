@@ -1,0 +1,36 @@
+---
+
+- name: Directory for dyndns secrets
+  file:
+    state: directory
+    path: /opt/commdata/dyndns/secrets
+    owner: root
+    group: root
+    mode: 0600
+
+# TODO Automatically install secret token
+
+# Secret token can be rotated at https://freedns.afraid.org/dynamic/?action=rotatekey
+- name: Ensure afraid.org secret is present
+  file:
+    state: file
+    path: /opt/commdata/dyndns/secrets/afraid.org-token-home
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Install dyndns updater script
+  copy:
+    src: "{{ role_path }}/files/dns-update.sh"
+    dest: /opt/commdata/dyndns/dns-update.sh
+    owner: root
+    group: root
+    mode: 0775
+
+- name: Install dyndns cron job
+  copy:
+    src: "{{ role_path }}/files/dns-update.cron"
+    dest: /etc/cron.d/dyndns-afraid-org-update
+    owner: root
+    group: root
+    mode: 0664

@@ -10,6 +10,10 @@
   roles:
   - common
   - jabber
+- hosts: dyndns
+  remote_user: root
+  roles:
+  - dyndns
 - hosts: laptops
   remote_user: root
   roles:
