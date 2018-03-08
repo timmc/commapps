@@ -1,0 +1,10 @@
+# crontab for SSL cert installation
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# TODO Change this whole thing to use prosodyctl's cert installer
+
+# Timed to run an hour or so after the NFSN script deposits certs here.
+39 6 * * * root /opt/commdata/jabber/cert-oracle/recv-ssl-certs.sh brainonfire.net >> /var/log/jabber-cert-oracle.log 2>&1
+39 7 * * * root /opt/commdata/jabber/cert-oracle/recv-ssl-certs.sh parsni.ps >> /var/log/jabber-cert-oracle.log 2>&1

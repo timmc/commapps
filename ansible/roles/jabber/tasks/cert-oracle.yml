@@ -1,0 +1,66 @@
+# This is a hacky way of allowing the Prosody Jabber server to get Let's
+# Encrypt certs from NFSN.
+#
+# One-time config:
+# 1. Create an SSH key on the controller machine for transferring SSL
+# certs to the jabber machine, no passphrase:
+#
+# ```
+# ssh-keygen -t rsa -b 4096 -C "cert-oracle on NFSN" -P '' -f ~/www/bof/private/sync/ID_certs-for-jabber
+# chmod g=,o= private/sync/ID_cert-oracle*
+# (cd ~/www/bof; ./upload-site.sh)
+# ```
+#
+# On the jabber machine, this ansible script creates a user that accepts
+# that key, and a cron job to install received certs.
+#
+# In NFSN control panel, add cron task to run
+# `/home/private/sync/cert-oracle/update-certs.sh` as `me` in `ssh`
+# environment on day 28 of each month.
+
+
+---
+- name: Create cert-receiving user
+  user:
+    name: cert-recv
+
+- name: Make sure cert-recv has valid .ssh dir
+  file:
+    state: directory
+    path: /home/cert-recv/.ssh
+    owner: cert-recv
+    group: cert-recv
+    mode: 0700
+
+- name: Authorized pubkeys for cert oracle SSH access
+  copy:
+    src: "{{ role_path }}/files/cert-oracle/authorized_keys"
+    dest: /home/cert-recv/.ssh/authorized_keys
+    owner: cert-recv
+    group: cert-recv
+
+- name: Directory for receiving certs
+  file:
+    state: directory
+    path: /home/cert-recv/recv
+    owner: cert-recv
+    group: cert-recv
+
+- name: Directory for cert oracle scripts
+  file:
+    state: directory
+    path: /opt/commdata/jabber/cert-oracle
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Script for installing received certs
+  copy:
+    src: "{{ role_path }}/files/cert-oracle/recv-ssl-certs.sh"
+    dest: /opt/commdata/jabber/cert-oracle/recv-ssl-certs.sh
+    mode: 0755
+
+- name: Cron job to run the cert-receiving script
+  copy:
+    src: "{{ role_path }}/files/cert-oracle/recv-ssl-certs.cron"
+    dest: /etc/cron.d/jabber-cert-oracle
