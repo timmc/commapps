@@ -10,9 +10,9 @@
   file:
     state: directory
     path: /opt/commdata/jabber
-    mode: 0750
     owner: prosody
     group: prosody
+    mode: 0750
 
 # cert oracle depends on main jabber dir
 - include: cert-oracle.yml
@@ -21,18 +21,17 @@
   file:
     state: directory
     path: /opt/commdata/jabber/data
-    mode: 0750
     owner: prosody
     group: prosody
+    mode: 0750
 
 - name: Directory for Jabber TLS secrets
   file:
     state: directory
     path: /opt/commdata/jabber/tls
-    mode: 0750
     owner: prosody
     group: prosody
-    recurse: yes
+    mode: 0750
 
 # TODO: Use rsync module to convey the conf.d files all at once
 

@@ -8,3 +8,5 @@
     src: "{{ role_path }}/files/apt.conf.d/20auto-upgrades"
     dest: /etc/apt/apt.conf.d/20auto-upgrades
 
+# TODO: Monitoring for reboot-required, failed upgrades
+
