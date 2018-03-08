@@ -1,14 +1,16 @@
 ---
-- hosts: sandstorm
+- hosts: all
   remote_user: root
   roles:
   - common
+- hosts: sandstorm
+  remote_user: root
+  roles:
   - { role: sandstorm, sandstorm_base_domain: sandy.parsni.ps, commdata_dir: "/opt/commdata" }
   - { role: remote-backup, debversion: "stretch" }
 - hosts: jabber
   remote_user: root
   roles:
-  - common
   - jabber
 - hosts: dyndns
   remote_user: root
