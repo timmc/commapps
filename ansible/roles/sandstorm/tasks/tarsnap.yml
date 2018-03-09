@@ -58,3 +58,19 @@
     owner: root
     group: root
     mode: 0600
+
+- name: Install backup script
+  copy:
+    src: "{{ role_path }}/files/tarsnap/run-backup.sh"
+    dest: /opt/commdata/backups/run-backup.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install cron job
+  copy:
+    src: "{{ role_path }}/files/tarsnap/cron"
+    dest: /etc/cron.d/sandstorm-backup
+    owner: root
+    group: root
+    mode: 0644

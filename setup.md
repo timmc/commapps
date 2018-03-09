@@ -172,12 +172,6 @@ Created account `comm-tarsnap-commdata@brainonfire.net`
 
 Install tarsnap and provision key.
 
-## Automate
-```
-ln -ns /opt/commapps/repo/scripts/backup/cron /etc/cron.d/commdata-backup
-```
-
-
 # Encrypted swap space
 
 Reference: https://wiki.archlinux.org/index.php/Dm-crypt/Swap_encryption
