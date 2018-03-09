@@ -7,7 +7,6 @@
   remote_user: root
   roles:
   - { role: sandstorm, sandstorm_base_domain: sandy.parsni.ps, commdata_dir: "/opt/commdata" }
-  - { role: remote-backup, debversion: "stretch" }
 - hosts: jabber
   remote_user: root
   roles:

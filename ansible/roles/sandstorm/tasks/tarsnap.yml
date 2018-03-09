@@ -1,0 +1,76 @@
+---
+- name: Install Tarsnap deb packaging key
+  apt_key:
+    url: https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc
+    state: present
+    id: "8E64CEEC8767B49710E308F770BD6C50E82A9D99"
+
+- name: Discover Debian codename
+  shell: lsb_release --codename --short
+  register: sh_debversion
+  changed_when: False
+
+- name: Use Tarsnap package repository
+  copy:
+    content: |
+      # Ansible: remote-backup role
+      deb http://pkg.tarsnap.com/deb/{{ sh_debversion.stdout }} ./
+    dest: /etc/apt/sources.list.d/tarsnap.list
+
+- name: Install tarsnap
+  apt: name=tarsnap
+
+# TODO: Securely write tarsnap key file (pre-generated on management
+# computer)
+#
+# Create a full key, generate read/write-only and full (but
+# passphrase-protected) variants, save off the full key, and shred
+# it. Passphrase is stored in `tarsnap-full.passphrase.gpg` on
+# management machine; full key stored in `tarsnap-full.key.gpg`.
+#
+# Full key is used for periodic deletions of old archives. Read/write
+# key cannot be used to delete archives (if an attacker gets into the
+# machine and wants to wipe it) but can be used to --fsck.
+#
+# **TODO**: Automate fsck after archive deletion/rotation (will need to
+# be done every time an archive is deleted using a different cache dir);
+# alternatively, push cache dir to host after deletions.
+#
+# ```
+# sudo mount -t tmpfs -o size=400M tmpfs ~/tmp/ram/
+# cd ~/tmp/ram
+# tarsnap-keygen --keyfile tarsnap-full.key --user comm-tarsnap-commdata@brainonfire.net --machine XXX_machine_name_XXX
+# tarsnap-keymgmt --outkeyfile tarsnap-rw.key -r -w tarsnap-full.key
+# tarsnap-keymgmt --outkeyfile tarsnap-full.passphrased.key --passphrased -r -w -d --nuke tarsnap-full.key
+# # Save off tarsnap-full.passphrased.key encrypted on management machine
+# # Provision host with tarsnap-rw.key
+# shred tarsnap-full.key
+# cd -
+# sudo umount ~/tmp/ram
+# ```
+
+- name: Ensure tarsnap key is in place
+  file:
+    # TODO Move this to /opt/commdata/sandstorm/backups/secrets/ once
+    # sandstorm itself has been moved to a subdirectory.
+    path: /opt/commdata/backups/tarsnap-rw.key
+    state: file
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Install backup script
+  copy:
+    src: "{{ role_path }}/files/tarsnap/run-backup.sh"
+    dest: /opt/commdata/backups/run-backup.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install cron job
+  copy:
+    src: "{{ role_path }}/files/tarsnap/cron"
+    dest: /etc/cron.d/sandstorm-backup
+    owner: root
+    group: root
+    mode: 0644

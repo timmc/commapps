@@ -170,39 +170,7 @@ instructions:
 
 Created account `comm-tarsnap-commdata@brainonfire.net`
 
-Install tarsnap.
-
-## Configure key
-
-Create a full key, generate read/write-only and full (but
-passphrase-protected) variants, save off the full key, and shred
-it. Passphrase is stored in `tarsnap-full.passphrase.gpg` on
-management machine; full key stored in `tarsnap-full.key.gpg`.
-
-Full key is used for periodic deletions of old archives. Read/write
-key cannot be used to delete archives (if an attacker gets into the
-machine and wants to wipe it) but can be used to --fsck.
-
-**TODO**: Automate fsck after archive deletion/rotation (will need to
-be done every time an archive is deleted using a different cache dir);
-alternatively, push cache dir to host after deletions.
-
-```
-mkdir /opt/commdata/backups
-pushd /opt/commdata/backups
-tarsnap-keygen --keyfile tarsnap-full.key --user comm-tarsnap-commdata@brainonfire.net --machine toster
-tarsnap-keymgmt --outkeyfile tarsnap-rw.key -r -w tarsnap-full.key
-tarsnap-keymgmt --outkeyfile tarsnap-full.passphrased.key --passphrased -r -w -d --nuke tarsnap-full.key
-less tarsnap-full.key # save this off somewhere...
-shred tarsnap-full.key
-popd
-```
-
-## Automate
-```
-ln -ns /opt/commapps/repo/scripts/backup/cron /etc/cron.d/commdata-backup
-```
-
+Install tarsnap and provision key.
 
 # Encrypted swap space
 
