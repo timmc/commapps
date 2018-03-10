@@ -25,7 +25,7 @@
     dest: /opt/commdata/dyndns/dns-update.sh
     owner: root
     group: root
-    mode: 0775
+    mode: 0755
 
 - name: Install dyndns cron job
   copy:
@@ -33,4 +33,4 @@
     dest: /etc/cron.d/dyndns-afraid-org-update
     owner: root
     group: root
-    mode: 0664
+    mode: 0644
