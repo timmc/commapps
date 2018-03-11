@@ -1,0 +1,32 @@
+# A playbook to install ansible public keys as authorized key for the
+# root user on a newly set up raspberry pi (well, anything with pi
+# user with passwordless sudo)
+#
+# Usage:
+# HOSTNAME=kibble
+# ansible-playbook bootstrap-pi.yml --inventory="$HOSTNAME.internal," --user=pi --ask-pass --become --become-user=root --extra-vars="root_authkeys_path=/home/timmc/.ssh/id_ansible_root.pub hostname=$HOSTNAME"
+
+---
+- hosts: all
+  tasks:
+  - name: Ensure root has valid .ssh dir
+    file:
+      state: directory
+      path: /root/.ssh
+      owner: root
+      group: root
+      mode: 0700
+  - name: Ensure ansible root pubkey is authorized for root
+    copy:
+      src: "{{ root_authkeys_path }}"
+      dest: /root/.ssh/authorized_keys
+      owner: root
+      group: root
+      mode: 644
+  - name: Set hostname
+    hostname:
+      name: "{{ hostname }}"
+  - name: Update software
+    apt:
+      update_cache: yes
+      upgrade: dist
