@@ -10,4 +10,10 @@ toster.internal
 [laptops]
 toster.internal
 
+[unused]
+# Hosts are mentioned here so that they have *any* presence in the
+# file and thus get included in "all hosts"
+kibble.internal
+murphy.internal
+
 # TODO: Define kibble as a bastion host
