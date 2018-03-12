@@ -21,7 +21,7 @@ mountpoint -q /opt/commdata || {
 # Give each snaptime file a different path based on ID, just in case
 # of concurrent runs. For correctness this should be created *before*
 # the snapshot is taken; for performance it should not be *too* long
-# before.
+# before, says Colin Percival.
 
 snaptime_path="/tmp/commdata-snaptime-$snapshot_id.ref"
 touch "$snaptime_path"
@@ -49,7 +49,8 @@ tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         --snaptime "$snaptime_path" \
         -C /opt/commdata/.zfs/snapshot/"$snapshot_id" \
         --humanize-numbers \
-        ./sandstorm
+        ./sandstorm \
+        ./jabber/data # FIXME don't require jabber and sandstorm on same box
 tarsnap_exit=$?
 
 rm -- "$snaptime_path"

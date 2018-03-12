@@ -1,6 +1,10 @@
 [sandstorm]
 toster.internal
 
+# NB: Currently, the backup script assumes sandstorm and jabber are
+# running on the same machine! (And is bundled with the sandstorm
+# config.)
+
 [jabber]
 toster.internal
 
