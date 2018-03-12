@@ -1,6 +1,6 @@
 # OS
 
-Debian 8 (Jessie) - stable
+Debian 9 (Stretch) - stable
 
 # Partitioning
 
@@ -21,14 +21,7 @@ Device     Boot     Start       End   Sectors   Size Id Type
 /dev/sda6       299806720 312580095  12773376   6.1G 83 Linux
 ```
 
-
-# With physical access
-
-Set up `/home/timmc/.ssh/authorized_keys` and record fingerprint of
-`ssh-keygen -lf /etc/ssh/ssh_host_ecdsa_key.pub`. Note the LAN IP
-address as well.
-
-## Get wifi working
+# Apt sources
 
 ```
 echo 'deb http://debian.csail.mit.edu/debian jessie main contrib non-free
@@ -40,10 +33,6 @@ deb-src http://debian.csail.mit.edu/debian jessie-updates main contrib non-free
 deb http://security.debian.org/ jessie/updates main contrib non-free
 deb-src http://security.debian.org/ jessie/updates main contrib non-free
 ' | sudo tee /etc/apt/sources.list
-apt-get update
-apt-get install firmware-iwlwifi
-modprobe -r iwlwifi
-modprobe iwlwifi
 ```
 
 Now set up port forwarding in router and use SSH for remaining config.

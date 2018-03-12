@@ -1,9 +1,9 @@
 ---
-- name: "Install basic sysadmin tools: ssh"
+- name: install ssh
   apt: name=ssh
-- name: "Install basic sysadmin tools: emacs"
+- name: install emacs
   apt: name=emacs
-- name: "Install basic sysadmin tools: screen"
+- name: install screen
   apt: name=screen
-- name: "Install basic sysadmin tools: curl"
+- name: install curl
   apt: name=curl

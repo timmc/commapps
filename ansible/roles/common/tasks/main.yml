@@ -8,5 +8,7 @@
   copy:
     src: "{{ role_path }}/files/sshd_config"
     dest: "/etc/ssh/sshd_config"
+    owner: root
+    group: root
     mode: 0644
   notify: reload sshd config
