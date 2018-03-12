@@ -161,6 +161,13 @@ Created account `comm-tarsnap-commdata@brainonfire.net`
 
 Install tarsnap and provision key.
 
+Instructions for clearing old archives:
+
+- List archives: `tarsnap --list-archives --keyfile /opt/commdata/backups/tarsnap-rw.key | sort > archives.lst`
+- `cp archives.lst delete.lst` and then edit the latter
+- `tarsnap -d --archive-names delete.lst --keyfile /opt/commdata/backups/tarsnap-full.passphrased.key --print-stats --humanize-numbers`
+- `tarsnap --fsck`
+
 # Encrypted swap space
 
 Reference: https://wiki.archlinux.org/index.php/Dm-crypt/Swap_encryption
