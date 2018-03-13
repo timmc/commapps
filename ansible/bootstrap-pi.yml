@@ -4,7 +4,7 @@
 #
 # Usage:
 # HOSTNAME=kibble
-# ansible-playbook bootstrap-pi.yml --inventory="$HOSTNAME.internal," --user=pi --ask-pass --become --become-user=root --extra-vars="root_authkeys_path=/home/timmc/.ssh/id_ansible_root.pub hostname=$HOSTNAME"
+# ansible-playbook bootstrap-pi.yml --inventory="$HOSTNAME.internal," --user=pi --ask-pass --become --become-user=root --extra-vars="root_authkeys_path=/home/timmc/.ssh/id_ansible_parsnips.pub hostname=$HOSTNAME"
 
 ---
 - hosts: all
