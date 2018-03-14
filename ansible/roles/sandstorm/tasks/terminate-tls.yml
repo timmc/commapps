@@ -31,18 +31,12 @@
     dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.chain.pem"
   notify: nginx reload config
 
-# TODO: Find satisfactory way to convey priate key; for now, nginx will fail
-# to reload, and you'll just have to write this file yourself and re-run.
-
-# # provide vars: sandstorm_tls_private_key
-# - include_vars: "{{ role_path }}/vars/vault.yml"
-#   no_log: true
-# - name: "Private key"
-#   copy:
-#     content: "{{ sandstorm_tls_private_key }}"
-#     dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.key"
-#   no_log: true
-#   notify: nginx reload config
+- name: "Private key"
+  copy:
+    content: "{{ sandstorm_tls_private_key }}"
+    dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.key"
+  no_log: true
+  notify: nginx reload config
 
 - name: Sandstorm nginx configuration
   template:
