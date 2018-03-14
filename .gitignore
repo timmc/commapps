@@ -1,1 +1,2 @@
 /ansible/vault-passphrase.gpg
+/ansible/group_vars/*/vault.yml

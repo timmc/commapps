@@ -8,9 +8,6 @@
     group: root
     mode: 0600
 
-# Secret token can be rotated at
-# https://freedns.afraid.org/dynamic/?action=rotatekey
-
 - name: Write afraid.org secret token
   copy:
     content: "{{ dyndns_afraidorg_token }}"

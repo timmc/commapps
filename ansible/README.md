@@ -51,3 +51,17 @@ instead run this command:
 ```
 ansible-playbook parsnips.yml -i hosts.prod --ask-vault-pass
 ```
+
+## Secrets
+
+Secrets are stored in `ansible/group_vars/*/vault.yml` vault variable
+files for each relevant host group. Each secret variable has the
+`vault_` prefix, and is accompanied by an assignment in an
+accompanying `vars.yml` file to a variable *without* that
+prefix. (This is a common Ansible pattern.)
+
+The `vault.yml` files are not in source control. The assignments in
+the indirection files should each have a comment describing the secret
+-- how it was generated, and the last date it was generated, or any
+changed inputs. This is in lieu of versioning the actual secret, but
+still provides for some degree of version history.
