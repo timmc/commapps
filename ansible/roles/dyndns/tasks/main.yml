@@ -8,13 +8,13 @@
     group: root
     mode: 0600
 
-# TODO Automatically install secret token
+# Secret token can be rotated at
+# https://freedns.afraid.org/dynamic/?action=rotatekey
 
-# Secret token can be rotated at https://freedns.afraid.org/dynamic/?action=rotatekey
-- name: Ensure afraid.org secret is present
-  file:
-    state: file
-    path: /opt/commdata/dyndns/secrets/afraid.org-token-home
+- name: Write afraid.org secret token
+  copy:
+    content: "{{ dyndns_afraidorg_token }}"
+    dest: /opt/commdata/dyndns/secrets/afraid.org-token-home
     owner: root
     group: root
     mode: 0600
