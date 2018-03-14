@@ -27,10 +27,13 @@
     - **TODO**: Monitoring for lingering ZFS snapshots
     - **TODO**: Schedule and perform a restore-from-backup exercise
 - Security
-    - **TODO**: Enable automatic security updates
+    - Done: Enable automatic security updates
+        - **TODO**: Notifications for completed updates that require reboot
     - **TODO**: Set up monitoring for non-security updates, and
       notifications of automatically applied updates
     - **TODO**: Find and go through a Debian hardening checklist
 - Availability
-    - **TODO**: Set up monitoring: Uptime
+    - Done: Set up monitoring: Uptime
+    - **TODO**: More advanced monitoring (running out of disk, high
+      memory usage, log errors...)
     - **TODO**: Set up monitoring: SSL cert expiration
