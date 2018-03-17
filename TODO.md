@@ -7,6 +7,7 @@
         - Done: Set up nginx with reverse proxy terminating wildcard
           TLS for Sandstorm
         - Done: Wildcard DNS via NFSN
+    - **TODO**: Move from afraid.org freedns to using NFSN DNS API
 - Repeatability
     - Done: Server rebuilt from (manual) runbook
     - **TODO**: Create automated runbook
@@ -25,7 +26,9 @@
         - Ideally, monitor should attempt to retrieve a file from the
           most recent backup and report the age of the backup.
     - **TODO**: Monitoring for lingering ZFS snapshots
-    - **TODO**: Schedule and perform a restore-from-backup exercise
+    - **TODO**: Perform a restore-from-backup exercise & schedule for
+      quarterly execution
+        - **TODO**: Monitoring on this somehow?
 - Security
     - Done: Enable automatic security updates
         - **TODO**: Notifications for completed updates that require reboot
