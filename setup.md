@@ -119,18 +119,6 @@ zpool create -m legacy commdata /dev/mapper/con-commdata
 mount -t zfs /dev/mapper/con-commdata /opt/commdata
 ```
 
-## Install startup service
-
-We have systemd v215, but need at least v228 (?) in order to enable a
-symlinked unit file: https://github.com/systemd/systemd/issues/1836
-
-```
-cp /opt/commapps/repo/scripts/encfs/systemd-service /etc/systemd/system/commapps.service
-systemctl daemon-reload
-systemctl enable commapps.service
-```
-
-
 # Sandstorm
 
 ```

@@ -8,8 +8,8 @@ Before=nginx.service
 [Service]
 Type=oneshot
 RemainAfterExit=True
-ExecStart=/opt/commapps/repo/scripts/encfs/open.sh
-ExecStop=/opt/commapps/repo/scripts/encfs/close.sh
+ExecStart=/opt/commapps/encfs/open.sh
+ExecStop=/opt/commapps/encfs/close.sh
 
 [Install]
 RequiredBy=sandstorm.service

@@ -1,0 +1,48 @@
+---
+- name: Location for encrypted partition scripts
+  file:
+    state: directory
+    path: /opt/commapps/encfs
+    recurse: yes
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for unlocking encrypted partition
+  copy:
+    src: "{{ role_path }}/files/encfs/open.sh"
+    dest: /opt/commapps/encfs/open.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for locking encrypted partition
+  copy:
+    src: "{{ role_path }}/files/encfs/close.sh"
+    dest: /opt/commapps/encfs/close.sh
+    owner: root
+    group: root
+    mode: 0755
+
+# If this is ever converted to a symlink for some reason, note that
+# you'll need systemd v228 (I think) or higher in order to enable a
+# symlinked unit file: https://github.com/systemd/systemd/issues/1836
+
+- name: systemd service for encrypted partition
+  copy:
+    src: "{{ role_path }}/files/encfs/commdata.service"
+    dest: /etc/systemd/system/commdata.service
+    owner: root
+    group: root
+    mode: 0644
+  register: task_install_encfs_service
+
+- name: Reload systemd config if we added or changed a service
+  command: systemctl daemon-reload
+  when: task_install_encfs_service | changed
+
+- name: Enable encrypted partition service
+  service:
+    name: commdata
+    enabled: yes
+    state: started
