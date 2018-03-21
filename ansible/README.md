@@ -42,14 +42,14 @@ export VAULT_PASSPHRASE_GPG_FILE=vault-passphrase.gpg
 And run the parsnips.yml playbook on the production hosts inventory:
 
 ```
-ansible-playbook parsnips.yml -i hosts.prod --vault-password-file=open-vault.sh
+ansible-playbook parsnips.yml -i prod.ini --vault-password-file=open-vault.sh
 ```
 
 If you're not using gpg-agent to manage the vault password file,
 instead run this command:
 
 ```
-ansible-playbook parsnips.yml -i hosts.prod --ask-vault-pass
+ansible-playbook parsnips.yml -i prod.ini --ask-vault-pass
 ```
 
 ## Secrets
