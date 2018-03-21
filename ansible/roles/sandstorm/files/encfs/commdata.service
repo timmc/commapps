@@ -4,6 +4,8 @@ Description=Community Data partition
 Before=sandstorm.service
 # nginx is configured to look for TLS certs & keys in /opt/commdata/secrets
 Before=nginx.service
+# Account data is stored in /opt/commdata/jabber/data
+Before=prosody.service
 
 [Service]
 Type=oneshot
@@ -14,3 +16,26 @@ ExecStop=/opt/commapps/encfs/close.sh
 [Install]
 RequiredBy=sandstorm.service
 RequiredBy=nginx.service
+RequiredBy=prosody.service
+
+# Note that this file lists *all possible* services that might be
+# storing data in this partition. Systemd will ignore the ones that
+# aren't installed.
+#
+# Including just the relevant and installed services is non-trivial in
+# Ansible, since when it checks or regenerates the file, it won't
+# necessarily know which lines are needed -- there's not enough
+# context, especially if I run just subsets of playbooks, or the order
+# changes.
+#
+# An alternative, if this stops being workable or palatable, would be
+# to use a systemd-generator and call `systemctl daemon-reload` to
+# regenerate the unit file from a collection of fragments in a
+# directory (still kind of order-dependent). Or, could use a custom
+# generator called by ansible (if the systemd native approach doesn't
+# work.)
+#
+# Finally, we could switch to overwriting the nginx, sandstorm,
+# prosody, etc. service files to include a *forward* dependency
+# on commdata instead of a list of reverse dependencies here. This
+# would probably have to be a last resort.
