@@ -3,6 +3,10 @@
   remote_user: root
   roles:
   - common
+- hosts: commdata
+  remote_user: root
+  roles:
+  - commdata
 - hosts: sandstorm
   remote_user: root
   roles:

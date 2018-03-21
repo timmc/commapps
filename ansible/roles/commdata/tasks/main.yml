@@ -10,7 +10,7 @@
 
 - name: Script for unlocking encrypted partition
   copy:
-    src: "{{ role_path }}/files/encfs/open.sh"
+    src: "{{ role_path }}/files/open.sh"
     dest: /opt/commapps/encfs/open.sh
     owner: root
     group: root
@@ -18,7 +18,7 @@
 
 - name: Script for locking encrypted partition
   copy:
-    src: "{{ role_path }}/files/encfs/close.sh"
+    src: "{{ role_path }}/files/close.sh"
     dest: /opt/commapps/encfs/close.sh
     owner: root
     group: root
@@ -30,7 +30,7 @@
 
 - name: systemd service for encrypted partition
   copy:
-    src: "{{ role_path }}/files/encfs/commdata.service"
+    src: "{{ role_path }}/files/commdata.service"
     dest: /etc/systemd/system/commdata.service
     owner: root
     group: root
