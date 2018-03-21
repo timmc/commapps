@@ -22,7 +22,7 @@
       dest: /root/.ssh/authorized_keys
       owner: root
       group: root
-      mode: 644
+      mode: 0644
   - name: Set hostname
     hostname:
       name: "{{ hostname }}"
