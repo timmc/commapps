@@ -1,4 +1,19 @@
 ---
+- name: Ensure root has valid .ssh dir
+  file:
+    state: directory
+    path: /root/.ssh
+    owner: root
+    group: root
+    mode: 0700
+- name: Ensure ansible root pubkey is authorized for root
+  copy:
+    src: "{{ role_path }}/files/id_ansible_parsnips.pub"
+    dest: /root/.ssh/authorized_keys
+    owner: root
+    group: root
+    mode: 0644
+
 # FIXME: include is deprecated; use import_tasks when upgrade from
 # ansible 2.2 to 2.4
 - include: sysadmin-tools.yml
