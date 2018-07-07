@@ -2,9 +2,21 @@
 - name: Install prosody
   apt: name=prosody
 
-- name: Install extra prosody modules
-  apt: name=prosody-modules
+- name: "Don't install extra prosody modules -- vendored in instead for consistent and recent versions"
+  apt:
+    name: prosody-modules
+    state: absent
   notify: Restart prosody
+
+- name: Directory for Prosody modules
+  file:
+    state: directory
+    path: "/opt/commapps/prosody/modules/"
+
+- name: Install Prosody modules
+  synchronize:
+    src: "{{ role_path }}/files/prosody/modules/"
+    dest: "/opt/commapps/prosody/modules/"
 
 - name: Directory for Jabber data in general
   file:

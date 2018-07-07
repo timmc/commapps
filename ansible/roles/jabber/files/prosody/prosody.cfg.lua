@@ -5,6 +5,9 @@ admins = { "cortex@brainonfire.net" }
 -- Better perf; requires libevent to be installed
 use_libevent = true
 
+-- Load extra modules from here
+plugin_paths = { "/opt/commapps/prosody/modules/community" }
+
 -- Modules to load on startup.
 -- Documentation for builtin modules: https://prosody.im/doc/modules
 
@@ -20,12 +23,20 @@ modules_enabled = {
   -- "Conversations" support
     "carbons"; -- Keep multiple clients in sync
     "mam"; -- XEP-0313 message archives
+    "privacy_lists"; -- required for mod_blocking
+    "blocking"; -- XEP-0191: Simple Communications Blocking support
+    "csi"; -- client state indication
+    "http_upload";
+    -- Disabled until I decide whether this is a terrible idea to enable, privacy-wise:
+    -- "cloud_notify"; -- Push notifications
+    "omemo_all_access"; -- Allow users to start OMEMO conversations without pre-existing mutual subscription
+    "smacks"; -- Fast reconnect
+    -- Disabled until I can be sure all users' clients have MAM support:
+    -- "smacks_noerror"; -- Suppresses "unacked message" warnings
 
   -- Not essential, but recommended
     "pep"; -- Enables users to publish their mood/activity/now-playing, etc.
     "private"; -- Private XML storage (for room bookmarks, etc.)
-    -- Not in apt packages anymore:
-    -- "blocklist"; -- Allow users to block communications with other users
     "vcard"; -- Allow users to set vCards
 
   -- Nice to have
