@@ -17,8 +17,11 @@ modules_enabled = {
     "disco"; -- Service discovery
     "posix"; -- For prosodyctl
 
-  -- Not essential, but recommended
+  -- "Conversations" support
     "carbons"; -- Keep multiple clients in sync
+    "mam"; -- XEP-0313 message archives
+
+  -- Not essential, but recommended
     "pep"; -- Enables users to publish their mood/activity/now-playing, etc.
     "private"; -- Private XML storage (for room bookmarks, etc.)
     -- Not in apt packages anymore:
