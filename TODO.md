@@ -10,8 +10,13 @@
     - **TODO**: Move from afraid.org freedns to using NFSN DNS API
 - Repeatability
     - Done: Server rebuilt from (manual) runbook
-    - **TODO**: Create automated runbook
+    - **TODO**: Create automated runbook for post-OS setup
         - Partially complete, using Ansible
+    - **TODO**: Create automated process for initial install (or
+        creating an automated bootable installer)
+        - Needs to handle creating partitions
+        - Consider using Intel PXE, or Debian preseed
+          (e.g. https://github.com/chef/bento/tree/master/debian/scripts)
 - Privacy
     - Done: Sandstorm moved to encrypted partition (passphrase not on same disk)
     - Done: No other services present on rebuilt server
