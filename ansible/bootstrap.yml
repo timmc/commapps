@@ -1,8 +1,13 @@
 # A playbook to install ansible public keys as authorized key for the
 # root user on a newly set up host.
 #
-# Example usage:
-# ansible-playbook bootstrap.yml --ask-pass --become --become-user=root --ask-become-pass --extra-vars="root_authkeys_path=roles/common/files/id_ansible_parsnips.pub hostname=__HOSTNAME_GOES_HERE__" --inventory="10.0.178.58," --user=pi
+# Usage:
+#
+# HOSTNAME=kibble
+# USER=pi
+# HOSTADDR=$HOSTNAME.internal
+# PUBKEY=roles/common/files/id_ansible_parsnips.pub
+# ansible-playbook bootstrap.yml --ask-pass --become --become-user=root --ask-become-pass --extra-vars="root_authkeys_path=$PUBKEY hostname=$HOSTNAME" --inventory="$HOSTADDR," --user="$USER"
 
 ---
 - hosts: all

@@ -1,8 +1,64 @@
 # OS
 
-Debian 9 (Stretch) - stable
+- Regular servers: Debian 9 (Stretch) - stable
+- Raspberry Pi: Raspbian Stretch
+
+## Raspberry Pi
+
+### Manual bootstrap
+
+- Write 2017-11-29-raspbian-stretch-lite.img to SD card
+- Connect SD card, component video, keyboard, and power
+- Log in: pi/raspberry (may need to hit enter to see prompt)
+- `sudo raspi-config`
+    - "Change User Password"
+        - Use something high-entropy (can throw it away once root SSH
+          is set up)
+    - "Update"
+    - "Advanced" -> "Expand filesystem"
+    - "Advanced" -> "Memory Split"
+        - Set GPU memory from 64 down to 16
+    - "Exit" (don't reboot yet)
+- `sudo systemctl enable ssh`
+- `sudo systemctl start ssh`
+- `ssh-keygen -l -f /etc/ssh/ssh_host_ecdsa_key.pub`
+    - Output: `ECDSA SHA256:0123456789ABCDEF0123456789ABCDEF0123456789A`
+- Connect ethernet
+- From controller machine, ssh to pi@HOSTNAME.internal and verify fingerprint
+- `sudo shutdown -r now`
+- Disconnect keyboard and video; everything else is over SSH
+- Baseline: Use ansible playbook bootstrap.yml to bootstrap:
+
+```
+HOSTNAME=_____
+USER=pi
+HOSTADDR=$HOSTNAME.internal
+PUBKEY=/home/timmc/.ssh/id_ansible_personal.pub
+ansible-playbook bootstrap.yml --ask-pass --become --become-user=root --ask-become-pass --extra-vars="root_authkeys_path=$PUBKEY hostname=$HOSTNAME" --inventory="$HOSTADDR," --user="$USER"
+```
+
+Alternative when no video available: Touch file `ssh` on boot
+partition to enable ssh, and immediately log in as pi user on ssh to
+change the user's default password, then proceed with rest of config
+-- including the enable/start ssh, since otherwise some systemd
+symlinks aren't properly created.
 
 # Partitioning
+
+Partitioning example on murphy (mounted on controller):
+
+- `fdisk -l /dev/sdb`
+- `e2fsck -f /dev/sdb2`
+- `resize2fs /dev/sdb2 4G` (shrink the root FS)
+- `parted /dev/sdb`
+    - `print`
+    - `resizepart 2 5GB` (specifies new *end location*, not size)
+    - `mkpart extended 5GB 100%`
+    - `mkpart logical 5GB 15GB`
+    - `mkpart logical 15GB 100%`
+- `resize2fs /dev/sdb2` (re-expand the root FS)
+
+Sample partitioning result from toster:
 
 ```
 $ fdisk -l
