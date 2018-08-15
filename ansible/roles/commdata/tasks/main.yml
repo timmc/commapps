@@ -1,4 +1,12 @@
 ---
+- name: Mountpoint for encrypted partition
+  file:
+    state: directory
+    path: /srv/commdata
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Location for encrypted partition scripts
   file:
     state: directory

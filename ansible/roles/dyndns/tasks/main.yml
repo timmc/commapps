@@ -3,7 +3,7 @@
 - name: Directory for dyndns secrets
   file:
     state: directory
-    path: /opt/commdata/dyndns/secrets
+    path: /srv/commdata/dyndns/secrets
     owner: root
     group: root
     mode: 0600
@@ -11,7 +11,7 @@
 - name: Write afraid.org secret token
   copy:
     content: "{{ dyndns_afraidorg_token }}"
-    dest: /opt/commdata/dyndns/secrets/afraid.org-token-home
+    dest: /srv/commdata/dyndns/secrets/afraid.org-token-home
     owner: root
     group: root
     mode: 0600
@@ -20,7 +20,7 @@
 - name: Install dyndns updater script
   copy:
     src: "{{ role_path }}/files/dns-update.sh"
-    dest: /opt/commdata/dyndns/dns-update.sh
+    dest: /srv/commdata/dyndns/dns-update.sh
     owner: root
     group: root
     mode: 0755

@@ -1,8 +1,8 @@
 VirtualHost "parsni.ps"
 
 ssl = {
-  key = "/opt/commdata/jabber/tls/parsni.ps.key";
-  certificate = "/opt/commdata/jabber/tls/parsni.ps.chain.pem";
+  key = "/srv/commdata/jabber/tls/parsni.ps.key";
+  certificate = "/srv/commdata/jabber/tls/parsni.ps.chain.pem";
   -- `openssl dhparam -out dhparam.pem 4096` on another machine
   -- Does not seem to enable forward secrecy? Anyway, ECDHE is better.
   -- dhparam = "/etc/prosody/certs/dh-4096.pem";

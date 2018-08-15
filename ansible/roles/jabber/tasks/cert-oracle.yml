@@ -49,7 +49,7 @@
 - name: Directory for cert oracle scripts
   file:
     state: directory
-    path: /opt/commdata/jabber/cert-oracle
+    path: /srv/commdata/jabber/cert-oracle
     mode: 0755
     owner: root
     group: root
@@ -57,7 +57,7 @@
 - name: Script for installing received certs
   copy:
     src: "{{ role_path }}/files/cert-oracle/recv-ssl-certs.sh"
-    dest: /opt/commdata/jabber/cert-oracle/recv-ssl-certs.sh
+    dest: /srv/commdata/jabber/cert-oracle/recv-ssl-certs.sh
     mode: 0755
 
 - name: Cron job to run the cert-receiving script

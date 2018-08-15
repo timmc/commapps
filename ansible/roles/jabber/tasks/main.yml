@@ -21,7 +21,7 @@
 - name: Directory for Jabber data in general
   file:
     state: directory
-    path: /opt/commdata/jabber
+    path: /srv/commdata/jabber
     owner: prosody
     group: prosody
     mode: 0750
@@ -32,7 +32,7 @@
 - name: Directory for Prosody data
   file:
     state: directory
-    path: /opt/commdata/jabber/data
+    path: /srv/commdata/jabber/data
     owner: prosody
     group: prosody
     mode: 0750
@@ -40,7 +40,7 @@
 - name: Directory for Jabber TLS secrets
   file:
     state: directory
-    path: /opt/commdata/jabber/tls
+    path: /srv/commdata/jabber/tls
     owner: prosody
     group: prosody
     mode: 0750

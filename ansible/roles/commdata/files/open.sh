@@ -12,4 +12,4 @@ cryptsetup --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt \
 # the partition is decrypted.
 zpool import commdata
 
-mount -t zfs /dev/mapper/con-commdata /opt/commdata
+mount -t zfs /dev/mapper/con-commdata /srv/commdata

@@ -75,7 +75,7 @@ s2s_secure_domains = { "parsni.ps", "brainonfire.net" }
 -- Required for init scripts and prosodyctl [default]
 pidfile = "/var/run/prosody/prosody.pid"
 
-data_path = "/opt/commdata/jabber/data"
+data_path = "/srv/commdata/jabber/data"
 
 authentication = "internal_hashed"
 

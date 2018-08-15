@@ -1,10 +1,10 @@
 [Unit]
 Description=Community Data partition
-# sandstorm runs entirely out of /opt/commdata/sandstorm
+# sandstorm runs entirely out of /srv/commdata/sandstorm
 Before=sandstorm.service
-# nginx is configured to look for TLS certs & keys in /opt/commdata/secrets
+# nginx is configured to look for TLS certs & keys in /srv/commdata/secrets
 Before=nginx.service
-# Account data is stored in /opt/commdata/jabber/data
+# Account data is stored in /srv/commdata/jabber/data
 Before=prosody.service
 
 [Service]

@@ -51,9 +51,9 @@
 
 - name: Ensure tarsnap key is in place
   file:
-    # TODO Move this to /opt/commdata/sandstorm/backups/secrets/ once
+    # TODO Move this to /srv/commdata/sandstorm/backups/secrets/ once
     # sandstorm itself has been moved to a subdirectory.
-    path: /opt/commdata/backups/tarsnap-rw.key
+    path: /srv/commdata/backups/tarsnap-rw.key
     state: file
     owner: root
     group: root
@@ -62,7 +62,7 @@
 - name: Install backup script
   copy:
     src: "{{ role_path }}/files/tarsnap/run-backup.sh"
-    dest: /opt/commdata/backups/run-backup.sh
+    dest: /srv/commdata/backups/run-backup.sh
     owner: root
     group: root
     mode: 0755

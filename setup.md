@@ -169,10 +169,10 @@ cryptsetup --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt open /dev/sda5 co
 
 ## Create ZFS pool with manual mounting
 ```
-mkdir /opt/commdata
+mkdir /srv/commdata
 # TODO: set canmount=noauto ?
 zpool create -m legacy commdata /dev/mapper/con-commdata
-mount -t zfs /dev/mapper/con-commdata /opt/commdata
+mount -t zfs /dev/mapper/con-commdata /srv/commdata
 ```
 
 # Sandstorm
@@ -185,7 +185,7 @@ bash install.sh
 Choose a developer install and set these options:
 
 - Don't expose only to localhost
-- Install into `/opt/commdata/sandstorm`
+- Install into `/srv/commdata/sandstorm`
 - Accept the `sandstorm` user but don't add own account to that group
 - Do start sandstorm at startup
 
@@ -207,9 +207,9 @@ Install tarsnap and provision key.
 
 Instructions for clearing old archives:
 
-- List archives: `tarsnap --list-archives --keyfile /opt/commdata/backups/tarsnap-rw.key | sort > archives.lst`
+- List archives: `tarsnap --list-archives --keyfile /srv/commdata/backups/tarsnap-rw.key | sort > archives.lst`
 - `cp archives.lst delete.lst` and then edit the latter
-- `tarsnap -d --archive-names delete.lst --keyfile /opt/commdata/backups/tarsnap-full.passphrased.key --print-stats --humanize-numbers`
+- `tarsnap -d --archive-names delete.lst --keyfile /srv/commdata/backups/tarsnap-full.passphrased.key --print-stats --humanize-numbers`
 - `tarsnap --fsck`
 
 # Encrypted swap space

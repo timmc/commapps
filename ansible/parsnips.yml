@@ -10,7 +10,7 @@
 - hosts: sandstorm
   remote_user: root
   roles:
-  - { role: sandstorm, sandstorm_base_domain: sandy.parsni.ps, commdata_dir: "/opt/commdata" }
+  - { role: sandstorm, sandstorm_base_domain: sandy.parsni.ps, commdata_dir: "/srv/commdata" }
 - hosts: jabber
   remote_user: root
   roles:

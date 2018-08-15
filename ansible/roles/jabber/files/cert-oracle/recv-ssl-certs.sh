@@ -9,7 +9,7 @@ set -eu -o pipefail
 DOMAIN=$1
 
 src_dir=/home/cert-recv/recv
-dest_dir=/opt/commdata/jabber/tls
+dest_dir=/srv/commdata/jabber/tls
 
 function install {
   hash_src=`sha256sum < "$1"`

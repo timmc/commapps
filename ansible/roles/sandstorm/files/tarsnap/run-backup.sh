@@ -13,7 +13,7 @@ function log {
 
 # Check if commdata is mounted before proceeding
 
-mountpoint -q /opt/commdata || {
+mountpoint -q /srv/commdata || {
   log "ERROR: Community data is not yet mounted"
   exit 2
 }
@@ -45,9 +45,9 @@ log "Running backup on $snapshot_id"
 # This uses a write-only tarsnap key.
 
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
-        --keyfile /opt/commdata/backups/tarsnap-rw.key \
+        --keyfile /srv/commdata/backups/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
-        -C /opt/commdata/.zfs/snapshot/"$snapshot_id" \
+        -C /srv/commdata/.zfs/snapshot/"$snapshot_id" \
         --humanize-numbers \
         ./sandstorm \
         ./jabber/data # FIXME don't require jabber and sandstorm on same box
