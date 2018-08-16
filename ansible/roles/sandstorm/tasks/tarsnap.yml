@@ -68,6 +68,14 @@
     group: root
     mode: 0755
 
+- name: Install archive listing script
+  copy:
+    src: "{{ role_path }}/files/tarsnap/list-archives.sh"
+    dest: /srv/commdata/backups/list-archives.sh
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Install cron job
   copy:
     src: "{{ role_path }}/files/tarsnap/cron"
