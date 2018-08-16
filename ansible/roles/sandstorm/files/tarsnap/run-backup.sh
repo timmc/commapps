@@ -42,7 +42,7 @@ zfs snapshot commdata@"$snapshot_id" || {
 
 log "Running backup on $snapshot_id"
 
-# This uses a write-only tarsnap key.
+# This uses a tarsnap key that can only read and write, but not delete
 
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         --keyfile /srv/commdata/backups/tarsnap-rw.key \
