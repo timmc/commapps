@@ -45,6 +45,9 @@
     group: prosody
     mode: 0750
 
+# TODO: Write: brainonfire.net.key parsni.ps.key
+# TODO: Demand presence of brainonfire.net.chain.pem parsni.ps.chain.pem (prompt to run cert-oracle)
+
 # TODO: Use rsync module to convey the conf.d files all at once
 
 - name: Directories for supporting configs
