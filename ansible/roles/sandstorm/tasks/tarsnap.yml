@@ -9,6 +9,7 @@
   shell: lsb_release --codename --short
   register: sh_debversion
   changed_when: False
+  check_mode: no
 
 - name: Use Tarsnap package repository
   copy:
