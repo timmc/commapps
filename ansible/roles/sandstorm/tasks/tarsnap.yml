@@ -60,10 +60,18 @@
     group: root
     mode: 0600
 
+- name: A place for tarsnap scripts
+  file:
+    state: directory
+    path: /opt/commapps/backups
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Install backup script
   copy:
     src: "{{ role_path }}/files/tarsnap/run-backup.sh"
-    dest: /srv/commdata/backups/run-backup.sh
+    dest: /opt/commapps/backups/run-backup.sh
     owner: root
     group: root
     mode: 0755
@@ -71,7 +79,7 @@
 - name: Install archive listing script
   copy:
     src: "{{ role_path }}/files/tarsnap/list-archives.sh"
-    dest: /srv/commdata/backups/list-archives.sh
+    dest: /opt/commapps/backups/list-archives.sh
     owner: root
     group: root
     mode: 0755
