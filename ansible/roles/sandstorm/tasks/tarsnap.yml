@@ -84,6 +84,14 @@
     group: root
     mode: 0755
 
+- name: Install archive restore script
+  copy:
+    src: "{{ role_path }}/files/tarsnap/restore-archive.sh"
+    dest: /opt/commapps/backups/restore-archive.sh
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Install cron job
   copy:
     src: "{{ role_path }}/files/tarsnap/cron"
