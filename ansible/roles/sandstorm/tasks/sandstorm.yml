@@ -4,3 +4,8 @@
     src: "{{ role_path }}/templates/sandstorm/sandstorm.conf.j2"
     dest: "{{ commdata_dir }}/sandstorm/sandstorm.conf"
   notify: restart sandstorm
+
+- name: "Ensure sandstorm is running"
+  service:
+    name: sandstorm
+    state: running
