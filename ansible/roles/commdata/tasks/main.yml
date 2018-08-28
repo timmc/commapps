@@ -42,11 +42,14 @@
     owner: root
     group: root
     mode: 0644
-  register: task_install_encfs_service
+  #register: task_install_encfs_service
 
-- name: Reload systemd config if we added or changed a service
+# Conditional reload doesn't seem to be sufficient; always reload it
+# for now, since it's idempotent.
+
+- name: Reload systemd config whether or not we added or changed a service
   command: systemctl daemon-reload
-  when: task_install_encfs_service | changed
+#  when: task_install_encfs_service | changed
 
 - name: Enable encrypted partition service
   service:
