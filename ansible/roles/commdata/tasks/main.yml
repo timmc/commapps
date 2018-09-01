@@ -1,4 +1,55 @@
 ---
+
+# First time setup:
+#
+# - Format a thumb drive with a GUID partition table (GPT)
+# - Create one partition: ext4, label "not-an-hsm"
+# - Run `sudo blkid /dev/sdb1` to find PARTUUID
+# - Create //host_vars/$HOST.yml with contents:
+#     ---
+#     commdata__key_partuuid: $PARTUUID
+
+
+- name: Mountpoint for not-an-hsm
+  file:
+    state: directory
+    path: /mnt/not-an-hsm
+
+- name: Automount for not-an-hsm
+  mount:
+    state: mounted
+    src: "PARTUUID={{ commdata__key_partuuid }}"
+    name: /mnt/not-an-hsm
+    fstype: ext4
+    opts: defaults
+    dump: 0
+    passno: 2
+
+- name: Directory for LUKS encryption key
+  file:
+    state: directory
+    path: /mnt/not-an-hsm/commdata/enckey
+    owner: root
+    group: root
+    mode: 0700
+
+- name: LUKS encryption key
+  shell: "tr -dc '[:graph:]' < /dev/urandom | head -c 32 > /mnt/not-an-hsm/commdata/enckey/pass.txt"
+  args:
+    creates: /mnt/not-an-hsm/commdata/enckey/pass.txt
+
+- name: Permissions for LUKS encryption key
+  file:
+    state: file
+    path: /mnt/not-an-hsm/commdata/enckey/pass.txt
+    owner: root
+    group: root
+    mode: 0700
+
+# TODO: PARTUUID for encrypted partition
+# TODO: luksFormat
+# TODO: Separate decrypt/mount scripts and services
+
 - name: Mountpoint for encrypted partition
   file:
     state: directory

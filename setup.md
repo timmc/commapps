@@ -130,18 +130,6 @@ defscrollback 5000
 vbell off' >> ~/.screenrc
 ```
 
-# Secrets store
-
-A meh place to store secrets like encryption passphrases required for
-startup:
-
-```
-mkdir /mnt/not-an-hsm
-echo 'UUID=c04b9188-0f23-4c85-b18b-718e6a631703 /mnt/not-an-hsm ext4 defaults 0 2' >> /etc/fstab
-mount -a
-```
-
-
 # Additional repos:
 
 For ZFS, among others:
@@ -154,12 +142,6 @@ apt-get update
 
 # Encrypted, snapshottable partition for community data
 apt-get install -t jessie-backports zfs-dkms
-
-## Set up passphrase file
-mkdir -p /mnt/not-an-hsm/commdata/enckey/
-chown root:root /mnt/not-an-hsm/commdata/enckey/
-chmod 700 /mnt/not-an-hsm/commdata/enckey/
-tr -d '\r\n' > /mnt/not-an-hsm/commdata/enckey/pass.txt
 
 ## Make LUKS-encrypted partition
 ```
