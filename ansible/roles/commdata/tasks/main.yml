@@ -58,19 +58,19 @@
 - name: "Does LUKS device exist?"
   shell: cryptsetup isLuks /dev/disk/by-partuuid/{{ commdata__luks_partuuid|quote }}
   failed_when: False
+  changed_when: False
   check_mode: no # run even in check mode
   register: commdata__isLuks
-  changed_when: commdata__isLuks.rc == 1
 
 - name: Collect entropy on controller
-  when: commdata__isLuks.changed
+  when: commdata__isLuks.rc == 1
   connection: local
   shell: "tr -dc '[:graph:]' < /dev/urandom | head -c 512"
   register: commdata__entropy
   check_mode: no
 
 - name: Boost entropy before using urandom for key material
-  when: commdata__isLuks.changed
+  when: commdata__isLuks.rc == 1
   shell: echo {{ commdata__entropy.stdout|quote }} > /dev/random
 
 
