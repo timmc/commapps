@@ -108,6 +108,39 @@
     dest: /opt/commapps/encfs/luks/lock.sh
     mode: 0755
 
+- name: Systemd unit file for encrypted partition
+  copy:
+    src: "{{ role_path }}/files/luks.service"
+    dest: /opt/commapps/encfs/luks/commdata-luks.service
+    mode: 0644
+  register: commdata__luks_service_file
+
+# This approach of using a symlinked unit file requires systemd v228
+# or higher, as far as I can tell:
+# https://github.com/systemd/systemd/issues/1836
+# This didn't work on Debian 8 (Jessie), but does on Debian 9 (Stretch)
+
+- name: Symlink encrypted partition unit file
+  file:
+    state: link
+    path: /etc/systemd/system/commdata-luks.service
+    src: /opt/commapps/encfs/luks/commdata-luks.service
+    force: yes # useful in check mode, when src didn't exist yet
+  register: commdata__luks_service_link
+
+# Conditional reload doesn't always seem to be sufficient, so watch
+# out for that.
+
+- name: Reload systemd config if luks unit file changed
+  command: systemctl daemon-reload
+  when: commdata__luks_service_file.changed or commdata__luks_service_link.changed
+
+- name: Enable encrypted partition service
+  service:
+    name: commdata-luks
+    enabled: yes
+    state: started
+
 
 - name: Mountpoint for encrypted partition
   file:
