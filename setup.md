@@ -151,7 +151,6 @@ cryptsetup --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt open /dev/sda5 co
 
 ## Create ZFS pool with manual mounting
 ```
-mkdir /srv/commdata
 # TODO: set canmount=noauto ?
 zpool create -m legacy commdata /dev/mapper/con-commdata
 mount -t zfs /dev/mapper/con-commdata /srv/commdata

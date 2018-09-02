@@ -8,7 +8,13 @@
 # - Create //host_vars/$HOST.yml with contents:
 #     ---
 #     commdata__key_partuuid: $PARTUUID
+# - TODO instructions on partitioning main drive
+# - Find partition UUID for logical partition used for LUKS, and add it
+#   to the host var file:
+#     commdata__luks_partuuid: $PARTUUID
 
+
+##== LUKS encrypted partition ==##
 
 - name: Mountpoint for not-an-hsm
   file:
@@ -45,6 +51,26 @@
     owner: root
     group: root
     mode: 0700
+
+- name: Install cryptsetup
+  apt: name=cryptsetup
+
+- name: Collect entropy on controller
+  connection: local
+  shell: "tr -dc '[:graph:]' < /dev/urandom | head -c 512"
+  check_mode: no
+  register: commdata__entropy
+
+- name: Boost entropy before using urandom for key material
+  shell: echo {{ commdata__entropy.stdout|quote }} > /dev/random
+
+- name: "Does LUKS device exist?"
+  shell: cryptsetup isLuks /dev/disk/by-partuuid/{{ commdata__luks_partuuid|quote }}
+  register: commdata__isLuks
+  failed_when: False
+  changed_when: False
+  check_mode: no # always run
+
 
 # TODO: PARTUUID for encrypted partition
 # TODO: luksFormat
