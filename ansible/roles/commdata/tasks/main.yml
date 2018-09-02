@@ -55,24 +55,26 @@
 - name: Install cryptsetup
   apt: name=cryptsetup
 
-- name: Collect entropy on controller
-  connection: local
-  shell: "tr -dc '[:graph:]' < /dev/urandom | head -c 512"
-  check_mode: no
-  register: commdata__entropy
-
-- name: Boost entropy before using urandom for key material
-  shell: echo {{ commdata__entropy.stdout|quote }} > /dev/random
-
 - name: "Does LUKS device exist?"
   shell: cryptsetup isLuks /dev/disk/by-partuuid/{{ commdata__luks_partuuid|quote }}
-  register: commdata__isLuks
   failed_when: False
-  changed_when: False
-  check_mode: no # always run
+  check_mode: no # run even in check mode
+  register: commdata__isLuks
+  changed_when: commdata__isLuks.rc == 1
+
+- name: Collect entropy on controller
+  when: commdata__isLuks.changed
+  connection: local
+  shell: "tr -dc '[:graph:]' < /dev/urandom | head -c 512"
+  register: commdata__entropy
+  check_mode: no
+
+- name: Boost entropy before using urandom for key material
+  when: commdata__isLuks.changed
+  shell: echo {{ commdata__entropy.stdout|quote }} > /dev/random
 
 
-# TODO: PARTUUID for encrypted partition
+
 # TODO: luksFormat
 # TODO: Separate decrypt/mount scripts and services
 
