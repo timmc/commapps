@@ -80,9 +80,15 @@
   when: commdata__isLuks.rc == 1
   shell: echo {{ commdata__entropy.stdout|quote }} > /dev/random
 
+# Using 512 instead of default 256 for both hash and key since XTS
+# apparently halves the key strength, and the recommendation for
+# quantum-safe symmetric crypto is to double the strength. So, to get
+# 128-bit classical security, use 512 bits here (4x).
 
+- name: Format LUKS device
+  when: commdata__isLuks.rc == 1
+  shell: cryptsetup --batch-mode --hash=sha512 --cipher=aes-xts-plain64 --key-size=512 --use-urandom --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt luksFormat /dev/disk/by-partuuid/{{ commdata__luks_partuuid|quote }}
 
-# TODO: luksFormat
 # TODO: Separate decrypt/mount scripts and services
 
 - name: Mountpoint for encrypted partition

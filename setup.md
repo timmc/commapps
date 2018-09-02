@@ -145,7 +145,6 @@ apt-get install -t jessie-backports zfs-dkms
 
 ## Make LUKS-encrypted partition
 ```
-cryptsetup --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt luksFormat /dev/sda5
 cryptsetup --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt open /dev/sda5 con-commdata --type luks
 ```
 
