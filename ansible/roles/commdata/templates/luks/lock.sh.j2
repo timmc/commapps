@@ -1,0 +1,6 @@
+#!/bin/bash
+# Close encrypted community-data partition
+
+set -eu -o pipefail
+
+cryptsetup luksClose /dev/mapper/con-commdata

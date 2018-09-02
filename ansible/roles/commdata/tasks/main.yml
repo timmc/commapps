@@ -13,7 +13,6 @@
 #   to the host var file:
 #     commdata__luks_partuuid: $PARTUUID
 
-
 ##== LUKS encrypted partition ==##
 
 - name: Mountpoint for not-an-hsm
@@ -89,20 +88,31 @@
   when: commdata__isLuks.rc == 1
   shell: cryptsetup --batch-mode --hash=sha512 --cipher=aes-xts-plain64 --key-size=512 --use-urandom --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt luksFormat /dev/disk/by-partuuid/{{ commdata__luks_partuuid|quote }}
 
-# TODO: Separate decrypt/mount scripts and services
+- name: Location for encrypted partition scripts
+  file:
+    state: directory
+    path: /opt/commapps/encfs/luks
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for unlocking LUKS device
+  template:
+    src: luks/unlock.sh.j2
+    dest: /opt/commapps/encfs/luks/unlock.sh
+    mode: 0755
+
+- name: Script for locking LUKS device
+  template:
+    src: luks/lock.sh.j2
+    dest: /opt/commapps/encfs/luks/lock.sh
+    mode: 0755
+
 
 - name: Mountpoint for encrypted partition
   file:
     state: directory
     path: /srv/commdata
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Location for encrypted partition scripts
-  file:
-    state: directory
-    path: /opt/commapps/encfs
     owner: root
     group: root
     mode: 0755

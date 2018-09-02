@@ -1,0 +1,8 @@
+#!/bin/bash
+# Decrypt community-data partition
+
+set -eu -o pipefail
+
+cryptsetup --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt \
+           open /dev/disk/by-partuuid/{{ commdata__luks_partuuid|quote }} \
+           con-commdata --type luks
