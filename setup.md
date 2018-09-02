@@ -130,18 +130,7 @@ defscrollback 5000
 vbell off' >> ~/.screenrc
 ```
 
-# Additional repos:
-
-For ZFS, among others:
-
-```
-echo 'deb http://debian.csail.mit.edu/debian/ jessie-backports main contrib' >> /etc/apt/sources.list.d/backports.list
-apt-get update
-```
-
-
 # Encrypted, snapshottable partition for community data
-apt-get install -t jessie-backports zfs-dkms
 
 ## Make LUKS-encrypted partition
 ```
