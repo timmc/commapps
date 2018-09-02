@@ -59,15 +59,22 @@
   shell: cryptsetup isLuks /dev/disk/by-partuuid/{{ commdata__luks_partuuid|quote }}
   failed_when: False
   changed_when: False
-  check_mode: no # run even in check mode
   register: commdata__isLuks
+  check_mode: no # Run in normal mode, since it registers a variable
+
+# Since the host may not have had enough time to gather entropy, we
+# produce some random numbers on the controller and mix them into the
+# host's entropy pool. This doesn't boost the host's estimation of its
+# own entropy, naturally, so /dev/random would still possibly
+# block. However, /dev/urandom should be safe to use after this point.
 
 - name: Collect entropy on controller
   when: commdata__isLuks.rc == 1
   connection: local
   shell: "tr -dc '[:graph:]' < /dev/urandom | head -c 512"
+  changed_when: False
   register: commdata__entropy
-  check_mode: no
+  check_mode: no # Run in normal mode, since it registers a variable
 
 - name: Boost entropy before using urandom for key material
   when: commdata__isLuks.rc == 1
