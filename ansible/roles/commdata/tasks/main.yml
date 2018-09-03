@@ -183,6 +183,17 @@
 - name: Install ZFS
   apt: name=zfs-fuse
 
+- name: Check if zpool exists
+  shell: zpool status commdata
+  changed_when: False
+  register: commdata__check_zpool_exist
+  failed_when: commdata__check_zpool_exist.rc > 1 # unknown codes
+  check_mode: no # Run in normal mode, since it registers a variable
+
+- name: Create ZFS pool in encrypted partition
+  when: commdata__check_zpool_exist.rc == 1
+  shell: zpool create -m legacy commdata /dev/mapper/con-commdata
+
 - name: Mountpoint for encrypted partition
   file:
     state: directory
