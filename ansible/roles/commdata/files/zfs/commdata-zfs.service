@@ -10,8 +10,8 @@ Before=prosody.service
 [Service]
 Type=oneshot
 RemainAfterExit=True
-ExecStart=/opt/commapps/encfs/open.sh
-ExecStop=/opt/commapps/encfs/close.sh
+ExecStart=/opt/commapps/encfs/zfs/mount.sh
+ExecStop=/opt/commapps/encfs/zfs/unmount.sh
 
 [Install]
 RequiredBy=sandstorm.service

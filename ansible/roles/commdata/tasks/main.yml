@@ -13,6 +13,39 @@
 #   to the host var file:
 #     commdata__luks_partuuid: $PARTUUID
 
+#== Cleanup after old versions of playbook ==#
+
+- name: Stop old combined systemd service
+  shell: systemctl stop commdata.service
+  failed_when: False # fails on all subsequent runs
+  changed_when: False
+
+- name: Disable old combined systemd service
+  shell: systemctl disable commdata.service
+  failed_when: False # fails on all subsequent runs
+  register: commdata__old_disable
+  changed_when: commdata__old_disable.rc == 0
+
+- name: Remove old combined systemd unit file
+  file:
+    state: absent
+    path: /etc/systemd/system/commdata.service
+  register: commdata__old_service_file
+
+- name: Reload systemd config if old unit file removed
+  command: systemctl daemon-reload
+  when: commdata__old_service_file.changed
+
+- name: "Remove old combined ZFS/LUKS scripts: open"
+  file:
+    state: absent
+    path: "{{ role_path }}/files/open.sh"
+
+- name: "Remove old combined ZFS/LUKS scripts: close"
+  file:
+    state: absent
+    path: "{{ role_path }}/files/close.sh"
+
 ##== LUKS encrypted partition ==##
 
 - name: Mountpoint for not-an-hsm
@@ -142,6 +175,11 @@
     state: started
 
 
+##== ZFS filesystem ==##
+
+- name: Install ZFS
+  apt: name=zfs-fuse
+
 - name: Mountpoint for encrypted partition
   file:
     state: directory
@@ -150,44 +188,28 @@
     group: root
     mode: 0755
 
-- name: Script for unlocking encrypted partition
-  copy:
-    src: "{{ role_path }}/files/open.sh"
-    dest: /opt/commapps/encfs/open.sh
+- name: Location for ZFS scripts
+  file:
+    state: directory
+    path: /opt/commapps/encfs/zfs
     owner: root
     group: root
     mode: 0755
 
-- name: Script for locking encrypted partition
+- name: Script for mounting ZFS
   copy:
-    src: "{{ role_path }}/files/close.sh"
-    dest: /opt/commapps/encfs/close.sh
+    src: "{{ role_path }}/files/zfs/mount.sh"
+    dest: /opt/commapps/encfs/zfs/mount.sh
     owner: root
     group: root
     mode: 0755
 
-# If this is ever converted to a symlink for some reason, note that
-# you'll need systemd v228 (I think) or higher in order to enable a
-# symlinked unit file: https://github.com/systemd/systemd/issues/1836
-
-- name: systemd service for encrypted partition
+- name: Script for unmounting ZFS
   copy:
-    src: "{{ role_path }}/files/commdata.service"
-    dest: /etc/systemd/system/commdata.service
+    src: "{{ role_path }}/files/zfs/unmount.sh"
+    dest: /opt/commapps/encfs/zfs/unmount.sh
     owner: root
     group: root
-    mode: 0644
-  #register: task_install_encfs_service
+    mode: 0755
 
-# Conditional reload doesn't seem to be sufficient; always reload it
-# for now, since it's idempotent.
-
-- name: Reload systemd config whether or not we added or changed a service
-  command: systemctl daemon-reload
-#  when: task_install_encfs_service | changed
-
-- name: Enable encrypted partition service
-  service:
-    name: commdata
-    enabled: yes
-    state: started
+# TODO: ZFS service
