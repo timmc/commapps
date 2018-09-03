@@ -39,12 +39,12 @@
 - name: "Remove old combined ZFS/LUKS scripts: open"
   file:
     state: absent
-    path: "{{ role_path }}/files/open.sh"
+    path: /opt/commapps/encfs/open.sh
 
 - name: "Remove old combined ZFS/LUKS scripts: close"
   file:
     state: absent
-    path: "{{ role_path }}/files/close.sh"
+    path: /opt/commapps/encfs/close.sh
 
 ##== LUKS encrypted partition ==##
 
