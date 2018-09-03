@@ -130,19 +130,6 @@ defscrollback 5000
 vbell off' >> ~/.screenrc
 ```
 
-# Encrypted, snapshottable partition for community data
-
-## Make LUKS-encrypted partition
-```
-cryptsetup --key-file /mnt/not-an-hsm/commdata/enckey/pass.txt open /dev/sda5 con-commdata --type luks
-```
-
-## Create ZFS pool with manual mounting
-```
-# TODO: set canmount=noauto ?
-zpool create -m legacy commdata /dev/mapper/con-commdata
-mount -t zfs /dev/mapper/con-commdata /srv/commdata
-```
 
 # Sandstorm
 
