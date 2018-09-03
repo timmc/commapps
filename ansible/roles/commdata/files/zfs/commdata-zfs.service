@@ -14,6 +14,7 @@ ExecStart=/opt/commapps/encfs/zfs/mount.sh
 ExecStop=/opt/commapps/encfs/zfs/unmount.sh
 
 [Install]
+Requires=commdata-luks.service
 RequiredBy=sandstorm.service
 RequiredBy=nginx.service
 RequiredBy=prosody.service
