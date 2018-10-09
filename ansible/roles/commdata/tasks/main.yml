@@ -192,6 +192,9 @@
 
 - name: Create ZFS pool in encrypted partition
   when: commdata__check_zpool_exist.rc == 1
+  # canmount=noauto prevents it from being imported on creation, which
+  # would interfere with the mount.sh script (TODO: make that script
+  # more resilient)
   shell: zpool create -m legacy commdata /dev/mapper/con-commdata
 
 - name: Mountpoint for encrypted partition
