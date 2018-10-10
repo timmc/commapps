@@ -1,4 +1,5 @@
 ---
+# TODO: Add check that commdata partition is mounted, then rotate all secrets
 - include: terminate-tls.yml
 - include: sandstorm.yml
 - include: tarsnap.yml

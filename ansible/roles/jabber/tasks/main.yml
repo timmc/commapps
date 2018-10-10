@@ -1,4 +1,6 @@
 ---
+# TODO: Add check that commdata partition is mounted, then rotate all secrets
+
 - name: Install prosody
   apt: name=prosody
 
