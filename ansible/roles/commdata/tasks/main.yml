@@ -190,6 +190,13 @@
   failed_when: commdata__check_zpool_exist.rc > 1 # unknown codes
   check_mode: no # Run in normal mode, since it registers a variable
 
+# TODO: Check if starting zfs is required; failed on initial run but
+# not after restarting host:
+# ```
+# connect: No such file or directory
+# Please make sure that the zfs-fuse daemon is running.
+# internal error: failed to initialize ZFS library
+# ```
 - name: Create ZFS pool in encrypted partition
   when: commdata__check_zpool_exist.rc == 1
   # canmount=noauto prevents it from being imported on creation, which
