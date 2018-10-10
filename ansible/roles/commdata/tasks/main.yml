@@ -12,6 +12,8 @@
 # - Find partition UUID for logical partition used for LUKS, and add it
 #   to the host var file:
 #     commdata__luks_partuuid: $PARTUUID
+# - Set host variable `commdata__zfs` to true or false depending on
+#   whether ZFS is supported on that architecture (no for raspi)
 
 - include: migration_cleanup.yml
 - include: luks.yml

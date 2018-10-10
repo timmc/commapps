@@ -3,5 +3,5 @@
 
 set -eu -o pipefail
 
-umount "/srv/commdata"
+# Automatically unmounts
 zpool export commdata

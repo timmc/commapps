@@ -4,15 +4,28 @@
 - name: Install ZFS
   apt: name=zfs-fuse
 
+# The ZFS tooling has the irritating property that when a pool exists,
+# it only shows up under `zpool import` when it is exported, and only
+# shows up under `zpool list` when it is imported. There doesn't seem
+# to be a command that will show it in both states.
+
 - name: Check if zpool exists
-  shell: zpool status commdata
-  changed_when: False
+  shell: '(zpool import; zpool list) | grep commdata >/dev/null'
   register: commdata__check_zpool_exist
+  changed_when: commdata__check_zpool_exist.rc == 1 # commdata not found
   failed_when: commdata__check_zpool_exist.rc > 1 # unknown codes
   check_mode: no # Run in normal mode, since it registers a variable
 
-# TODO: Check if starting zfs is required; failed on initial run but
-# not after restarting host:
+- name: 'Check if existing zpool has right settings: Mountpoint'
+  when: commdata__check_zpool_exist.rc == 0
+  shell: zfs get -H mountpoint -o value commdata
+  register: commdata__zfs_check_mountpoint
+  failed_when: commdata__zfs_check_mountpoint.stdout != "/srv/commdata"
+  changed_when: False
+  check_mode: no
+
+# TODO: Check if starting zfs is required after installing it; failed on
+# initial run but not after restarting host:
 # ```
 # connect: No such file or directory
 # Please make sure that the zfs-fuse daemon is running.
@@ -20,10 +33,7 @@
 # ```
 - name: Create ZFS pool in encrypted partition
   when: commdata__check_zpool_exist.rc == 1
-  # canmount=noauto prevents it from being imported on creation, which
-  # would interfere with the mount.sh script (TODO: make that script
-  # more resilient)
-  shell: zpool create -m legacy commdata /dev/mapper/con-commdata
+  shell: zpool create -m /srv/commdata commdata /dev/mapper/con-commdata
 
 - name: Mountpoint for encrypted partition
   file:
@@ -57,4 +67,30 @@
     group: root
     mode: 0755
 
-# TODO: ZFS service
+- name: Systemd unit file for mounting ZFS
+  copy:
+    src: "{{ role_path }}/files/zfs/commdata-fs.service"
+    dest: /opt/commapps/encfs/zfs/commdata-fs.service
+    mode: 0644
+  register: commdata__zfs_service_file
+
+- name: Symlink ZFS mount unit file
+  file:
+    state: link
+    path: /etc/systemd/system/commdata-fs.service
+    src: /opt/commapps/encfs/zfs/commdata-fs.service
+    force: yes # useful in check mode, when src didn't exist yet
+  register: commdata__zfs_service_link
+
+# Conditional reload doesn't always seem to be sufficient, so watch
+# out for that.
+
+- name: Reload systemd config if luks unit file changed
+  command: systemctl daemon-reload
+  when: commdata__zfs_service_file.changed or commdata__zfs_service_link.changed
+
+- name: Enable ZFS mount service
+  service:
+    name: commdata-fs
+    enabled: yes
+    state: started
