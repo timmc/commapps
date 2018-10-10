@@ -16,7 +16,6 @@
 # it only shows up under `zpool import` when it is exported, and only
 # shows up under `zpool list` when it is imported. There doesn't seem
 # to be a command that will show it in both states.
-
 - name: Check if zpool exists
   shell: '(zpool import; zpool list) | grep commdata >/dev/null'
   register: commdata__check_zpool_exist
@@ -24,21 +23,10 @@
   failed_when: commdata__check_zpool_exist.rc > 1 # unknown codes
   check_mode: no # Run in normal mode, since it registers a variable
 
-- name: 'Check if existing zpool has right settings: Mountpoint'
-  when: commdata__check_zpool_exist.rc == 0
-  shell: zfs get -H mountpoint -o value commdata
-  register: commdata__zfs_check_mountpoint
-  failed_when: commdata__zfs_check_mountpoint.stdout != "/srv/commdata"
-  changed_when: False
-  check_mode: no
-
-# TODO: Check if starting zfs is required after installing it; failed on
-# initial run but not after restarting host:
-# ```
-# connect: No such file or directory
-# Please make sure that the zfs-fuse daemon is running.
-# internal error: failed to initialize ZFS library
-# ```
+# If the mountpoint is ever changed, it will need to be modified on
+# existing hosts' commdata pools. It can only be checked after import,
+# so it's irritating to do from Ansible, but here's the command:
+# `zfs get -H mountpoint -o value commdata`
 - name: Create ZFS pool in encrypted partition
   when: commdata__check_zpool_exist.rc == 1
   shell: zpool create -m /srv/commdata commdata /dev/mapper/con-commdata
