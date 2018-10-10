@@ -4,6 +4,14 @@
 - name: Install ZFS
   apt: name=zfs-fuse
 
+# For some reason, on zfs-fuse 0.7.0-16 on Debian 9, zfs-fuse doesn't
+# start after being installed. It seems to be OK after reboot, though.
+- name: Ensure zfs-fuse is running
+  service:
+    name: zfs-fuse
+    enabled: yes
+    state: started
+
 # The ZFS tooling has the irritating property that when a pool exists,
 # it only shows up under `zpool import` when it is exported, and only
 # shows up under `zpool list` when it is imported. There doesn't seem
