@@ -19,7 +19,7 @@
   remote_user: root
   roles:
   - dyndns
-- hosts: laptops
+- hosts: inf_laptop
   remote_user: root
   roles:
   - laptop
