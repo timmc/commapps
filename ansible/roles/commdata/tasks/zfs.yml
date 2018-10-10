@@ -1,0 +1,60 @@
+---
+# ZFS filesystem
+
+- name: Install ZFS
+  apt: name=zfs-fuse
+
+- name: Check if zpool exists
+  shell: zpool status commdata
+  changed_when: False
+  register: commdata__check_zpool_exist
+  failed_when: commdata__check_zpool_exist.rc > 1 # unknown codes
+  check_mode: no # Run in normal mode, since it registers a variable
+
+# TODO: Check if starting zfs is required; failed on initial run but
+# not after restarting host:
+# ```
+# connect: No such file or directory
+# Please make sure that the zfs-fuse daemon is running.
+# internal error: failed to initialize ZFS library
+# ```
+- name: Create ZFS pool in encrypted partition
+  when: commdata__check_zpool_exist.rc == 1
+  # canmount=noauto prevents it from being imported on creation, which
+  # would interfere with the mount.sh script (TODO: make that script
+  # more resilient)
+  shell: zpool create -m legacy commdata /dev/mapper/con-commdata
+
+- name: Mountpoint for encrypted partition
+  file:
+    state: directory
+    path: /srv/commdata
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Location for ZFS scripts
+  file:
+    state: directory
+    path: /opt/commapps/encfs/zfs
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for mounting ZFS
+  copy:
+    src: "{{ role_path }}/files/zfs/mount.sh"
+    dest: /opt/commapps/encfs/zfs/mount.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for unmounting ZFS
+  copy:
+    src: "{{ role_path }}/files/zfs/unmount.sh"
+    dest: /opt/commapps/encfs/zfs/unmount.sh
+    owner: root
+    group: root
+    mode: 0755
+
+# TODO: ZFS service

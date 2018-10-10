@@ -1,0 +1,34 @@
+---
+# Cleanup after old versions of playbook
+
+- name: Stop old combined systemd service
+  shell: systemctl stop commdata.service
+  failed_when: False # fails on all subsequent runs
+  changed_when: False
+
+- name: Disable old combined systemd service
+  shell: systemctl disable commdata.service
+  failed_when: False # fails on all subsequent runs
+  register: commdata__old_disable
+  changed_when: commdata__old_disable.rc == 0
+
+- name: Remove old combined systemd unit file
+  file:
+    state: absent
+    path: /etc/systemd/system/commdata.service
+  register: commdata__old_service_file
+
+- name: Reload systemd config if old unit file removed
+  command: systemctl daemon-reload
+  when: commdata__old_service_file.changed
+
+- name: "Remove old combined ZFS/LUKS scripts: open"
+  file:
+    state: absent
+    path: /opt/commapps/encfs/open.sh
+
+- name: "Remove old combined ZFS/LUKS scripts: close"
+  file:
+    state: absent
+    path: /opt/commapps/encfs/close.sh
+
