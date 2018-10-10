@@ -16,3 +16,4 @@
 - include: migration_cleanup.yml
 - include: luks.yml
 - include: zfs.yml
+  when: commdata__zfs == True
