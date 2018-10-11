@@ -1,0 +1,92 @@
+---
+# ZFS filesystem
+
+- name: Install ZFS
+  apt: name=zfs-fuse
+
+# For some reason, on zfs-fuse 0.7.0-16 on Debian 9, zfs-fuse doesn't
+# start after being installed. It seems to be OK after reboot, though.
+- name: Ensure zfs-fuse is running
+  service:
+    name: zfs-fuse
+    enabled: yes
+    state: started
+
+# The ZFS tooling has the irritating property that when a pool exists,
+# it only shows up under `zpool import` when it is exported, and only
+# shows up under `zpool list` when it is imported. There doesn't seem
+# to be a command that will show it in both states.
+- name: Check if zpool exists
+  shell: '(zpool import; zpool list) | grep commdata >/dev/null'
+  register: commdata__check_zpool_exist
+  changed_when: commdata__check_zpool_exist.rc == 1 # commdata not found
+  failed_when: commdata__check_zpool_exist.rc > 1 # unknown codes
+  check_mode: no # Run in normal mode, since it registers a variable
+
+# If the mountpoint is ever changed, it will need to be modified on
+# existing hosts' commdata pools. It can only be checked after import,
+# so it's irritating to do from Ansible, but here's the command:
+# `zfs get -H mountpoint -o value commdata`
+- name: Create ZFS pool in encrypted partition
+  when: commdata__check_zpool_exist.rc == 1
+  shell: zpool create -m /srv/commdata commdata /dev/mapper/con-commdata
+
+- name: Mountpoint for encrypted partition
+  file:
+    state: directory
+    path: /srv/commdata
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Location for ZFS scripts
+  file:
+    state: directory
+    path: /opt/commapps/encfs/zfs
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for mounting ZFS
+  copy:
+    src: "{{ role_path }}/files/zfs/mount.sh"
+    dest: /opt/commapps/encfs/zfs/mount.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for unmounting ZFS
+  copy:
+    src: "{{ role_path }}/files/zfs/unmount.sh"
+    dest: /opt/commapps/encfs/zfs/unmount.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Systemd unit file for mounting ZFS
+  copy:
+    src: "{{ role_path }}/files/zfs/commdata-fs.service"
+    dest: /opt/commapps/encfs/zfs/commdata-fs.service
+    mode: 0644
+  register: commdata__zfs_service_file
+
+- name: Symlink ZFS mount unit file
+  file:
+    state: link
+    path: /etc/systemd/system/commdata-fs.service
+    src: /opt/commapps/encfs/zfs/commdata-fs.service
+    force: yes # useful in check mode, when src didn't exist yet
+  register: commdata__zfs_service_link
+
+# Conditional reload doesn't always seem to be sufficient, so watch
+# out for that.
+
+- name: Reload systemd config if luks unit file changed
+  command: systemctl daemon-reload
+  when: commdata__zfs_service_file.changed or commdata__zfs_service_link.changed
+
+- name: Enable ZFS mount service
+  service:
+    name: commdata-fs
+    enabled: yes
+    state: started
