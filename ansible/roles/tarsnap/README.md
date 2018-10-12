@@ -7,11 +7,13 @@ locally.
 
 ## General approach
 
-- Each service host has its own Tarsnap private key
+- TODO: Each service host has its own Tarsnap private key
 - Each service host runs a nightly backup job
-- The management host rotates backups on behalf of the service hosts
+- TODO: The management host rotates backups on behalf of the service hosts
 
 ## Details
+
+NOT YET IMPLEMENTED
 
 - The service host retains only a read-write version of the key
     - Delete and nuke access have been stripped from it so that if the

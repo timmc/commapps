@@ -33,8 +33,8 @@
 
 - name: Tarsnap key file
   copy:
-    content: "{{ tarsnap_rw_key }}"
-    path: /srv/commdata/backups/secrets/tarsnap-rw.key
+    content: "{{ commdata_tarsnap_rw_key }}"
+    dest: /srv/commdata/backups/secrets/tarsnap-rw.key
     owner: root
     group: root
     mode: 0600
@@ -50,7 +50,7 @@
 
 - name: Install backup script
   copy:
-    src: "{{ role_path }}/files/tarsnap/run-backup.sh"
+    src: "{{ role_path }}/files/run-backup.sh"
     dest: /opt/commapps/backups/run-backup.sh
     owner: root
     group: root
@@ -58,7 +58,7 @@
 
 - name: Install archive listing script
   copy:
-    src: "{{ role_path }}/files/tarsnap/list-archives.sh"
+    src: "{{ role_path }}/files/list-archives.sh"
     dest: /opt/commapps/backups/list-archives.sh
     owner: root
     group: root
@@ -66,7 +66,7 @@
 
 - name: Install archive restore script
   copy:
-    src: "{{ role_path }}/files/tarsnap/restore-archive.sh"
+    src: "{{ role_path }}/files/restore-archive.sh"
     dest: /opt/commapps/backups/restore-archive.sh
     owner: root
     group: root
@@ -74,7 +74,7 @@
 
 - name: Install cron job
   copy:
-    src: "{{ role_path }}/files/tarsnap/cron"
+    src: "{{ role_path }}/files/cron"
     dest: /etc/cron.d/sandstorm-backup # TODO move
     owner: root
     group: root

@@ -7,6 +7,7 @@
   remote_user: root
   roles:
   - commdata
+  - tarsnap
 - hosts: sandstorm
   remote_user: root
   roles:
