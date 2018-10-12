@@ -13,8 +13,11 @@ RemainAfterExit=True
 ExecStart=/opt/commapps/encfs/zfs/mount.sh
 ExecStop=/opt/commapps/encfs/zfs/unmount.sh
 
-[Install]
 Requires=commdata-luks.service
+After=commdata-luks.service
+
+[Install]
+# TODO: Do these need to be mentioned in Before directives as well?
 RequiredBy=sandstorm.service
 RequiredBy=nginx.service
 RequiredBy=prosody.service
