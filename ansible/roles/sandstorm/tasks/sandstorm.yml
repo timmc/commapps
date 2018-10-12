@@ -1,4 +1,23 @@
 ---
+- name: "A place for sandstorm scripts"
+  file:
+    state: directory
+    path: /opt/commapps/sandstorm
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Installer script"
+  copy:
+    src: "{{ role_path }}/files/sandstorm/install.sh"
+    dest: /opt/commapps/sandstorm/install.sh
+    mode: 0755
+
+- name: "Install Sandstorm"
+  shell: /opt/commapps/sandstorm/install.sh /srv/commdata/sandstorm
+  args:
+    creates: /srv/commdata/sandstorm
+
 - name: "Sandstorm config file"
   template:
     src: "{{ role_path }}/templates/sandstorm/sandstorm.conf.j2"
