@@ -1,0 +1,34 @@
+# TODO: Securely write tarsnap key file (pre-generated on management
+# computer)
+#
+# Create a full key, generate read/write-only and full (but
+# passphrase-protected) variants, save off the full key, and shred
+# it. Passphrase is stored in `tarsnap-full.passphrase.gpg` on
+# management machine; full key stored in `tarsnap-full.key.gpg`.
+#
+# Full key is used for periodic deletions of old archives. Read/write
+# key cannot be used to delete archives (if an attacker gets into the
+# machine and wants to wipe it) but can be used to --fsck.
+#
+# **TODO**: Automate fsck after archive deletion/rotation (will need to
+# be done every time an archive is deleted using a different cache dir);
+# alternatively, push cache dir to host after deletions.
+#
+# The following instructions assume per-host tarsnap keys, but I only
+# created one for toster and have just been using that one on toster
+# alone. I may want per-service keys instead.
+#
+# ```
+# sudo mount -t tmpfs -o size=400M tmpfs ~/tmp/ram/
+# cd ~/tmp/ram
+# tarsnap-keygen --keyfile tarsnap-full.key --user comm-tarsnap-commdata@brainonfire.net --machine XXX_machine_name_XXX
+# tarsnap-keymgmt --outkeyfile tarsnap-rw.key -r -w tarsnap-full.key
+# tarsnap-keymgmt --outkeyfile tarsnap-full.passphrased.key --passphrased -r -w -d --nuke tarsnap-full.key
+# # Save off tarsnap-full.passphrased.key encrypted on management machine
+# # Save off tarsnap-rw.key into the vault: `ansible-vault edit --vault-password-file=open-vault.sh group_vars/tarsnap/vault.yml`
+# shred tarsnap-full.key
+# shred tarsnap-rw.key
+# cd -
+# sudo umount ~/tmp/ram
+# ```
+tarsnap_rw_key: "{{ vault_tarsnap_rw_key }}"

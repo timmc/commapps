@@ -6,4 +6,4 @@ mountpoint -q /srv/commdata || {
   exit 2
 }
 
-tarsnap --list-archives --keyfile /srv/commdata/backups/tarsnap-rw.key | sort
+tarsnap --list-archives --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key | sort

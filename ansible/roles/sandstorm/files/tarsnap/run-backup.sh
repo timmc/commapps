@@ -45,7 +45,7 @@ log "Running backup on $snapshot_id"
 # This uses a tarsnap key that can only read and write, but not delete
 
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
-        --keyfile /srv/commdata/backups/tarsnap-rw.key \
+        --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
         -C /srv/commdata/.zfs/snapshot/"$snapshot_id" \
         --humanize-numbers \

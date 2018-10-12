@@ -21,5 +21,5 @@ TARGET="/srv/commdata/tmp/tarsnap-restore/$ARCHIVE"
 
 mkdir -p "$TARGET"
 tarsnap -x -f "$ARCHIVE" -C "$TARGET" \
-        --keyfile /srv/commdata/backups/tarsnap-rw.key \
+        --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
         -p -v
