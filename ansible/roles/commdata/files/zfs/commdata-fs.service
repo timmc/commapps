@@ -1,5 +1,6 @@
 [Unit]
 Description=Community Data filesystem (ZFS)
+
 # sandstorm runs entirely out of /srv/commdata/sandstorm
 Before=sandstorm.service
 # nginx is configured to look for TLS certs & keys in /srv/commdata/secrets
@@ -7,14 +8,14 @@ Before=nginx.service
 # Account data is stored in /srv/commdata/jabber/data
 Before=prosody.service
 
+After=commdata-luks.service
+After=zfs-fuse.target
+
 [Service]
 Type=oneshot
 RemainAfterExit=True
 ExecStart=/opt/commapps/encfs/zfs/mount.sh
 ExecStop=/opt/commapps/encfs/zfs/unmount.sh
-
-Requires=commdata-luks.service
-After=commdata-luks.service
 
 [Install]
 # TODO: Do these need to be mentioned in Before directives as well?

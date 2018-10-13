@@ -6,8 +6,3 @@ Type=oneshot
 RemainAfterExit=True
 ExecStart=/opt/commapps/encfs/luks/unlock.sh
 ExecStop=/opt/commapps/encfs/luks/lock.sh
-
-# Technically not needed, since could just rely on commdata-fs
-# to ask for this service to be started at startup.
-[Install]
-WantedBy=multi-user.target
