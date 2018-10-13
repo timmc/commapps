@@ -58,25 +58,3 @@ server {
   # Allow large spk uploads from the /install form and allow grains to receive large uploads.
   client_max_body_size 1024m;
 }
-
-# XXX: Redirects for old sandcats.io Sandstorm URLs
-server {
-  listen 6443;
-  server_name timmc.sandcats.io *.timmc.sandcats.io;
-
-  if ( $host ~ ^(?<subdomain>.+)\.timmc\.sandcats\.io$ ) {
-    return 301 https://$subdomain.sandy.parsni.ps$request_uri;
-  }
-  if ( $host = "timmc.sandcats.io" ) {
-    return 301 https://sandy.parsni.ps$request_uri;
-  }
-
-  ssl on;
-  ssl_certificate /srv/commdata/secrets/tls/timmc.sandcats.io-20180219.chain.pem;
-  ssl_certificate_key /srv/commdata/secrets/tls/timmc.sandcats.io-20180219.key;
-
-  ssl_session_timeout 5m;
-
-  # HSTS with a 365.25 days = 31557600 seconds expiration
-  add_header Strict-Transport-Security max-age=31557600;
-}
