@@ -3,6 +3,10 @@
   remote_user: root
   roles:
   - common
+- hosts: inf_laptop
+  remote_user: root
+  roles:
+  - laptop
 - hosts: commdata
   remote_user: root
   roles:
@@ -20,7 +24,3 @@
   remote_user: root
   roles:
   - dyndns
-- hosts: inf_laptop
-  remote_user: root
-  roles:
-  - laptop
