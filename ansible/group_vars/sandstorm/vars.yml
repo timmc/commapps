@@ -1,5 +1,2 @@
-# Generated with `openssl genrsa -aes256 -out sandy.parsni.ps.key 4096`
-# Encryption is stripped before storing here; not protected by a password:
-# `openssl rsa -in local-gen/sandy.parsni.ps.key` decrypts output of above
-# Last generated 2018-02-19 when getting AlphaSSL wildcard cert
-sandstorm_tls_private_key: "{{ vault_sandstorm_tls_private_key }}"
+# API key for NFSN, acquired from NearlyFreeSpeech.net support request.
+sandstorm__nfsn_api_key: "{{ vault_sandstorm__nfsn_api_key }}"

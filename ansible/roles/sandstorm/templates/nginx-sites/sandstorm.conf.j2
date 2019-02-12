@@ -20,8 +20,8 @@ server {
   server_name {{ sandstorm_base_domain }} *.{{ sandstorm_base_domain }};
 
   ssl on;
-  ssl_certificate {{ commdata_dir }}/secrets/tls/sandstorm-wildcard.chain.pem;
-  ssl_certificate_key {{ commdata_dir }}/secrets/tls/sandstorm-wildcard.key;
+  ssl_certificate {{ commdata_dir }}/etc-letsencrypt/live/sandy.parsni.ps/fullchain.pem;
+  ssl_certificate_key {{ commdata_dir }}/etc-letsencrypt/live/sandy.parsni.ps/privkey.pem;
 
   ssl_session_timeout 5m;
 

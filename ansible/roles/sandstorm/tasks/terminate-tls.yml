@@ -15,28 +15,63 @@
 # TODO Tasks for creating commdata
 # TODO Tasks for ensuring nginx doesn't start until commdata partition unlocked
 
-# FIXME If commdata hasn't already been created, this might create it with
-# 0700 permissions, which isn't really a problem, but is a possible source
-# of non-determinism
-- name: Directory for TLS certs and private keys
+#== ACME wildcard cert renewal ==#
+
+- name: Install certbot
+  apt: name=certbot
+
+- name: Certbot secrets directory
   file:
-    path: "{{ commdata_dir }}/secrets/tls"
+    path: "{{ commdata_dir }}/secrets/certbot"
     state: directory
-    mode: 0700
     owner: root
     group: root
-- name: "Certificate chain"
-  copy:
-    src: "{{ role_path }}/files/sandstorm-wildcard.chain.pem"
-    dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.chain.pem"
-  notify: nginx reload config
+    mode: 0600
 
-- name: "Private key"
+- name: Certbot config directory
+  file:
+    path: "{{ commdata_dir }}/etc-letsencrypt" # Replaces /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Certbot configuration"
   copy:
-    content: "{{ sandstorm_tls_private_key }}"
-    dest: "{{ commdata_dir }}/secrets/tls/sandstorm-wildcard.key"
+    src: "{{ role_path }}/files/certbot/certbot.ini"
+    dest: "{{ commdata_dir }}/etc-letsencrypt/certbot.ini"
+
+- name: NFSN API key
+  copy:
+    content: "{{ sandstorm__nfsn_api_key }}"
+    dest: "{{ commdata_dir }}/secrets/certbot/nfsn-api-key"
+    owner: root
+    group: root
+    mode: 0600
   no_log: true
-  notify: nginx reload config
+
+- name: Certbot management files
+  file:
+    state: directory
+    path: /opt/commapps/certbot
+
+- name: Certbot cert scipts
+  synchronize:
+    src: "{{ role_path }}/files/certbot/scripts/"
+    dest: /opt/commapps/certbot/scripts/
+  register: certbot__scripts
+
+- name: Initial certbot run so nginx can start
+  command: /opt/commapps/certbot/scripts/renew-certs.sh
+  when: certbot__scripts.changed
+
+- name: Schedule daily renewal check
+  copy:
+    src: "{{ role_path }}/files/certbot/certbot.cron"
+    dest: /etc/cron.d/commapps-certbot
+
+
+#==#
 
 - name: Sandstorm nginx configuration
   template:

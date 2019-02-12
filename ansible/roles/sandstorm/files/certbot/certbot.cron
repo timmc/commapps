@@ -1,0 +1,7 @@
+# crontab for TLS cert renewal
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Run daily at a randomly selected time
+47 5 * * * root /opt/commapps/certbot/scripts/renew-certs.sh >> /var/log/certbot-renewal.log 2>&1
