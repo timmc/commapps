@@ -6,7 +6,13 @@
 at_sign="@"
 email="for-letsencrypt-parsnips${at_sign}brainonfire.net"
 
+configdir=/srv/commdata/etc-letsencrypt
 scripts=/opt/commapps/certbot/scripts
+
+if [[ ! -d "$configdir" ]]; then
+    echo "Config dir does not exist (commdata partition not mounted?)"
+    exit 1
+fi
 
 # `certonly`: Only do auth steps, don't try to install them
 # `--config-dir` so that certs and keys are in encrypted volume
@@ -19,7 +25,7 @@ scripts=/opt/commapps/certbot/scripts
 # `--server https://acme-v02.api.letsencrypt.org/directory`: Earlier
 # versions of certbot don't default to v2, I think...
 certbot certonly --noninteractive \
-        --config-dir "/srv/commdata/etc-letsencrypt" \
+        --config-dir "$configdir" \
         --agree-tos --manual-public-ip-logging-ok --email "$email" \
         --manual -d '*.sandy.parsni.ps' -d 'sandy.parsni.ps' \
         --preferred-challenges 'dns-01' \
