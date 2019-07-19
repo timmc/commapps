@@ -42,6 +42,12 @@ zfs snapshot commdata@"$snapshot_id" || {
 }
 # That's the last place we can call exit without cleanup.
 
+# zfs-fuse doesn't yet allow you to *look* at snapshots via
+# .zfs/snapshot, but you can clone them and look at the clone.
+# Source: https://www.csamuel.org/2008/06/28/recovering-files-from-a-zfsfuse-snapshot-under-linux
+log "Cloning snapshot to make it visible"
+zfs clone commdata@"$snapshot_id" commdata/snapclone-"$snapshot_id"
+
 log "Running backup on $snapshot_id"
 
 # This uses a tarsnap key that can only read and write, but not delete
@@ -50,7 +56,7 @@ set +e
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
-        -C /srv/commdata/.zfs/snapshot/"$snapshot_id" \
+        -C /srv/commdata/snapclone-"$snapshot_id" \
         --humanize-numbers \
         ./sandstorm \
         ./jabber/data # FIXME don't require jabber and sandstorm on same box
@@ -61,7 +67,11 @@ rm -- "$snaptime_path"
 
 log "Releasing snapshot $snapshot_id"
 set +e
-zfs destroy commdata@"$snapshot_id"
+# Destroy the snapshot as well as the clone (recursive). I would have
+# explicitly destroyed the clone, but zfs didn't let me!
+# TODO: Investigate why even this command sometimes fails with
+# "dataset is busy".
+zfs destroy -R commdata@"$snapshot_id"
 snapshot_destroy_exit=$?
 set -e
 
