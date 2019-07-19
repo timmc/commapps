@@ -27,4 +27,4 @@
 - name: "Ensure sandstorm is running"
   service:
     name: sandstorm
-    state: running
+    state: started
