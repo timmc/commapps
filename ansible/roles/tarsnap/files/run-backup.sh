@@ -7,6 +7,8 @@
 # 4 - Backup error
 # 5 - Cleanup error (non-fatal, but needs followup)
 
+set -eu -o pipefail
+
 function log {
   echo `date --universal "+%Y-%m-%d %H:%M:%S"`: "$@"
 }
@@ -23,12 +25,12 @@ mountpoint -q /srv/commdata || {
 # the snapshot is taken; for performance it should not be *too* long
 # before, says Colin Percival.
 
-snaptime_path="/tmp/commdata-snaptime-$snapshot_id.ref"
-touch "$snaptime_path"
-
 # Using timestamped snapshots solves some concurrency issues. Use
 # nanoseconds since UNIX epoch.
 snapshot_id="tarsnap-periodic-$(date --universal +%s%N)"
+
+snaptime_path="/tmp/commdata-snaptime-$snapshot_id.ref"
+touch -- "$snaptime_path"
 
 # Creation of the ZFS snapshot serves as a mutex lock on these
 # backups.
@@ -44,6 +46,7 @@ log "Running backup on $snapshot_id"
 
 # This uses a tarsnap key that can only read and write, but not delete
 
+set +e
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
@@ -52,12 +55,15 @@ tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         ./sandstorm \
         ./jabber/data # FIXME don't require jabber and sandstorm on same box
 tarsnap_exit=$?
+set -e
 
 rm -- "$snaptime_path"
 
 log "Releasing snapshot $snapshot_id"
+set +e
 zfs destroy commdata@"$snapshot_id"
 snapshot_destroy_exit=$?
+set -e
 
 # Choose between possible exit codes based on priority.
 
