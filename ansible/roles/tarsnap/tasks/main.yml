@@ -5,7 +5,9 @@
   apt_key:
     url: https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc
     state: present
-    id: "8E64CEEC8767B49710E308F770BD6C50E82A9D99"
+    # Expires 2020-02-01
+    # TODO Monitor for expiration?
+    id: "496746B3F1B9FC646BFD3EEC6D97F5A4CA38CF33"
 
 - name: Discover Debian codename
   shell: lsb_release --codename --short
