@@ -43,7 +43,7 @@ change the user's default password, then proceed with rest of config
 -- including the enable/start ssh, since otherwise some systemd
 symlinks aren't properly created.
 
-# Partitioning
+## Partitioning
 
 Partitioning example on murphy (mounted on controller):
 
@@ -77,17 +77,17 @@ Device     Boot     Start       End   Sectors   Size Id Type
 /dev/sda6       299806720 312580095  12773376   6.1G 83 Linux
 ```
 
-# Apt sources
+## Apt sources
 
 ```
-echo 'deb http://debian.csail.mit.edu/debian jessie main contrib non-free
-deb-src http://debian.csail.mit.edu/debian jessie main contrib non-free
+echo 'deb http://debian.csail.mit.edu/debian stretch main contrib non-free
+deb-src http://debian.csail.mit.edu/debian stretch main contrib non-free
 
-deb http://debian.csail.mit.edu/debian jessie-updates main contrib non-free
-deb-src http://debian.csail.mit.edu/debian jessie-updates main contrib non-free
+deb http://debian.csail.mit.edu/debian stretch-updates main contrib non-free
+deb-src http://debian.csail.mit.edu/debian stretch-updates main contrib non-free
 
-deb http://security.debian.org/ jessie/updates main contrib non-free
-deb-src http://security.debian.org/ jessie/updates main contrib non-free
+deb http://security.debian.org/ stretch/updates main contrib non-free
+deb-src http://security.debian.org/ stretch/updates main contrib non-free
 ' | sudo tee /etc/apt/sources.list
 ```
 
