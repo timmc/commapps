@@ -1,26 +1,45 @@
 ---
-- name: Ensure root has valid .ssh dir
+
+# Fundamental setup
+
+- name: Root ssh folder
   file:
     state: directory
-    path: /root/.ssh
+    path: "/root/.ssh"
     owner: root
     group: root
     mode: 0700
 
-- name: Ensure ansible root pubkey is authorized for root
+- name: Trusted Ansible key
   copy:
     src: "{{ role_path }}/files/id_ansible_parsnips.pub"
-    dest: /root/.ssh/authorized_keys
+    dest: "/root/.ssh/authorized_keys"
     owner: root
     group: root
     mode: 0644
 
-- name: Sysadmin tools
+# Sane environment
+
+- name: "Install system fundamentals"
+  apt: name=ntp
+
+- name: "UTC system clock"
+  timezone: name=UTC
+  register: common__timezone
+
+- name: "Restart cron when timezone changed"
+  service: name=cron state=restarted
+  when: common__timezone.changed
+
+# Adminning
+
+- name: Sysadmin basics
   apt:
     name:
     - ssh
     - rsync
     - emacs
+    - screen
     - curl
     - locate
     - socat
