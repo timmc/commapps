@@ -14,7 +14,10 @@
 - hosts: sandstorm
   remote_user: root
   roles:
-  - { role: sandstorm, sandstorm_base_domain: sandy.parsni.ps, commdata_dir: "/srv/commdata" }
+  - { role: sandstorm,
+      sandstorm_base_domain: sandstorm.appux.com,
+      sandstorm_old_domain: sandy.parsni.ps,
+      commdata_dir: "/srv/commdata" }
   - tarsnap # TODO - use for all commdata (incompat w/ raspi though)
 - hosts: jabber
   remote_user: root

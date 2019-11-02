@@ -20,8 +20,8 @@ server {
   server_name {{ sandstorm_base_domain }} *.{{ sandstorm_base_domain }};
 
   ssl on;
-  ssl_certificate {{ commdata_dir }}/etc-letsencrypt/live/sandy.parsni.ps/fullchain.pem;
-  ssl_certificate_key {{ commdata_dir }}/etc-letsencrypt/live/sandy.parsni.ps/privkey.pem;
+  ssl_certificate {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_base_domain }}/fullchain.pem;
+  ssl_certificate_key {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_base_domain }}/privkey.pem;
 
   ssl_session_timeout 5m;
 
@@ -58,3 +58,26 @@ server {
   # Allow large spk uploads from the /install form and allow grains to receive large uploads.
   client_max_body_size 1024m;
 }
+
+# Redirect old domain to current one
+server {
+  listen 443;
+  server_name {{ sandstorm_old_domain }} *.{{ sandstorm_old_domain }};
+
+  if ( $host ~ ^(?<subdomain>.+)\.\Q{{ sandstorm_old_domain }}\E$ ) {
+    return 302 https://$subdomain.{{ sandstorm_base_domain }}$request_uri;
+  }
+  if ( $host = "{{ sandstorm_old_domain }}" ) {
+    return 302 https://{{ sandstorm_base_domain }}$request_uri;
+  }
+
+  ssl on;
+  ssl_certificate {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_old_domain }}/fullchain.pem;
+  ssl_certificate_key {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_old_domain }}/privkey.pem;
+
+  ssl_session_timeout 5m;
+
+  # HSTS with a 365.25 days = 31557600 seconds expiration
+  add_header Strict-Transport-Security max-age=31557600;
+}
+

@@ -142,6 +142,11 @@ sandstorm.appux.com CNAME t.timmc.org. 600
 *.sandstorm.appux.com CNAME t.timmc.org. 600
 ```
 
+Login providers:
+
+- https://console.developers.google.com/
+- https://github.com/settings/applications/248526
+
 If you're restoring from backup, follow the
 [standard restore instructions](https://docs.sandstorm.io/en/latest/administering/backups/):
 
