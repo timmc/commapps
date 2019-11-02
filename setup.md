@@ -133,27 +133,21 @@ vbell off' >> ~/.screenrc
 
 # Sandstorm
 
+DNS:
+
 ```
-wget https://raw.githubusercontent.com/sandstorm-io/sandstorm/master/install.sh
-bash install.sh
+sandy.parsni.ps CNAME k.timmc.org.
+*.sandy.parsni.ps CNAME k.timmc.org.
+sandstorm.appux.com CNAME t.timmc.org. 600
+*.sandstorm.appux.com CNAME t.timmc.org. 600
 ```
 
-Choose a developer install and set these options:
-
-- Don't expose only to localhost
-- Install into `/srv/commdata/sandstorm`
-- Accept the `sandstorm` user but don't add own account to that group
-- Do start sandstorm at startup
-
-If you're restoring from backup, the other options don't matter, since
-you'll then follow the
-[restore](https://docs.sandstorm.io/en/latest/administering/backups/)
-instructions:
+If you're restoring from backup, follow the
+[standard restore instructions](https://docs.sandstorm.io/en/latest/administering/backups/):
 
 - Stop sandstorm
 - Move installed dir away, replace it with backup
 - Start sandstorm
-
 
 # Tarsnap
 
