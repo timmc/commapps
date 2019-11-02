@@ -65,10 +65,10 @@ server {
   server_name {{ sandstorm_old_domain }} *.{{ sandstorm_old_domain }};
 
   if ( $host ~ ^(?<subdomain>.+)\.\Q{{ sandstorm_old_domain }}\E$ ) {
-    return 302 https://$subdomain.{{ sandstorm_base_domain }}$request_uri;
+    return 301 https://$subdomain.{{ sandstorm_base_domain }}$request_uri;
   }
   if ( $host = "{{ sandstorm_old_domain }}" ) {
-    return 302 https://{{ sandstorm_base_domain }}$request_uri;
+    return 301 https://{{ sandstorm_base_domain }}$request_uri;
   }
 
   ssl on;
@@ -81,3 +81,9 @@ server {
   add_header Strict-Transport-Security max-age=31557600;
 }
 
+# HTTP -> HTTPS redirect for old domain too
+server {
+  listen 80;
+  server_name {{ sandstorm_old_domain }} *.{{ sandstorm_old_domain }};
+  return 301 https://$host$request_uri$is_args$args;
+}
