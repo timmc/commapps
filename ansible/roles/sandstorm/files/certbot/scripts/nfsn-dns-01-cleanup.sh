@@ -3,7 +3,7 @@
 
 set -eu -o pipefail
 
-if [[ "${CERTBOT_DOMAIN}" != 'sandy.parsni.ps' ]]; then
+if [[ "${CERTBOT_DOMAIN}" != "${RENEW_SANDSTORM_FULL_DOMAIN}" ]]; then
     echo "Unexpected domain for DNS-01 auth challenge: ${CERTBOT_DOMAIN}"
     exit 1
 fi
@@ -14,5 +14,5 @@ if [[ "${CERTBOT_VALIDATION}" = '' ]]; then
 fi
 
 /opt/commapps/certbot/scripts/nfsn-call.sh \
-    "POST" "/dns/parsni.ps/removeRR" \
-    "name=_acme-challenge.sandy&type=TXT&data=${CERTBOT_VALIDATION}"
+    "POST" "/dns/${RENEW_BASE_DOMAIN}/removeRR" \
+    "name=_acme-challenge.${RENEW_SANDSTORM_SUBDOMAIN}&type=TXT&data=${CERTBOT_VALIDATION}"
