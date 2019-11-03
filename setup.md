@@ -96,22 +96,12 @@ Now set up port forwarding in router and use SSH for remaining config.
 
 # Basics
 ```
-timedatectl set-timezone Etc/UTC
 apt-get update
 apt-get dist-upgrade
 apt-get install cryptsetup git git-gui gitk nmap gnome-disk-utility
 ```
 
-
-# Custom utilities
-
-These will be used for backups, mounting, and other maintenance and
-administration.
-
-`mkdir /opt/commapps && git clone https://github.com/timmc/commapps.git /opt/commapps/repo`
-
-
-# For each user:
+# For each user that needs a shell:
 Set history size (can't override)
 ```
 sed -i 's/^\(HIST\(FILE\)\?SIZE=.*\)/\10000/' ~/.bashrc
@@ -146,6 +136,8 @@ Login providers:
 
 - https://console.developers.google.com/
 - https://github.com/settings/applications/248526
+
+Run ansible scripts.
 
 If you're restoring from backup, follow the
 [standard restore instructions](https://docs.sandstorm.io/en/latest/administering/backups/):
