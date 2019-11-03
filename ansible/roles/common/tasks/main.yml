@@ -12,7 +12,7 @@
 
 - name: Trusted Ansible key
   copy:
-    src: "{{ role_path }}/files/id_ansible_parsnips.pub"
+    src: "{{ role_path }}/files/id_ansible_appux.pub"
     dest: "/root/.ssh/authorized_keys"
     owner: root
     group: root

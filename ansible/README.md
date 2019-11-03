@@ -1,6 +1,6 @@
-# Ansible config for Parsnips
+# Ansible config for Appux
 
-Configuration management for Parsnips servers using Ansible.
+Configuration management for Appux servers using Ansible.
 
 ## Requirements
 
@@ -11,7 +11,7 @@ Configuration management for Parsnips servers using Ansible.
 ## Setup
 
 - Have SSH private key installed, perhaps in
-  `~/.ssh/id_ansible_parsnips`, with a strong passphrase
+  `~/.ssh/id_ansible_appux`, with a strong passphrase
 - Have Ansible vault passphrase in GPG-encrypted file, perhaps in
   `../vault-passphrase.gpg` (using symmetric encryption, and again a
   strong passphrase)
@@ -29,7 +29,7 @@ Unlock the SSH private key for your session, if using ssh-agent:
 
 ```
 ssh-agent bash
-ssh-add ~/.ssh/id_ansible_parsnips
+ssh-add ~/.ssh/id_ansible_appux
 ```
 
 Tell the vault script where to find the encrypted passphrase, if using
@@ -39,17 +39,17 @@ gpg-agent:
 export VAULT_PASSPHRASE_GPG_FILE=vault-passphrase.gpg
 ```
 
-And run the parsnips.yml playbook on the production hosts inventory:
+And run the appux.yml playbook on the production hosts inventory:
 
 ```
-ansible-playbook parsnips.yml -i prod.ini --vault-password-file=open-vault.sh
+ansible-playbook appux.yml -i prod.ini --vault-password-file=open-vault.sh
 ```
 
 If you're not using gpg-agent to manage the vault password file,
 instead run this command:
 
 ```
-ansible-playbook parsnips.yml -i prod.ini --ask-vault-pass
+ansible-playbook appux.yml -i prod.ini --ask-vault-pass
 ```
 
 ## Secrets

@@ -6,7 +6,7 @@
 # HOSTNAME=kibble
 # USER=pi
 # HOSTADDR=$HOSTNAME.internal
-# PUBKEY=roles/common/files/id_ansible_parsnips.pub
+# PUBKEY=roles/common/files/id_ansible_appux.pub
 # ansible-playbook bootstrap.yml --ask-pass --become --become-user=root --ask-become-pass --extra-vars="root_authkeys_path=$PUBKEY hostname=$HOSTNAME" --inventory="$HOSTADDR," --user="$USER"
 
 ---
