@@ -167,6 +167,33 @@ Instructions for clearing old archives:
 - `tarsnap -d --archive-names delete.lst --keyfile /srv/commdata/backups/tarsnap-full.passphrased.key --print-stats --humanize-numbers`
 - `tarsnap --fsck`
 
+# Prosody
+
+DNS:
+
+```
+_xmpp-client._tcp.appux.com	SRV	10 0 5222 k.timmc.org.
+_xmpp-client._tcp.muc.appux.com	SRV	10 0 5222 k.timmc.org.
+_xmpp-server._tcp.appux.com	SRV	10 0 5269 k.timmc.org.
+_xmpp-server._tcp.muc.appux.com	SRV	10 0 5269 k.timmc.org.
+```
+
+Create a scheduled task on `appux` NFSN site:
+
+- Name: CertOracle
+- Command: /home/private/sync/cert-oracle/update-certs.sh
+- User: me
+- Environment: ssh
+- Hour: 6
+- Day of week: Every
+- Day of month: 28
+
+Remaining setup:
+
+- Run Ansible scripts
+- When prompted, copy CSR file to cert-oracle on NFSN and run it once
+- Then continue or re-run scripts
+
 # Encrypted swap space
 
 Reference: https://wiki.archlinux.org/index.php/Dm-crypt/Swap_encryption

@@ -20,6 +20,17 @@
     src: "{{ role_path }}/files/prosody/modules/"
     dest: "/opt/commapps/prosody/modules/"
 
+- name: Directory for scripts
+  file:
+    state: directory
+    path: "/opt/commapps/prosody/scripts/"
+
+- name: Setup-helper script
+  copy:
+    src: "{{ role_path }}/files/keygen/generate-tls-key-csr.sh"
+    dest: "/opt/commapps/prosody/scripts/generate-tls-key-csr.sh"
+    mode: 0755
+
 - name: Directory for Jabber data in general
   file:
     state: directory
@@ -47,8 +58,26 @@
     group: prosody
     mode: 0750
 
-# TODO: Write: brainonfire.net.key parsni.ps.key
-# TODO: Demand presence of brainonfire.net.chain.pem parsni.ps.chain.pem (prompt to run cert-oracle)
+- name: Create TLS private key and CSR
+  command: /opt/commapps/prosody/scripts/generate-tls-key-csr.sh appux.com
+  args:
+    creates: "/srv/commdata/jabber/tls/appux.com.csr.pem"
+  register: jabber__csr_created
+
+- name: Give instructions if CSR and key were created
+  debug:
+    msg:
+    - "First-time setup for appux.com:"
+    - "» Cancel this ansible run and log into the server"
+    - "» Copy /srv/commdata/jabber/tls/appux.com.csr.pem to NFSN"
+    - "» Run the cert-oracle script on NFSN"
+    - "» Run receiver on the server: /srv/commdata/jabber/cert-oracle/recv-ssl-certs.sh appux.com"
+    verbosity: 0
+  when: jabber__csr_created.changed and not ansible_check_mode
+
+- name: Pause for manual intervention when key and CSR created
+  pause:
+  when: jabber__csr_created.changed and not ansible_check_mode
 
 # TODO: Use rsync module to convey the conf.d files all at once
 
@@ -67,6 +96,12 @@
   copy:
     src: "{{ role_path }}/files/prosody/vhosts/parsni.ps.cfg.lua"
     dest: /etc/prosody/conf.d/vhosts/parsni.ps.cfg.lua
+  notify: Restart prosody
+
+- name: "Supporting prosody configs: appux vhost"
+  copy:
+    src: "{{ role_path }}/files/prosody/vhosts/appux.com.cfg.lua"
+    dest: /etc/prosody/conf.d/vhosts/appux.com.cfg.lua
   notify: Restart prosody
 
 - name: Main prosody config
