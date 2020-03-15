@@ -58,8 +58,8 @@ tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         --snaptime "$snaptime_path" \
         -C /srv/commdata/snapclone-"$snapshot_id" \
         --humanize-numbers \
-        ./sandstorm \
-        ./jabber/data # FIXME don't require jabber and sandstorm on same box
+#        ./jabber/data \ # FIXME don't require jabber and sandstorm on same box
+        ./sandstorm
 tarsnap_exit=$?
 set -e
 
