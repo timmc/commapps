@@ -13,8 +13,8 @@
     name: /mnt/not-an-hsm
     fstype: ext4
     opts: defaults
-    dump: 0
-    passno: 2
+    dump: "0"
+    passno: "2"
 
 - name: Directory for LUKS encryption key
   file:
