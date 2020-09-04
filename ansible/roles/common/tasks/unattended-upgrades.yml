@@ -8,7 +8,7 @@
     owner: root
     group: root
     mode: 0644
-- name: Enable scheduled unattended upgrades
+- name: Enable scheduled unattended security upgrades
   copy:
     src: "{{ role_path }}/files/apt.conf.d/20auto-upgrades"
     dest: /etc/apt/apt.conf.d/20auto-upgrades
