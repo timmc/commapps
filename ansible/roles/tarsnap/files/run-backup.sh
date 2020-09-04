@@ -27,7 +27,8 @@ mountpoint -q /srv/commdata || {
 
 # Using timestamped snapshots solves some concurrency issues. Use
 # nanoseconds since UNIX epoch.
-snapshot_id="tarsnap-periodic-$(date --universal +%s%N)"
+snapshot_prefix="tarsnap-periodic"
+snapshot_id="${snapshot_prefix}-$(date --universal +%s%N)"
 
 snaptime_path="/tmp/commdata-snaptime-$snapshot_id.ref"
 touch -- "$snaptime_path"
