@@ -4,12 +4,14 @@ Configuration management for Appux servers using Ansible.
 
 ## Requirements
 
-- ansible
+- `sudo apt install python3 python3-venv`
 - ssh-agent (optional)
 - gpg-agent (optional)
 
 ## Setup
 
+- Create a virtualenv: `python3.7 -m venv venv-3.7`
+- Install requirements: `pip install -r requirements/base.txt`
 - Have SSH private key installed, perhaps in
   `~/.ssh/id_ansible_appux`, with a strong passphrase
 - Have Ansible vault passphrase in GPG-encrypted file, perhaps in
@@ -24,6 +26,12 @@ Configuration management for Appux servers using Ansible.
       memorable, which limits the strength. Use diceware for this.
 
 ## Run
+
+Activate the virtualenv:
+
+```
+source venv-3.7/bin/activate
+```
 
 Unlock the SSH private key for your session, if using ssh-agent:
 
@@ -42,15 +50,17 @@ export VAULT_PASSPHRASE_GPG_FILE=vault-passphrase.gpg
 And run the appux.yml playbook on the production hosts inventory:
 
 ```
-ansible-playbook appux.yml -i prod.ini --vault-password-file=open-vault.sh
+ansible-playbook appux.yml -i prod.ini --vault-password-file=open-vault.sh --diff --check
 ```
 
 If you're not using gpg-agent to manage the vault password file,
 instead run this command:
 
 ```
-ansible-playbook appux.yml -i prod.ini --ask-vault-pass
+ansible-playbook appux.yml -i prod.ini --ask-vault-pass --diff --check
 ```
+
+Remove `--check` if the output looks reasonable.
 
 ## Secrets
 

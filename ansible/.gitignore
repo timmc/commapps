@@ -1,2 +1,6 @@
 # Ansible junk
 /*.retry
+
+# Virtualenvs
+/venv/
+/venv-*/
