@@ -11,3 +11,8 @@ PORT=6080
 BASE_URL=https://{{ sandstorm_base_domain }}
 WILDCARD_HOST=*.{{ sandstorm_base_domain }}
 # SANDCATS_BASE_DOMAIN=sandcats.io
+
+# Close the client-side hole in Sandstorm's security model (may cause some
+# apps to break). Enforces CSP to prevent loading from and exfiltration to
+# other-origin sites.
+ALLOW_LEGACY_RELAXED_CSP=false
