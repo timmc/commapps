@@ -1,13 +1,22 @@
 ---
 # TODO: Add check that commdata partition is mounted, then rotate all secrets
 
+# Fetch and compute fingerprint of current authoritative key:
+#
+# curl -sS https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc \
+#   | gpg --with-colons --import-options show-only --import --fingerprint \
+#   | awk -F: '$1 == "fpr" {print $10;}'
+#
+# After running this, check the new expiry, e.g.:
+#
+# apt-key list | grep 6D1A -B 1
 - name: Install Tarsnap deb packaging key
   apt_key:
     url: https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc
     state: present
-    # Expires 2020-02-01
+    # Expires 2021-02-01
     # TODO Monitor for expiration?
-    id: "496746B3F1B9FC646BFD3EEC6D97F5A4CA38CF33"
+    id: "6D1A57E4FA6982AAA2049EB6FC72A10BF6B692AA"
 
 - name: Discover Debian codename
   shell: lsb_release --codename --short
@@ -21,6 +30,12 @@
       # Ansible: remote-backup role
       deb http://pkg.tarsnap.com/deb/{{ sh_debversion.stdout }} ./
     dest: /etc/apt/sources.list.d/tarsnap.list
+  register: tarsnap__repo
+
+- name: Refresh after adding repo
+  apt:
+    update_cache: yes
+  when: tarsnap__repo.changed
 
 - name: Install tarsnap
   apt: name=tarsnap
