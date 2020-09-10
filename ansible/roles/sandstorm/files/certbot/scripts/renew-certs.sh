@@ -4,10 +4,8 @@
 
 set -eu -o pipefail
 
-export RENEW_BASE_DOMAIN=parsni.ps
-export RENEW_SANDSTORM_SUBDOMAIN=sandy
-/opt/commapps/certbot/scripts/renew-one-cert.sh
+RENEW_SUB=sandy RENEW_BASE=parsni.ps RENEW_WILD=true \
+ /opt/commapps/certbot/scripts/renew-one-cert.sh
 
-export RENEW_BASE_DOMAIN=appux.com
-export RENEW_SANDSTORM_SUBDOMAIN=sandstorm
-/opt/commapps/certbot/scripts/renew-one-cert.sh
+RENEW_SUB=sandstorm RENEW_BASE=appux.com RENEW_WILD=true \
+ /opt/commapps/certbot/scripts/renew-one-cert.sh
