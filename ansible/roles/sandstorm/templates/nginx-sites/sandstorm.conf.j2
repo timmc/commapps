@@ -16,10 +16,9 @@ server {
 
 # Configuration for Sandstorm shell and apps, over HTTPS.
 server {
-  listen 443;
+  listen 443 ssl;
   server_name {{ sandstorm_base_domain }} *.{{ sandstorm_base_domain }};
 
-  ssl on;
   ssl_certificate {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_base_domain }}/fullchain.pem;
   ssl_certificate_key {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_base_domain }}/privkey.pem;
 
@@ -61,7 +60,7 @@ server {
 
 # Redirect old domain to current one
 server {
-  listen 443;
+  listen 443 ssl;
   server_name {{ sandstorm_old_domain }} *.{{ sandstorm_old_domain }};
 
   if ( $host ~ ^(?<subdomain>.+)\.\Q{{ sandstorm_old_domain }}\E$ ) {
@@ -71,7 +70,6 @@ server {
     return 301 https://{{ sandstorm_base_domain }}$request_uri;
   }
 
-  ssl on;
   ssl_certificate {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_old_domain }}/fullchain.pem;
   ssl_certificate_key {{ commdata_dir }}/etc-letsencrypt/live/{{ sandstorm_old_domain }}/privkey.pem;
 
