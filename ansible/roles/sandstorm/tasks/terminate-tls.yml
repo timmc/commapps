@@ -1,16 +1,4 @@
 ---
-- name: Install nginx
-  apt: name=nginx
-
-- name: Directory for nginx ssl params
-  file:
-    path: "/etc/nginx/ssl"
-    state: directory
-- name: Predefined Diffie-Hellman group
-  copy:
-    src: "{{ role_path }}/files/ffdhe4096.pem"
-    dest: "/etc/nginx/ssl/ffdhe4096.pem"
-  notify: nginx reload config
 
 # TODO Tasks for creating commdata
 # TODO Tasks for ensuring nginx doesn't start until commdata partition unlocked
