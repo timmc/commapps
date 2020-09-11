@@ -6,6 +6,7 @@
   file:
     path: "/etc/nginx/ssl"
     state: directory
+
 - name: Predefined Diffie-Hellman group
   copy:
     src: "{{ role_path }}/files/ffdhe4096.pem"
