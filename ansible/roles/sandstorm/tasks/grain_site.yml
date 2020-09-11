@@ -1,0 +1,13 @@
+---
+- name: "Install configuration for grain-hosted site"
+  template:
+    src: nginx-sites/grain.conf.j2
+    dest: "/etc/nginx/sites-available/{{item.domain}}.conf"
+  notify: nginx reload config
+
+- name: "Enable nginx configuration for grain-hosted site"
+  file:
+    src: "/etc/nginx/sites-available/{{item.domain}}.conf"
+    dest: "/etc/nginx/sites-enabled/{{item.domain}}.conf"
+    state: link
+  notify: nginx reload config

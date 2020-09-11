@@ -2,3 +2,9 @@
 # TODO: Add check that commdata partition is mounted, then rotate all secrets
 - include: terminate-tls.yml
 - include: sandstorm.yml
+
+- name: "Sites hosted in grains"
+  include_tasks: grain_site.yml
+  loop:
+    - purpose: "Spelunk's WebDAV integration test server"
+      domain: spelunk-webdav-testing.spidersge.org

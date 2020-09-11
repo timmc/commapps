@@ -1,0 +1,17 @@
+# Configuration for {{item.purpose}}
+server {
+  listen 443 ssl;
+  server_name {{item.domain}} *.{{item.domain}};
+
+  ssl_certificate {{commdata_dir}}/etc-letsencrypt/live/{{item.domain}}/fullchain.pem;
+  ssl_certificate_key {{commdata_dir}}/etc-letsencrypt/live/{{item.domain}}/privkey.pem;
+
+  # HSTS with a 365.25 days = 31557600 seconds expiration
+  add_header Strict-Transport-Security max-age=31557600;
+
+  location / {
+    proxy_pass http://127.0.0.1:6080;
+    # Forward the Host header
+    proxy_set_header Host $http_host;
+  }
+}
