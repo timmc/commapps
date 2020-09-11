@@ -13,3 +13,8 @@
     dest: "/etc/nginx/ssl/ffdhe4096.pem"
   notify: nginx reload config
 
+- name: "nginx global config"
+  copy:
+    src: "{{ role_path }}/files/nginx.conf"
+    dest: "/etc/nginx/nginx.conf"
+  notify: nginx reload config
