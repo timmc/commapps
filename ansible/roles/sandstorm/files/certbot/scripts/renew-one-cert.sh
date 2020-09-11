@@ -24,7 +24,7 @@ fi
 
 renew_full="${RENEW_SUB}.${RENEW_BASE}"
 domain_args=(-d "$renew_full")
-if [[ "$RENEW_WILD" = "true" ]]; then
+if [[ "${RENEW_WILD:-}" = "true" ]]; then
     domain_args+=(-d "*.$renew_full")
 fi
 
