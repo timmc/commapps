@@ -54,12 +54,12 @@ log "Running backup on $snapshot_id"
 # This uses a tarsnap key that can only read and write, but not delete
 
 set +e
+# FIXME don't hardcode sandstorm here
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
         -C /srv/commdata/snapclone-"$snapshot_id" \
         --humanize-numbers \
-#        ./jabber/data \ # FIXME don't require jabber and sandstorm on same box
         ./sandstorm
 tarsnap_exit=$?
 set -e
