@@ -24,7 +24,7 @@
   apt: name=ntp
 
 - name: "UTC system clock"
-  timezone: name=UTC
+  timezone: name=Etc/UTC
   register: common__timezone
 
 - name: "Restart cron when timezone changed"
