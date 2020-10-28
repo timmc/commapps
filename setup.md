@@ -1,13 +1,14 @@
 # OS
 
-- Regular servers: Debian 9 (Stretch) - stable
-- Raspberry Pi: Raspbian Stretch
+- Regular servers: Debian 10 (Buster) - stable
+- Raspberry Pi: Raspbian Buster
 
 ## Raspberry Pi
 
 ### Manual bootstrap
 
 - Write 2017-11-29-raspbian-stretch-lite.img to SD card
+    - UPDATE: Get buster instead
 - Connect SD card, component video, keyboard, and power
 - Log in: pi/raspberry (may need to hit enter to see prompt)
 - `sudo raspi-config`
@@ -80,14 +81,14 @@ Device     Boot     Start       End   Sectors   Size Id Type
 ## Apt sources
 
 ```
-echo 'deb http://debian.csail.mit.edu/debian stretch main contrib non-free
-deb-src http://debian.csail.mit.edu/debian stretch main contrib non-free
+echo 'deb http://debian.csail.mit.edu/debian buster main contrib non-free
+deb-src http://debian.csail.mit.edu/debian buster main contrib non-free
 
-deb http://debian.csail.mit.edu/debian stretch-updates main contrib non-free
-deb-src http://debian.csail.mit.edu/debian stretch-updates main contrib non-free
+deb http://debian.csail.mit.edu/debian buster-updates main contrib non-free
+deb-src http://debian.csail.mit.edu/debian buster-updates main contrib non-free
 
-deb http://security.debian.org/ stretch/updates main contrib non-free
-deb-src http://security.debian.org/ stretch/updates main contrib non-free
+deb http://security.debian.org/ buster/updates main contrib non-free
+deb-src http://security.debian.org/ buster/updates main contrib non-free
 ' | sudo tee /etc/apt/sources.list
 ```
 
