@@ -43,13 +43,6 @@ ssh-agent bash
 ssh-add ~/.ssh/id_ansible_appux
 ```
 
-Tell the vault script where to find the encrypted passphrase, if using
-gpg-agent:
-
-```
-export VAULT_PASSPHRASE_GPG_FILE=vault-passphrase.gpg
-```
-
 And run the appux.yml playbook on the production hosts inventory:
 
 ```

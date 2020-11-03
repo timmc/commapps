@@ -17,4 +17,4 @@ EOF
     exit 1
 fi
 
-gpg --batch --use-agent --decrypt -- "$VAULT_PASSPHRASE_GPG_FILE"
+gpg --batch --use-agent --decrypt -- "${VAULT_PASSPHRASE_GPG_FILE:-vault-passphrase.gpg}"
