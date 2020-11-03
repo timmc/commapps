@@ -2,5 +2,4 @@
 /*.retry
 
 # Virtualenvs
-/venv/
-/venv-*/
+/.venv*/

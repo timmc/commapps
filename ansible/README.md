@@ -10,8 +10,11 @@ Configuration management for Appux servers using Ansible.
 
 ## Setup
 
-- Create a virtualenv: `python3.7 -m venv venv-3.7`
-- Install requirements: `pip install -r requirements/base.txt`
+- Create a virtualenv: `python3.7 -m venv .venv37`
+- If desired, first upgrade requirements:
+  `pip install pip-tools && pip-compile -U -o requirements/base.txt requirements/base.in`
+- Install requirements:
+  `pip install pip-tools && pip-sync requirements/base.txt`
 - Have SSH private key installed, perhaps in
   `~/.ssh/id_ansible_appux`, with a strong passphrase
 - Have Ansible vault passphrase in GPG-encrypted file, perhaps in
@@ -30,7 +33,7 @@ Configuration management for Appux servers using Ansible.
 Activate the virtualenv:
 
 ```
-source venv-3.7/bin/activate
+source .venv37/bin/activate
 ```
 
 Unlock the SSH private key for your session, if using ssh-agent:
