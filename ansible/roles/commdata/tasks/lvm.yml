@@ -13,6 +13,73 @@
   community.general.lvol:
     lv: main
     vg: commdata
-    # Leave enough space for a snapshot to be created for backups
-    size: 98%FREE
+    # Leave enough space for a snapshot to be created for backups.
+    # Fun fact: The value of 98%FREE is determined by whether this has
+    # already run or not, so 98%VG is the best option.
+    size: 98%VG
     active: yes
+
+- name: "Ext4 filesystem for actual commdata"
+  community.general.filesystem:
+    dev: /dev/mapper/commdata-main
+    fstype: ext4
+
+- name: "Mountpoint for encrypted partition"
+  file:
+    state: directory
+    path: /srv/commdata
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Location for LVM scripts
+  file:
+    state: directory
+    path: /opt/commapps/encfs/lvm
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for mounting LVM
+  copy:
+    src: "{{ role_path }}/files/lvm/mount.sh"
+    dest: /opt/commapps/encfs/lvm/mount.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Script for unmounting LVM
+  copy:
+    src: "{{ role_path }}/files/lvm/unmount.sh"
+    dest: /opt/commapps/encfs/lvm/unmount.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Systemd unit file for mounting LVM
+  copy:
+    src: "{{ role_path }}/files/lvm/commdata-fs.service"
+    dest: /opt/commapps/encfs/lvm/commdata-fs.service
+    mode: 0644
+  register: commdata__lvm_service_file
+
+- name: Symlink LVM mount unit file
+  file:
+    state: link
+    path: /etc/systemd/system/commdata-fs.service
+    src: /opt/commapps/encfs/lvm/commdata-fs.service
+    force: yes # useful in check mode, when src didn't exist yet
+  register: commdata__lvm_service_link
+
+# Conditional reload doesn't always seem to be sufficient, so watch
+# out for that.
+
+- name: Reload systemd config if luks unit file changed
+  command: systemctl daemon-reload
+  when: commdata__lvm_service_file.changed or commdata__lvm_service_link.changed
+
+- name: Enable LVM mount service
+  service:
+    name: commdata-fs
+    enabled: yes
+    state: started
