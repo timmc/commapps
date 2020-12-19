@@ -18,6 +18,8 @@
     mode: 0600
   no_log: true
 
+# ----
+
 - name: Directory for dyndns scripts
   file:
     state: directory
@@ -34,10 +36,21 @@
     group: root
     mode: 0755
 
+# TODO: Create dyndns user and run with lowered permissions
+
 - name: Install dyndns cron job
   copy:
-    src: "{{ role_path }}/files/dns-update.cron"
+    content: |
+      PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+      */3 * * * * root /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-afraid.org-home.log 2>&1
     dest: /etc/cron.d/dyndns-afraid-org-update
-    owner: root
-    group: root
-    mode: 0644
+
+- name: Rotate logs
+  copy:
+    content: |
+      /var/log/dyndns-afraid.org-home.log {
+        weekly
+        rotate 5
+        missingok
+      }
+    dest: /etc/logrotate.d/appux-dyndns

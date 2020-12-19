@@ -1,2 +1,0 @@
-PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-*/3 * * * * root /opt/commapps/dyndns/dns-update.sh
