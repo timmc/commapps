@@ -12,10 +12,18 @@
 # - Find partition UUID for logical partition used for LUKS, and add it
 #   to the host var file:
 #     commdata__luks_partuuid: $PARTUUID
-# - Set host variable `commdata__zfs` to true or false depending on
-#   whether ZFS is supported on that architecture (no for raspi)
+# - Set host variables `commdata__zfs` and `commdata__lvm` (at most one as True)
+#   depending on which one will be used. ZFS playbook is not supported on some
+#   architectures, such as ARM (Raspberry Pi).
+
+- name: "Fail if incompatible FS settings"
+  fail:
+    msg: "At most one of ZFS and LVM can be selected"
+  when: commdata__zfs and commdata__lvm
 
 - include: migration_cleanup.yml
 - include: luks.yml
 - include: zfs.yml
   when: commdata__zfs == True
+- include: lvm.yml
+  when: commdata__lvm == True

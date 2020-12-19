@@ -1,0 +1,18 @@
+---
+# LVM + ext4 filesystem
+
+- name: "Install LVM tooling"
+  apt: name=lvm2
+
+- name: "Volume group for commdata"
+  community.general.lvg:
+    vg: commdata
+    pvs: /dev/mapper/con-commdata
+
+- name: "Main logical volume"
+  community.general.lvol:
+    lv: main
+    vg: commdata
+    # Leave enough space for a snapshot to be created for backups
+    size: 98%FREE
+    active: yes

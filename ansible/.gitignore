@@ -3,3 +3,6 @@
 
 # Virtualenvs
 /.venv*/
+
+# Ansible Galaxy downloads
+/.ansible-galaxy/

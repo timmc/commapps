@@ -11,10 +11,12 @@ Configuration management for Appux servers using Ansible.
 ## Setup
 
 - Create a virtualenv: `python3.7 -m venv .venv37`
-- If desired, first upgrade requirements:
+- If desired, first upgrade dependencies:
   `pip install pip-tools && pip-compile -U -o requirements/base.txt requirements/base.in`
-- Install requirements:
+- Install Python dependencies:
   `pip install pip-tools && pip-sync requirements/base.txt`
+- Install Ansible Galaxy dependencies:
+  `ansible-galaxy collection install -r galaxy-reqs.yml`
 - Have SSH private key installed, perhaps in
   `~/.ssh/id_ansible_appux`, with a strong passphrase
 - Have Ansible vault passphrase in GPG-encrypted file, perhaps in
