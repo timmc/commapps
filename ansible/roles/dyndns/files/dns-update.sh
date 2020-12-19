@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu -o -pipefail
+set -eu -o pipefail
 
 # Randomized [0..59] sleep to reduce impact on afraid.org
 sleep 20
