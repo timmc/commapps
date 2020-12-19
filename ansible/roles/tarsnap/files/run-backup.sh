@@ -78,6 +78,8 @@ set +e
 # help if you end up in this situation:
 #
 #    for s in `zfs list -t snapshot | grep -F "tarsnap-periodic" | sort | awk '{ print $1 }'`; do echo "Destroying $s"; zfs destroy -R "$s"; done
+#
+# TODO: Switch to using ext4 and use LVM for snapshotting -- more reliable?
 zfs destroy -R commdata@"$snapshot_id"
 snapshot_destroy_exit=$?
 set -e
