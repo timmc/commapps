@@ -18,10 +18,18 @@
     mode: 0600
   no_log: true
 
+- name: Directory for dyndns scripts
+  file:
+    state: directory
+    path: /opt/commapps/dyndns
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Install dyndns updater script
   copy:
     src: "{{ role_path }}/files/dns-update.sh"
-    dest: /srv/commdata/dyndns/dns-update.sh
+    dest: /opt/commapps/dyndns/dns-update.sh
     owner: root
     group: root
     mode: 0755
