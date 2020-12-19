@@ -71,3 +71,24 @@ the indirection files should each have a comment describing the secret
 -- how it was generated, and the last date it was generated, or any
 changed inputs. This is in lieu of versioning the actual secret, but
 still provides for some degree of version history.
+
+## Moving a service
+
+Let's say we're moving a service from one host to another. In examples
+below, the `jabber` service is moving from a "source" of
+`murphy.internal` to a "destination" of `toster.internal`.
+
+- Shut down the service on the source host.
+    - Example: `ssh root@murphy.internal systemctl stop prosody`
+- Remove any existing service data on the destination machine
+    - Example: `ssh root@toster.internal rm -rf /srv/commdata/jabber/`
+- Copy over the service data using a tar stream
+    - Example: `ssh root@murphy.internal "tar czf - -C /srv/commdata jabber" | ssh root@toster.internal "tar xzf - -C /srv/commdata"`
+- Add destination host to service in prod.ini and run Ansible on
+  it. This will also start the service.
+    - Example: Add `toster.internal` under the `[jabber]` header and
+      run Ansible with `--limit toster.internal`
+- Change any DNS or router configuration to point to destination
+- Confirm service is running properly on destination, then delete
+  files from source
+    - Example: `ssh root@murphy.internal rm -rf /srv/commdata/jabber/`
