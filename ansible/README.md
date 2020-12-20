@@ -32,17 +32,17 @@ Configuration management for Appux servers using Ansible.
 
 ## Run
 
-Activate the virtualenv:
-
-```
-source .venv37/bin/activate
-```
-
 Unlock the SSH private key for your session, if using ssh-agent:
 
 ```
 ssh-agent bash
 ssh-add ~/.ssh/id_ansible_appux
+```
+
+Activate the virtualenv:
+
+```
+source .venv37/bin/activate
 ```
 
 And run the appux.yml playbook on the production hosts inventory:
