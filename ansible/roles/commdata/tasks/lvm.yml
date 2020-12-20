@@ -13,10 +13,14 @@
   community.general.lvol:
     lv: main
     vg: commdata
-    # Leave enough space for a snapshot to be created for backups.
-    # Fun fact: The value of 98%FREE is determined by whether this has
-    # already run or not, so 98%VG is the best option.
-    size: 98%VG
+    # Leave enough space for a snapshot to be created for
+    # backups. This needs to leave enough room for the copy-on-write
+    # snapshot for the total volume of writes that will occur while
+    # the backup is running.
+    #
+    # TODO: Look into using a thinpool so that there's no need to plan
+    # ahead for snapshot sizes.
+    size: 95%VG
     active: yes
 
 - name: "Ext4 filesystem for actual commdata"
