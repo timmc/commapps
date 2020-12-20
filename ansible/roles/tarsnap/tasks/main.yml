@@ -96,6 +96,14 @@
     group: root
     mode: 0755
 
+- name: Install backup script - LVM variant
+  copy:
+    src: "{{ role_path }}/files/run-backup-lvm.sh"
+    dest: /opt/commapps/backups/run-backup-lvm.sh
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Install archive listing script
   copy:
     src: "{{ role_path }}/files/list-archives.sh"
@@ -112,10 +120,37 @@
     group: root
     mode: 0755
 
-- name: Install cron job
+- name: "Install cron job -- ZFS/sandstorm variant"
+  when: commdata__zfs
   copy:
     src: "{{ role_path }}/files/cron"
     dest: /etc/cron.d/sandstorm-backup # TODO move
     owner: root
     group: root
     mode: 0644
+
+- name: "Install cron job -- LVM/all variant"
+  when: commdata__lvm
+  copy:
+    content: |
+      # crontab for commdata backups, installed by ansible
+
+      SHELL=/bin/bash
+      PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+      # Timing randomly chosen to reduce stress on Tarsnap servers
+      39 4 * * * root /opt/commapps/backups/run-backup-lvm.sh >> /var/log/commdata-tarsnap-backup.log 2>&1
+    dest: /etc/cron.d/commdata-tarsnap-backup
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Log rotation"
+  copy:
+    content: |
+      /var/log/commdata-tarsnap-backup.log {
+          monthly
+          rotate 5
+          missingok
+      }
+    dest: /etc/logrotate.d/commdata-tarsnap-backup
