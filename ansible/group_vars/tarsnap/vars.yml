@@ -31,4 +31,4 @@
 # cd -
 # sudo umount ~/tmp/ram
 # ```
-commdata_tarsnap_rw_key: "{{ vault_commdata_tarsnap_rw_key }}"
+tarsnap__rw_key: "{{ vault_tarsnap__rw_key }}"

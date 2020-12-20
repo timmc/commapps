@@ -73,7 +73,7 @@
 
 - name: Tarsnap key file
   copy:
-    content: "{{ commdata_tarsnap_rw_key }}"
+    content: "{{ tarsnap__rw_key }}"
     dest: /srv/commdata/backups/secrets/tarsnap-rw.key
     owner: root
     group: root
