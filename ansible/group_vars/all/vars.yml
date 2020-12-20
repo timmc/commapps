@@ -1,3 +1,7 @@
+# Vars for roles that don't correspond directly to groups, and are
+# shared between them.
+
+
 # TODO: Securely write tarsnap key file (pre-generated on management
 # computer)
 #
@@ -25,7 +29,7 @@
 # tarsnap-keymgmt --outkeyfile tarsnap-rw.key -r -w tarsnap-full.key
 # tarsnap-keymgmt --outkeyfile tarsnap-full.passphrased.key --passphrased -r -w -d --nuke tarsnap-full.key
 # # Save off tarsnap-full.passphrased.key encrypted on management machine
-# # Save off tarsnap-rw.key into the vault: `ansible-vault edit --vault-password-file=open-vault.sh group_vars/tarsnap/vault.yml`
+# # Save off tarsnap-rw.key into the vault: `ansible-vault edit --vault-password-file=open-vault.sh group_vars/all/vault.yml`
 # shred tarsnap-full.key
 # shred tarsnap-rw.key
 # cd -
