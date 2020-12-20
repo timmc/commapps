@@ -21,7 +21,6 @@
     msg: "At most one of ZFS and LVM can be selected"
   when: commdata__zfs and commdata__lvm
 
-- include: migration_cleanup.yml
 - include: luks.yml
 - include: zfs.yml
   when: commdata__zfs == True
