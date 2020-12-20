@@ -23,7 +23,7 @@ Configuration management for Appux servers using Ansible.
   `../vault-passphrase.gpg` (using symmetric encryption, and again a
   strong passphrase)
     - The vault passphrase itself is *very* strong, since the
-      encrypted vault will be public, so offline attacks are
+      encrypted vault might become public at some point, so offline attacks are
       possible. I used `cat /dev/urandom | tr -dc '[:print:]' | head -c80`
       to produce the passphrase.
     - The passphrase protecting vault-passphrase.gpg is something
@@ -48,7 +48,7 @@ ssh-add ~/.ssh/id_ansible_appux
 And run the appux.yml playbook on the production hosts inventory:
 
 ```
-ansible-playbook appux.yml -i prod.ini --vault-password-file=open-vault.sh --diff --check
+ansible-playbook appux.yml -i prod.ini --diff --check
 ```
 
 If you're not using gpg-agent to manage the vault password file,

@@ -17,4 +17,5 @@ EOF
     exit 1
 fi
 
-gpg --batch --use-agent --decrypt -- "${VAULT_PASSPHRASE_GPG_FILE:-vault-passphrase.gpg}"
+gpg --batch --use-agent --decrypt -- \
+    "${VAULT_PASSPHRASE_GPG_FILE:-$HOME/secrets/appux-vault-passphrase.gpg}"
