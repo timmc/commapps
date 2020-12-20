@@ -10,7 +10,7 @@
 
 - name: Certbot secrets directory
   file:
-    path: "{{ commdata_dir }}/secrets/certbot"
+    path: "/srv/commdata/secrets/certbot"
     state: directory
     owner: root
     group: root
@@ -18,7 +18,7 @@
 
 - name: Certbot config directory
   file:
-    path: "{{ commdata_dir }}/etc-letsencrypt" # Replaces /etc/letsencrypt
+    path: "/srv/commdata/etc-letsencrypt" # Replaces /etc/letsencrypt
     state: directory
     owner: root
     group: root
@@ -27,12 +27,12 @@
 - name: "Certbot configuration"
   copy:
     src: "{{ role_path }}/files/certbot/certbot.ini"
-    dest: "{{ commdata_dir }}/etc-letsencrypt/certbot.ini"
+    dest: "/srv/commdata/etc-letsencrypt/certbot.ini"
 
 - name: NFSN API key
   copy:
     content: "{{ sandstorm__nfsn_api_key }}"
-    dest: "{{ commdata_dir }}/secrets/certbot/nfsn-api-key"
+    dest: "/srv/commdata/secrets/certbot/nfsn-api-key"
     owner: root
     group: root
     mode: 0600

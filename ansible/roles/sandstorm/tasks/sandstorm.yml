@@ -21,7 +21,7 @@
 - name: "Sandstorm config file"
   template:
     src: "{{ role_path }}/templates/sandstorm/sandstorm.conf.j2"
-    dest: "{{ commdata_dir }}/sandstorm/sandstorm.conf"
+    dest: "/srv/commdata/sandstorm/sandstorm.conf"
   notify: restart sandstorm
 
 - name: "Ensure sandstorm is running"
