@@ -29,6 +29,7 @@
     content: |
       # Ansible: remote-backup role
       deb http://pkg.tarsnap.com/deb/{{ sh_debversion.stdout }} ./
+      deb-src http://pkg.tarsnap.com/deb-src ./
     dest: /etc/apt/sources.list.d/tarsnap.list
   register: tarsnap__repo
 
@@ -37,8 +38,30 @@
     update_cache: yes
   when: tarsnap__repo.changed
 
+# Tarsnap packages are only pre-built for some architectures (not for
+# ARM, for instance.) If it's in the package cache we can install it,
+# but otherwise we'll have to use apt-src to build it from source.
+
+- name: "Check if tarsnap is installable from binary"
+  shell: apt-cache show tarsnap
+  register: tarsnap__apt_cache
+  failed_when: False
+  changed_when: False
+  check_mode: no
+
 - name: Install tarsnap
+  when: tarsnap__apt_cache.rc == 0
   apt: name=tarsnap
+
+# TODO: Check if the installed version is the latest available, and
+# upgrading if not. (Would apply to apt-src compiled packages, which
+# don't get upgrades the normal way.)
+
+- name: "Compile and install tarsnap"
+  when: tarsnap__apt_cache.rc != 0
+  include: source-install.yml
+
+# ----
 
 - name: Directory for tarsnap secrets
   file:
