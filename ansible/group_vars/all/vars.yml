@@ -1,10 +1,8 @@
 # Vars for roles that don't correspond directly to groups, and are
 # shared between them.
 
-# See tarsnap role README.md for details.
-# Legacy single key, to be retired
-tarsnap__rw_key: "{{ vault_tarsnap__rw_key }}"
 # Per-host Tarsnap machine keys, only capable of read-write.
+# See tarsnap role README.md for details.
 tarsnap__rw_keys:
   toster: "{{ vault_tarsnap__rw_key_toster }}"
   murphy: "{{ vault_tarsnap__rw_key_murphy }}"

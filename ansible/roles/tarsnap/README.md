@@ -5,11 +5,13 @@ compressed backups. It entails a preloaded account with pro rata
 billing and an open source client that performs all encryption
 locally.
 
+It's a bit slow, especially on the restore side, but it does the job.
+
 ## General approach
 
-- TODO: Each service host has its own Tarsnap private key
+- Each service host has its own Tarsnap private key
 - Each service host runs a nightly backup job
-- TODO: The management host rotates backups on behalf of the service hosts
+- TODO: The supervisor rotates backups on behalf of the service hosts
 
 ## Details
 
@@ -19,18 +21,22 @@ NOT YET IMPLEMENTED
     - Delete and nuke access have been stripped from it so that if the
       machine is compromised the attacker cannot destroy existing
       backups.
-- The management host has the full key for every service host
+- The supervisor has the full key for every service host
     - This is required for performing deletions. Read access is
       necessary because of the deduplication.
-- Each ansible role is responsible for initiating nightly backups for
-  whatever data it manages, using the read-write key.
-- The archives contain the host name and the role name (or similar).
-- The management host has a daily task to rotate backups (that is,
+- `/srv/commdata` is backed up nightly using the read-write key; all
+  ansible roles must store any sensitive or important data in this
+  directory.
+- The archive names contain the host name, rather than the roles the
+  host performs.
+- TODO: The supervisor has a daily task to rotate backups (that is,
   delete selected older backups) for each of those other hosts
-- Because tarsnap requires in up-to-date cache dir per key, each
-  host runs tarsnap with the `--fsck` flag before running a backup,
-  since any intervening archive deletions from the management host
-  will have put the cache dir out of sync.
+- TODO: Because tarsnap requires in up-to-date cache dir per key, each host
+  runs tarsnap with the `--fsck` flag before running a backup, since
+  any intervening archive deletions from the supervisor will have put
+  the cache dir out of sync. (Alternatively, the supervisor might be
+  able to copy its copy of the cache dir over after performing
+  rotations.)
 
 ## Key provisioning
 
@@ -92,7 +98,7 @@ tarsnap-keymgmt --outkeyfile "$TMPDIR/tarsnap-rw.key" -r -w "$TMPDIR/tarsnap-ful
 (ansible-vault decrypt --output - group_vars/all/vault.yml; echo "vault_tarsnap__rw_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-rw.key") | ansible-vault encrypt --output group_vars/all/vault.yml
 ``
 
-Save the full key for the management machine to use.
+Save the full key for the supervisor machine to use.
 
 ```
 (ansible-vault decrypt --output - group_vars/supervisor/vault.yml; echo "vault_tarsnap__full_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.key") | ansible-vault encrypt --output group_vars/supervisor/vault.yml
@@ -112,3 +118,4 @@ entries.
 
 - Timing of cron jobs
 - Fast restore: https://github.com/directededge/redsnapper
+- `--aggressive-networking`
