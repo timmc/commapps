@@ -27,7 +27,18 @@
 - include: lvm.yml
   when: commdata__lvm == True
 
-- name: Confirm that commdata is mounted
+# Make sure that no matter how the partition was set up, it is
+# properly mounted now. Other roles that rely on the commdata role are
+# going to be writing secrets here and need to be sure that it's the
+# encrypted partition, not the bare mountpoint.
+#
+# Other roles may wish to include this directive at the top of their
+# tasks as well, besides including commdata as a dependency role in
+# their meta/main.yml.
+#
+# Lack of this directive has caused secrets to be written to disk
+# unencrypted before, thanks to a mis-written systemd service file.
+- name: "Confirm that commdata is mounted"
   shell: mountpoint /srv/commdata
   changed_when: False
 

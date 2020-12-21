@@ -1,6 +1,11 @@
 ---
-# TODO: Add check that commdata partition is mounted, then rotate all secrets
-- include: terminate-tls.yml
+# Double-check. See redundant task in commdata for more info.
+# TODO: Rotate secrets now that this check is in place
+- name: "Confirm that commdata is mounted"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+- include: terminate-tls.yml # TODO: rename to proxy-config.yml to not be confused with role
 - include: sandstorm.yml
 
 - name: "Sites hosted in grains"
