@@ -7,3 +7,4 @@ tarsnap__rw_key: "{{ vault_tarsnap__rw_key }}"
 # Per-host Tarsnap machine keys, only capable of read-write.
 tarsnap__rw_keys:
   toster: "{{ vault_tarsnap__rw_key_toster }}"
+  murphy: "{{ vault_tarsnap__rw_key_murphy }}"

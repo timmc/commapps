@@ -4,3 +4,4 @@
 # TODO: Actually make use of these.
 tarsnap__full_keys:
   toster: "{{ vault_tarsnap__full_key_toster }}"
+  murphy: "{{ vault_tarsnap__full_key_murphy }}"
