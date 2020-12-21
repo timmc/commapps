@@ -69,7 +69,7 @@ if [[ -z "${backup_failure:-}" ]]; then
             --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
             --snaptime "$snaptime_path" \
             -C /srv/active-snapshot \
-            --humanize-numbers \
+            --humanize-numbers --aggressive-networking \
             . || {
         log "ERROR: Tarsnap failed with exit code $?"
         backup_failure=true

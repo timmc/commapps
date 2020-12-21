@@ -118,4 +118,3 @@ entries.
 
 - Timing of cron jobs
 - Fast restore: https://github.com/directededge/redsnapper
-- `--aggressive-networking`

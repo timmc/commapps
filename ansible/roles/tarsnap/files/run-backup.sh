@@ -62,7 +62,7 @@ tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
         --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
         -C /srv/commdata/snapclone-"$snapshot_id" \
-        --humanize-numbers \
+        --humanize-numbers --aggressive-networking \
         ./sandstorm
 tarsnap_exit=$?
 set -e
