@@ -57,9 +57,13 @@ Mount ramdisks over sensitive working areas, including where
 ansible-vault writes temporary plaintext copies of vaults. `ramfs` is
 chosen here over `tmpfs` to avoid data being swapped out.
 
+Also unalias `rm` if you've got it aliased to put things in the
+Trash. Not that that would have ever bitten me...
+
 ```
 sudo mount -t ramfs ramfs ~/tmp/ram && sudo chown `whoami`: ~/tmp/ram
 sudo mount -t ramfs ramfs ~/.ansible/tmp && sudo chown `whoami`: ~/.ansible/tmp
+unalias rm
 ```
 
 Set up variables and a work directory.
@@ -94,10 +98,9 @@ Save the full key for the management machine to use.
 (ansible-vault decrypt --output - group_vars/supervisor/vault.yml; echo "vault_tarsnap__full_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.key") | ansible-vault encrypt --output group_vars/supervisor/vault.yml
 ```
 
-Clean up.
+Clean up by unmounting -- this is the safest way to do it.
 
 ```
-rm -rf "$TMPDIR"
 sudo umount ~/tmp/ram ~/.ansible/tmp
 ```
 

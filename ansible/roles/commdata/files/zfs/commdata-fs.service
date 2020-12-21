@@ -22,6 +22,9 @@ ExecStop=/opt/commapps/encfs/zfs/unmount.sh
 RequiredBy=sandstorm.service
 RequiredBy=nginx.service
 RequiredBy=prosody.service
+# Mount commdata even if no services are running so that backups can run
+# but also so administrators aren't confused.
+WantedBy=multi-user.target
 
 # Note that this file lists *all possible* services that might be
 # storing data in this partition. Systemd will ignore the ones that

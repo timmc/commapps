@@ -27,6 +27,10 @@
 - include: lvm.yml
   when: commdata__lvm == True
 
+- name: Confirm that commdata is mounted
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
 - name: Directory for caches
   file:
     state: directory
