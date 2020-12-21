@@ -54,7 +54,8 @@ alternatively, push cache dir to host after deletions.
 ### Instructions
 
 Mount ramdisks over sensitive working areas, including where
-ansible-vault writes temporary plaintext copies of vaults.
+ansible-vault writes temporary plaintext copies of vaults. `ramfs` is
+chosen here over `tmpfs` to avoid data being swapped out.
 
 ```
 sudo mount -t ramfs ramfs ~/tmp/ram && sudo chown `whoami`: ~/tmp/ram
