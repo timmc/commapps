@@ -51,11 +51,14 @@ zfs clone commdata@"$snapshot_id" commdata/snapclone-"$snapshot_id"
 
 log "Running backup on $snapshot_id"
 
-# This uses a tarsnap key that can only read and write, but not delete
+# Back up the entire snapshot. There's no exclusion for the
+# Tarsnap cache directory, since Tarsnap is able to exclude that
+# on its own.
 
 set +e
 # FIXME don't hardcode sandstorm here
 tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
+        --cache /srv/commdata/cache/tarsnap \
         --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
         --snaptime "$snaptime_path" \
         -C /srv/commdata/snapclone-"$snapshot_id" \

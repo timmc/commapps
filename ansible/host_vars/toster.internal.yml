@@ -3,3 +3,4 @@ commdata__key_partuuid: 0a546db8-c367-4a7e-bfee-e1a096e926ad
 commdata__luks_partuuid: 453e050c-05
 commdata__zfs: True
 commdata__lvm: False
+host_shortname: toster

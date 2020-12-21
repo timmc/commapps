@@ -3,3 +3,4 @@ commdata__key_partuuid: 151b866e-8711-4073-a8f7-226b5ac6791f
 commdata__luks_partuuid: 112cd86e-05
 commdata__zfs: False
 commdata__lvm: True
+host_shortname: murphy

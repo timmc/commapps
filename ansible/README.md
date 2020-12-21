@@ -74,6 +74,15 @@ the indirection files should each have a comment describing the secret
 changed inputs. This is in lieu of versioning the actual secret, but
 still provides for some degree of version history.
 
+You should use this pair of commands any time you run `ansible-vault
+edit` so that plaintext secrets aren't spilled to disk:
+
+```
+sudo mount -t ramfs ramfs ~/.ansible/tmp && sudo chown `whoami`: ~/.ansible/tmp
+#ansible-vault edit ...
+sudo umount ~/.ansible/tmp
+```
+
 ## Moving a service
 
 Let's say we're moving a service from one host to another. In examples

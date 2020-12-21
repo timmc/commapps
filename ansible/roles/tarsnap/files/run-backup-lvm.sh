@@ -61,8 +61,11 @@ mount -o ro "/dev/commdata/$snapshot_id" /srv/active-snapshot || {
 if [[ -z "${backup_failure:-}" ]]; then
     log "Running backup on $snapshot_id"
 
-    # This uses a tarsnap key that can only read and write, but not delete
+    # Back up the entire snapshot. There's no exclusion for the
+    # Tarsnap cache directory, since Tarsnap is able to exclude that
+    # on its own.
     tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
+            --cache /srv/commdata/cache/tarsnap \
             --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
             --snaptime "$snaptime_path" \
             -C /srv/active-snapshot \

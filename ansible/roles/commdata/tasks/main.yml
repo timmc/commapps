@@ -26,3 +26,8 @@
   when: commdata__zfs == True
 - include: lvm.yml
   when: commdata__lvm == True
+
+- name: Directory for caches
+  file:
+    state: directory
+    path: /srv/commdata/cache

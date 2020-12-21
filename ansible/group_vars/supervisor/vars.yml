@@ -1,0 +1,6 @@
+# Full-powered Tarsnap keys for every host. See tarsnap role README.md
+# for details.
+#
+# TODO: Actually make use of these.
+tarsnap__full_keys:
+  toster: "{{ vault_tarsnap__full_key_toster }}"

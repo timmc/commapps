@@ -63,6 +63,14 @@
 
 # ----
 
+- name: Directory for tarsnap cache
+  file:
+    state: directory
+    path: /srv/commdata/cache/tarsnap
+    owner: root
+    group: root
+    mode: 0600
+
 - name: Directory for tarsnap secrets
   file:
     state: directory
@@ -73,7 +81,7 @@
 
 - name: Tarsnap key file
   copy:
-    content: "{{ tarsnap__rw_key }}"
+    content: "{{ tarsnap__rw_keys[host_shortname] }}"
     dest: /srv/commdata/backups/secrets/tarsnap-rw.key
     owner: root
     group: root
