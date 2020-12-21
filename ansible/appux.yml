@@ -1,24 +1,20 @@
 ---
+# All hosts get the common setup
 - hosts: all
   remote_user: root
   roles:
-  - common
-- hosts: inf_laptop
+    - common
+# murphy is a Raspberry Pi, planned to be the supervisor
+- hosts: murphy.internal
   remote_user: root
   roles:
-  - laptop
-- hosts: sandstorm
+    - dyndns
+# toster is a laptop
+- hosts: toster.internal
   remote_user: root
   roles:
-  - terminate-tls
-  - role: sandstorm
-    sandstorm_base_domain: sandstorm.appux.com
-    sandstorm_old_domain: sandy.parsni.ps
-- hosts: jabber
-  remote_user: root
-  roles:
-  - jabber
-- hosts: dyndns
-  remote_user: root
-  roles:
-  - dyndns
+    - laptop
+    - role: sandstorm
+      sandstorm_base_domain: sandstorm.appux.com
+      sandstorm_old_domain: sandy.parsni.ps
+    - jabber

@@ -101,7 +101,7 @@ tarsnap-keymgmt --outkeyfile "$TMPDIR/tarsnap-rw.key" -r -w "$TMPDIR/tarsnap-ful
 Save the full key for the supervisor machine to use.
 
 ```
-(ansible-vault decrypt --output - group_vars/supervisor/vault.yml; echo "vault_tarsnap__full_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.key") | ansible-vault encrypt --output group_vars/supervisor/vault.yml
+(ansible-vault decrypt --output - roles/supervisor/vars/vault.yml; echo "vault_tarsnap__full_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.key") | ansible-vault encrypt --output roles/supervisor/vars/vault.yml
 ```
 
 Clean up by unmounting -- this is the safest way to do it.
@@ -111,7 +111,7 @@ sudo umount ~/tmp/ram ~/.ansible/tmp
 ```
 
 Make sure to update `group_vars/all/vars.yml` and
-`host_vars/supervisor/vars.yml` with the newest machine key dictionary
+`roles/supervisor/vars/main.yml` with the newest machine key dictionary
 entries.
 
 ## TODO

@@ -1,5 +1,13 @@
 ---
-# TODO: Add check that commdata partition is mounted, then rotate all secrets
+# Double-check. See redundant task in commdata for more info.
+- name: "Confirm that commdata is mounted"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+# Mechanism for vars/vault separation for role vars
+- include_vars: "{{ role_path }}/vars/vault.yml"
+
+# ----
 
 # Fetch and compute fingerprint of current authoritative key:
 #

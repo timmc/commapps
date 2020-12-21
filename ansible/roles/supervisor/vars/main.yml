@@ -3,5 +3,7 @@
 #
 # TODO: Actually make use of these.
 tarsnap__full_keys:
+  # Rotated 2020-12-20
   toster: "{{ vault_tarsnap__full_key_toster }}"
+  # Rotated 2020-12-20
   murphy: "{{ vault_tarsnap__full_key_murphy }}"

@@ -1,4 +1,4 @@
 # Secret token found at https://freedns.afraid.org/dynamic/v2/
 # Can be rotated by disabling and re-enabling dynamic DNS in table.
-# Rotated 2018-03-14
+# Rotated 2020-12-21
 dyndns_afraidorg_token: "{{ vault_dyndns_afraidorg_token }}"

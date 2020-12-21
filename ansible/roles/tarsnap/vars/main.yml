@@ -1,8 +1,6 @@
-# Vars for roles that don't correspond directly to groups, and are
-# shared between them.
-
 # Per-host Tarsnap machine keys, only capable of read-write.
-# See tarsnap role README.md for details.
 tarsnap__rw_keys:
+  # Rotated 2020-12-20
   toster: "{{ vault_tarsnap__rw_key_toster }}"
+  # Rotated 2020-12-20
   murphy: "{{ vault_tarsnap__rw_key_murphy }}"
