@@ -7,7 +7,8 @@
 # Ansible Galaxy downloads
 /.ansible-galaxy/
 
-# Encrypted secrets live in vault.yml under host_vars and group_vars.
+# Encrypted secrets live in vault.yml under role vars, and potentially
+# group_vars and host_vars in the future.
 # Also include vault.yaml in case I misname the file.
 vault.yml
 vault.yaml
