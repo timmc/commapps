@@ -1,12 +1,20 @@
 #!/bin/bash
+# Update DNS records to point to this server's public IP.
+#
+# Set DYNDNS_SLEEP to a fixed random number of seconds 0-59 when
+# running from a cron job to help level load on the dyndns service.
 
 set -eu -o pipefail
 
-# Randomized [0..59] sleep to reduce impact on afraid.org
-sleep 20
+function log {
+  echo `date --universal "+%Y-%m-%d %H:%M:%S"`: "$@"
+}
+
+sleep "${DYNDNS_SLEEP:-0}"
+
+log "Running dyndns updater"
 
 token="$(cat /srv/commdata/dyndns/secrets/afraid.org-token-home)"
-
-echo -n "`date -u +'%Y-%m-%d %H:%M:%S'`: "
 curl -sS "https://sync.afraid.org/u/$token/?content-type=json" -m10 || true
-echo
+
+log "Dyndns update complete"

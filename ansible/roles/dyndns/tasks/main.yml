@@ -49,6 +49,8 @@
   copy:
     content: |
       PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+      # Randomized [0..59] sleep to reduce impact on afraid.org
+      DYNDNS_SLEEP=20
       */3 * * * * dyndns_upd /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-afraid.org-home.log 2>&1
     dest: /etc/cron.d/dyndns-afraid-org-update
 
