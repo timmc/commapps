@@ -14,15 +14,18 @@
     name: dyndns_upd
     system: yes
 
-- name: Directory for dyndns secrets
+- name: "Directory for dyndns data"
   file:
     state: directory
-    path:
-      - /srv/commdata/dyndns
-      - /srv/commdata/dyndns/secrets
+    path: /srv/commdata/dyndns
+
+- name: "Directory for dyndns secrets"
+  file:
+    state: directory
+    path: /srv/commdata/dyndns/secrets
     owner: dyndns_upd
     group: dyndns_upd
-    mode: u=r
+    mode: u=rx,g=,o=
 
 - name: Write afraid.org secret token
   copy:
@@ -30,7 +33,7 @@
     dest: /srv/commdata/dyndns/secrets/afraid.org-token-home
     owner: dyndns_upd
     group: dyndns_upd
-    mode: u=r
+    mode: u=r,g=,o=
   no_log: true
 
 # ----
