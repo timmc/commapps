@@ -10,9 +10,6 @@
 
 # ----
 
-# TODO Tasks for ensuring nginx doesn't start until commdata partition unlocked
-
-
 #== ACME wildcard cert renewal ==#
 
 - name: Install certbot
