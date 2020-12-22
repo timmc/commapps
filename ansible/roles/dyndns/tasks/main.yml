@@ -17,7 +17,9 @@
 - name: Directory for dyndns secrets
   file:
     state: directory
-    path: /srv/commdata/dyndns/secrets
+    path:
+      - /srv/commdata/dyndns
+      - /srv/commdata/dyndns/secrets
     owner: dyndns_upd
     group: dyndns_upd
     mode: u=r
@@ -37,17 +39,11 @@
   file:
     state: directory
     path: /opt/commapps/dyndns
-    owner: root
-    group: root
-    mode: 0755
 
 - name: Install dyndns updater script
   copy:
     src: "{{ role_path }}/files/dns-update.sh"
     dest: /opt/commapps/dyndns/dns-update.sh
-    owner: root
-    group: root
-    mode: 0755
 
 - name: Install dyndns cron job
   copy:
@@ -66,11 +62,3 @@
         create dyndns_upd dyndns_upd
       }
     dest: /etc/logrotate.d/appux-dyndns
-
-# TODO delete (one-off)
-- name: "Set log file to correct owner, if present"
-  file:
-    path: "/var/log/dyndns-afraid.org-home.log"
-    state: file
-    owner: dyndns_upd
-    group: dyndns_upd
