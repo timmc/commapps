@@ -77,7 +77,7 @@
     path: /srv/commdata/cache/tarsnap
     owner: root
     group: root
-    mode: 0600
+    mode: g=,o=
 
 - name: Directory for tarsnap secrets
   file:
@@ -85,7 +85,7 @@
     path: /srv/commdata/backups/secrets
     owner: root
     group: root
-    mode: 0600
+    mode: g=,o=
 
 - name: Tarsnap key file
   copy:
@@ -93,57 +93,43 @@
     dest: /srv/commdata/backups/secrets/tarsnap-rw.key
     owner: root
     group: root
-    mode: 0600
+    mode: g=,o=
   no_log: true
 
 - name: A place for tarsnap scripts
   file:
     state: directory
     path: /opt/commapps/backups
-    owner: root
-    group: root
-    mode: 0755
 
 - name: Install backup script
   copy:
     src: "{{ role_path }}/files/run-backup.sh"
     dest: /opt/commapps/backups/run-backup.sh
-    owner: root
-    group: root
-    mode: 0755
+    mode: preserve
 
 - name: Install backup script - LVM variant
   copy:
     src: "{{ role_path }}/files/run-backup-lvm.sh"
     dest: /opt/commapps/backups/run-backup-lvm.sh
-    owner: root
-    group: root
-    mode: 0755
+    mode: preserve
 
 - name: Install archive listing script
   copy:
     src: "{{ role_path }}/files/list-archives.sh"
     dest: /opt/commapps/backups/list-archives.sh
-    owner: root
-    group: root
-    mode: 0755
+    mode: preserve
 
 - name: Install archive restore script
   copy:
     src: "{{ role_path }}/files/restore-archive.sh"
     dest: /opt/commapps/backups/restore-archive.sh
-    owner: root
-    group: root
-    mode: 0755
+    mode: preserve
 
 - name: "Install cron job -- ZFS/sandstorm variant"
   when: commdata__zfs
   copy:
     src: "{{ role_path }}/files/cron"
     dest: /etc/cron.d/sandstorm-backup # TODO move
-    owner: root
-    group: root
-    mode: 0644
 
 - name: "Install cron job -- LVM/all variant"
   when: commdata__lvm
@@ -157,9 +143,6 @@
       # Timing randomly chosen to reduce stress on Tarsnap servers
       39 4 * * * root /opt/commapps/backups/run-backup-lvm.sh >> /var/log/commdata-tarsnap-backup.log 2>&1
     dest: /etc/cron.d/commdata-tarsnap-backup
-    owner: root
-    group: root
-    mode: 0644
 
 - name: "Log rotation"
   copy:
