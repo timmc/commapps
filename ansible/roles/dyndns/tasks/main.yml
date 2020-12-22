@@ -9,21 +9,26 @@
 
 # ----
 
+- name: "Create dyndns updater user with few permissions"
+  user:
+    name: dyndns_upd
+    system: yes
+
 - name: Directory for dyndns secrets
   file:
     state: directory
     path: /srv/commdata/dyndns/secrets
-    owner: root
-    group: root
-    mode: 0600
+    owner: dyndns_upd
+    group: dyndns_upd
+    mode: u=r
 
 - name: Write afraid.org secret token
   copy:
     content: "{{ dyndns_afraidorg_token }}"
     dest: /srv/commdata/dyndns/secrets/afraid.org-token-home
-    owner: root
-    group: root
-    mode: 0600
+    owner: dyndns_upd
+    group: dyndns_upd
+    mode: u=r
   no_log: true
 
 # ----
@@ -44,13 +49,11 @@
     group: root
     mode: 0755
 
-# TODO: Create dyndns user and run with lowered permissions
-
 - name: Install dyndns cron job
   copy:
     content: |
       PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-      */3 * * * * root /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-afraid.org-home.log 2>&1
+      */3 * * * * dyndns_upd /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-afraid.org-home.log 2>&1
     dest: /etc/cron.d/dyndns-afraid-org-update
 
 - name: Rotate logs
@@ -60,5 +63,14 @@
         weekly
         rotate 5
         missingok
+        create dyndns_upd dyndns_upd
       }
     dest: /etc/logrotate.d/appux-dyndns
+
+# TODO delete (one-off)
+- name: "Set log file to correct owner, if present"
+  file:
+    path: "/var/log/dyndns-afraid.org-home.log"
+    state: file
+    owner: dyndns_upd
+    group: dyndns_upd
