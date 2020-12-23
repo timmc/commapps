@@ -51,6 +51,7 @@
 - name: Install dyndns cron job
   copy:
     content: |
+      SHELL=/bin/bash
       PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
       # Randomized [0..59] sleep to reduce impact on afraid.org
       DYNDNS_SLEEP=20
