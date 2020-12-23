@@ -2,12 +2,12 @@
 
 - Control
     - Done: Move to my own domain name; prerequisites follow:
-        - Done: Buy wildcard cert
-          ([$40–70/yr](https://www.ssl2buy.com/wildcard-ssl-certificate/))
+        - Done: Get wildcard cert for Sandstorm (Let's Encrypt)
         - Done: Set up nginx with reverse proxy terminating wildcard
           TLS for Sandstorm
         - Done: Wildcard DNS via NFSN
     - **TODO**: Move from afraid.org freedns to using NFSN DNS API
+        - https://members.nearlyfreespeech.net/wiki/API/Reference
 - Repeatability
     - Done: Server rebuilt from (manual) runbook
     - **TODO**: Create automated runbook for post-OS setup
