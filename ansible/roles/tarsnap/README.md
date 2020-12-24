@@ -113,6 +113,59 @@ sudo umount ~/tmp/ram ~/.ansible/tmp
 Make sure to update `roles/{tarsnap,supervisor}/vars/main.yml` with
 the newest machine key dictionary entries.
 
+## Deleting old archives
+
+This is still an annoying manual process that must be done from the
+controller machine using the full key that is kept GPG protected
+there. The only impact of not running this every few months is that
+costs slowly creep up, despite Tarsnap's deduplication.
+
+TODO: Have the supervisor perform deletions automatically.
+
+Mount a ramdisk:
+
+```
+sudo mount -t ramfs ramfs ~/tmp/ram && sudo chown `whoami`: ~/tmp/ram
+unalias rm
+```
+
+Retrieve the full key:
+
+```
+gpg2 --decrypt ~/secrets/appux/tarsnap-machine-MACHINE_NAME.key.gpg > ~/tmp/ram/tarsnap-full.key
+```
+
+Make a cache dir, prepare it for use, and list the archives:
+
+```
+mkdir ~/tmp/ram/cache
+tarsnap --fsck-prune --keyfile ~/tmp/ram/tarsnap-full.key --cachedir ~/tmp/ram/cache
+tarsnap --list-archives --keyfile ~/tmp/ram/tarsnap-full.key --cachedir ~/tmp/ram/cache | sort > ~/tmp/ram/archives.lst
+```
+
+Edit the archives list to remove any entries you want to *keep*,
+saving it as `delete.lst`. The perform the deletions:
+
+```
+tarsnap -d --archive-names ~/tmp/ram/delete.lst --print-stats --humanize-numbers --keyfile ~/tmp/ram/tarsnap-full.key --cachedir ~/tmp/ram/cache
+```
+
+Clean up by unmounting -- this is the safest way to do it:
+
+```
+sudo umount ~/tmp/ram
+```
+
+Finally, log into the machine whose archives have been trimmed and run
+tarsnap's fsck so that the next backup will work properly:
+
+```
+tarsnap --fsck --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key --cache /srv/commdata/cache/tarsnap
+```
+
+(TODO: Have hosts automatically run --fsck as part of their backup
+process so that the supervisor is free to perform deletions at will.)
+
 ## TODO
 
 - Timing of cron jobs

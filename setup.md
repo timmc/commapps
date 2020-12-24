@@ -1,14 +1,15 @@
-# OS
+# Initial setup for hosts
 
-- Regular servers: Debian 10 (Buster) - stable
-- Raspberry Pi: Raspbian Buster
+## OS installation
 
-## Raspberry Pi
+### Raspberry Pi
 
-### Manual bootstrap
+Manual bootstrap:
 
-- Write 2017-11-29-raspbian-stretch-lite.img to SD card
-    - UPDATE: Get buster instead
+- Download latest Raspberry Pi OS (previously known as Raspbian) from
+  here, preferably the Lite version: Raspberry Pi OS Lite
+    - Last tested with `stretch`
+- Write .img to SD card
 - Connect SD card, component video, keyboard, and power
 - Log in: pi/raspberry (may need to hit enter to see prompt)
 - `sudo raspi-config`
@@ -23,7 +24,7 @@
 - `sudo systemctl enable ssh`
 - `sudo systemctl start ssh`
 - `ssh-keygen -l -f /etc/ssh/ssh_host_ecdsa_key.pub`
-    - Output: `ECDSA SHA256:0123456789ABCDEF0123456789ABCDEF0123456789A`
+    - Example output: `ECDSA SHA256:0123456789ABCDEF0123456789ABCDEF0123456789A`
 - Connect ethernet
 - From controller machine, ssh to pi@HOSTNAME.internal and verify fingerprint
 - `sudo shutdown -r now`
@@ -78,6 +79,22 @@ Device     Boot     Start       End   Sectors   Size Id Type
 /dev/sda6       299806720 312580095  12773376   6.1G 83 Linux
 ```
 
+# Encrypted swap space
+
+Reference: https://wiki.archlinux.org/index.php/Dm-crypt/Swap_encryption
+
+Use the safest method, creating a tiny decoy filesystem and then
+placing a swap space just after it using offset. This allows naming of
+the swap location independent of hardware/drive order (pinning to
+"/dev/sda6" could lead to data loss after repartitioning, since swapon
+would overwrite a partition.)
+
+```
+mkfs.ext2 -L cryptswap /dev/sda6 1M
+echo 'swap  LABEL=cryptswap  /dev/urandom  swap,offset=2048,cipher=aes-xts-plain64,size=256' >> /etc/crypttab
+echo '/dev/mapper/swap  none  swap  defaults  0  0' >> /etc/fstab
+```
+
 ## Apt sources
 
 Regular Debian computers:
@@ -104,111 +121,13 @@ deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free r
 
 Now set up port forwarding in router and use SSH for remaining config.
 
+# Pre Ansible
 
-# Basics
-```
-apt-get update
-apt-get dist-upgrade
-apt-get install cryptsetup git git-gui gitk nmap gnome-disk-utility
-```
+If the host uses the tarsnap role, create a Tarsnap key for it
+according to the README.
 
-# For each user that needs a shell:
-Set history size (can't override)
-```
-sed -i 's/^\(HIST\(FILE\)\?SIZE=.*\)/\10000/' ~/.bashrc
-mkdir ~/dotfiles
-(
-cat <<'EOF'
-export HISTTIMEFORMAT='%F %T '
-export EDITOR="emacs -nw"
-# Because Debian thinks normal users shouldn't have ifconfig or whatever
-export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
-EOF
-) > ~/dotfiles/.bash_custom
-echo 'source ~/dotfiles/.bash_custom' >> ~/.bashrc
-echo 'hardstatus string "%H | %-Lw%{= BW}%50>%n* %t%{-}%+Lw%<"
-defscrollback 5000
-vbell off' >> ~/.screenrc
-```
+# Post Ansible
 
-
-# Sandstorm
-
-DNS:
-
-```
-sandy.parsni.ps CNAME k.timmc.org.
-*.sandy.parsni.ps CNAME k.timmc.org.
-sandstorm.appux.com CNAME t.timmc.org. 600
-*.sandstorm.appux.com CNAME t.timmc.org. 600
-```
-
-Login providers:
-
-- https://console.developers.google.com/
-- https://github.com/settings/applications/248526
-
-Run ansible scripts.
-
-If you're restoring from backup, follow the
-[standard restore instructions](https://docs.sandstorm.io/en/latest/administering/backups/):
-
-- Stop sandstorm
-- Move installed dir away, replace it with backup
-- Start sandstorm
-
-# Tarsnap
-
-Created account `comm-tarsnap-commdata@brainonfire.net`
-
-Install tarsnap and provision key.
-
-Instructions for clearing old archives:
-
-- List archives: `tarsnap --list-archives --keyfile /srv/commdata/backups/tarsnap-rw.key | sort > archives.lst`
-- `cp archives.lst delete.lst` and then edit the latter
-- `tarsnap -d --archive-names delete.lst --keyfile /srv/commdata/backups/tarsnap-full.passphrased.key --print-stats --humanize-numbers`
-- `tarsnap --fsck`
-
-# Prosody
-
-DNS:
-
-```
-_xmpp-client._tcp.appux.com	SRV	10 0 5222 k.timmc.org.
-_xmpp-client._tcp.muc.appux.com	SRV	10 0 5222 k.timmc.org.
-_xmpp-server._tcp.appux.com	SRV	10 0 5269 k.timmc.org.
-_xmpp-server._tcp.muc.appux.com	SRV	10 0 5269 k.timmc.org.
-```
-
-Create a scheduled task on `appux` NFSN site:
-
-- Name: CertOracle
-- Command: /home/private/sync/cert-oracle/update-certs.sh
-- User: me
-- Environment: ssh
-- Hour: 6
-- Day of week: Every
-- Day of month: 28
-
-Remaining setup:
-
-- Run Ansible scripts
-- When prompted, copy CSR file to cert-oracle on NFSN and run it once
-- Then continue or re-run scripts
-
-# Encrypted swap space
-
-Reference: https://wiki.archlinux.org/index.php/Dm-crypt/Swap_encryption
-
-Use the safest method, creating a tiny decoy filesystem and then
-placing a swap space just after it using offset. This allows naming of
-the swap location independent of hardware/drive order (pinning to
-"/dev/sda6" could lead to data loss after repartitioning, since swapon
-would overwrite a partition.)
-
-```
-mkfs.ext2 -L cryptswap /dev/sda6 1M
-echo 'swap  LABEL=cryptswap  /dev/urandom  swap,offset=2048,cipher=aes-xts-plain64,size=256' >> /etc/crypttab
-echo '/dev/mapper/swap  none  swap  defaults  0  0' >> /etc/fstab
-```
+If the host has the commdata role, copy text of
+`/mnt/not-an-hsm/commdata/enckey/pass.txt` into controller's
+`private-partition-passphrases.gpg` recovery file.
