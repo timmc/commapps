@@ -56,7 +56,7 @@
     group: dyndns_upd
     # This is required in order to ensure the file is *present* and
     # also gets correct mode/owner, but doesn't get touched if already
-    # present.
+    # present. Thanks to https://github.com/ansible/ansible/issues/7490
     state: touch
     modification_time: preserve
     access_time: preserve
