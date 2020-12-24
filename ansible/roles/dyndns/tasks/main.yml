@@ -47,6 +47,7 @@
   copy:
     src: "{{ role_path }}/files/dns-update.sh"
     dest: /opt/commapps/dyndns/dns-update.sh
+    mode: preserve
 
 - name: "Create log file writeable by dyndns user"
   file:
