@@ -8,6 +8,7 @@ Before=nginx.service
 # Account data is stored in /srv/commdata/jabber/data
 Before=prosody.service
 
+Requires=commdata-luks.service
 After=commdata-luks.service
 
 [Service]

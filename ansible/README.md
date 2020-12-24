@@ -10,7 +10,8 @@ Configuration management for Appux servers using Ansible.
 
 ## Setup
 
-- Create a virtualenv: `python3.7 -m venv .venv37`
+- Create a virtualenv using `python3.7 -m venv .venv37`
+  and then activate it with `source .venv37/bin/activate`
 - If desired, first upgrade dependencies:
   `pip install pip-tools && pip-compile -U -o requirements/base.txt requirements/base.in`
 - Install Python dependencies:
