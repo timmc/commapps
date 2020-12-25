@@ -63,22 +63,19 @@
 - name: Systemd unit file for mounting LVM
   copy:
     src: "{{ role_path }}/files/lvm/commdata-fs.service"
-    dest: /opt/commapps/encfs/lvm/commdata-fs.service
-    mode: 0644
+    dest: /etc/systemd/system/commdata-fs.service
   register: commdata__lvm_service_file
 
-- name: Symlink LVM mount unit file
+- name: "Migration: Remove symlinked LVM mount unit file"
   file:
-    state: link
-    path: /etc/systemd/system/commdata-fs.service
-    src: /opt/commapps/encfs/lvm/commdata-fs.service
-    force: yes # useful in check mode, when src didn't exist yet
+    state: absent
+    path: /opt/commapps/encfs/lvm/commdata-fs.service
   register: commdata__lvm_service_link
 
 # Conditional reload doesn't always seem to be sufficient, so watch
 # out for that.
 
-- name: Reload systemd config if luks unit file changed
+- name: Reload systemd config if lvm unit file changed
   command: systemctl daemon-reload
   when: commdata__lvm_service_file.changed or commdata__lvm_service_link.changed
 

@@ -102,16 +102,13 @@
 - name: Systemd unit file for encrypted partition
   copy:
     src: "{{ role_path }}/files/luks.service"
-    dest: /opt/commapps/encfs/luks/commdata-luks.service
-    mode: 0644
+    dest: /etc/systemd/system/commdata-luks.service
   register: commdata__luks_service_file
 
-- name: Symlink encrypted partition unit file
+- name: "Migration: Remove symlinked encrypted partition unit file"
   file:
-    state: link
-    path: /etc/systemd/system/commdata-luks.service
-    src: /opt/commapps/encfs/luks/commdata-luks.service
-    force: yes # useful in check mode, when src didn't exist yet
+    state: absent
+    path: /opt/commapps/encfs/luks/commdata-luks.service
   register: commdata__luks_service_link
 
 # Conditional reload doesn't always seem to be sufficient, so watch
@@ -129,4 +126,3 @@
     name: commdata-luks
     enabled: yes
     state: started
-
