@@ -66,18 +66,9 @@
     dest: /etc/systemd/system/commdata-fs.service
   register: commdata__lvm_service_file
 
-- name: "Migration: Remove symlinked LVM mount unit file"
-  file:
-    state: absent
-    path: /opt/commapps/encfs/lvm/commdata-fs.service
-  register: commdata__lvm_service_link
-
-# Conditional reload doesn't always seem to be sufficient, so watch
-# out for that.
-
 - name: Reload systemd config if lvm unit file changed
   command: systemctl daemon-reload
-  when: commdata__lvm_service_file.changed or commdata__lvm_service_link.changed
+  when: commdata__lvm_service_file.changed
 
 - name: Enable LVM mount service
   service:

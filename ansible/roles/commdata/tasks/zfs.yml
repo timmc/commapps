@@ -69,18 +69,9 @@
     dest: /etc/systemd/system/commdata-fs.service
   register: commdata__zfs_service_file
 
-- name: "Migration: Remove symlinked ZFS mount unit file"
-  file:
-    state: absent
-    path: /opt/commapps/encfs/zfs/commdata-fs.service
-  register: commdata__zfs_service_link
-
-# Conditional reload doesn't always seem to be sufficient, so watch
-# out for that.
-
 - name: Reload systemd config if zfs unit file changed
   command: systemctl daemon-reload
-  when: commdata__zfs_service_file.changed or commdata__zfs_service_link.changed
+  when: commdata__zfs_service_file.changed
 
 - name: Enable ZFS mount service
   service:

@@ -94,29 +94,15 @@
     dest: /opt/commapps/encfs/luks/lock.sh
     mode: 0755
 
-# This approach of using a symlinked unit file requires systemd v228
-# or higher, as far as I can tell:
-# https://github.com/systemd/systemd/issues/1836
-# This didn't work on Debian 8 (Jessie), but does on Debian 9 (Stretch)
-
 - name: Systemd unit file for encrypted partition
   copy:
     src: "{{ role_path }}/files/luks.service"
     dest: /etc/systemd/system/commdata-luks.service
   register: commdata__luks_service_file
 
-- name: "Migration: Remove symlinked encrypted partition unit file"
-  file:
-    state: absent
-    path: /opt/commapps/encfs/luks/commdata-luks.service
-  register: commdata__luks_service_link
-
-# Conditional reload doesn't always seem to be sufficient, so watch
-# out for that.
-
 - name: Reload systemd config if luks unit file changed
   command: systemctl daemon-reload
-  when: commdata__luks_service_file.changed or commdata__luks_service_link.changed
+  when: commdata__luks_service_file.changed
 
 # At boot this service will be started automatically, but at setup
 # need it open in order to set up ZFS.
