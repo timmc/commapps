@@ -40,7 +40,8 @@ Now expand the rootfs filesystem into the new space:
 `sudo resize2fs /dev/sdXXX2`
 
 Mount rootfs, set `ROOTFS=<path to rootfs mount>` and
-`HOSTNAME=<shortname>`, and make the following changes as root:
+`HOSTNAME=<shortname>`, and make the following changes as root from
+the base of the repo:
 
 - Set the hostname:
   `echo "$HOSTNAME" > "$ROOTFS"/etc/hostname`
@@ -57,17 +58,22 @@ Now make one more change, but this time to the *boot*
 partition. Create a blank file called `ssh` in the boot partition to
 tell the Raspberry Pi to enable ssh on next boot.
 
-Unmount boot and rootfs. Plug in ethernet and power, find the IP
-address (e.g. `nmap -p 22 10.0.1.0/24`), and wait until SSH is
-responsive. SSH in as `root` using the Ansible root key. (You can
+Unmount boot and rootfs. Plug in ethernet and power, but not the
+encryption key USB stick (which seems to inhibit first-boot, or at
+least first-boot ssh.)
+
+Locate the host's IP address and wait for SSH to become responsive.
+(Something like `nmap -p 22 10.0.1.0/24` is great for this.)
+SSH in as `root` using the Ansible root key. (You can
 either trust the host fingerprints on first use or see one of the
 variations below.)
 
 As root, perform some final manual setup by running `raspi-config`:
 
 - Accept `pi` as the default user if prompted
-- Use the "Update" option
-- "Advanced -> Memory Split" or "Performance -> GPU Memory"
+- Use the "Update" option to update the config tool
+- "Advanced -> Memory Split" or "Performance -> GPU Memory" depending
+  on model
     - Set GPU memory from 64 down to 16
 - "Exit" or "Finish" and allow to reboot
 
