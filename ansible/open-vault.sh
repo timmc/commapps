@@ -11,7 +11,7 @@ set -eu -o pipefail
 
 while true; do
     mtype=`findmnt --output=fstype --noheadings -- ~/.ansible/tmp || true`
-    if [[ "$mtype" != "ramfs" ]]; then
+    if [[ "$mtype" = "ramfs" ]]; then
         break
     fi
     cat <<EOF >&2
