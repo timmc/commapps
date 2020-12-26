@@ -4,11 +4,14 @@
   remote_user: root
   roles:
     - common
-# murphy is a Raspberry Pi, planned to be the supervisor
+
+# murphy is a Raspberry Pi
 - hosts: murphy.internal
   remote_user: root
   roles:
+    - supervisor
     - dyndns
+
 # toster is a laptop
 - hosts: toster.internal
   remote_user: root

@@ -1,0 +1,55 @@
+---
+# Double-check. See redundant task in commdata for more info.
+- name: "Confirm that commdata is mounted"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+# Mechanism for vars/vault separation for role vars
+- include_vars: "{{ role_path }}/vars/vault.yml"
+
+# ----
+
+- name: "Directory for supervisor data"
+  file:
+    state: directory
+    path: /srv/commdata/supervisor
+
+
+#== Backups maintenance ==#
+
+- name: "Create backups user with few permissions"
+  user:
+    name: backups
+    system: yes
+
+- name: "Directory for backups maintenance data"
+  file:
+    state: directory
+    path: /srv/commdata/supervisor/backups
+    owner: backups
+    mode: u=rx,g=,o=
+
+- name: "Directory for each machine's data"
+  file:
+    state: directory
+    path: "/srv/commdata/supervisor/backups/{{ item.name }}"
+    owner: backups
+    mode: u=rx,g=,o=
+  with_items: "{{ supervisor__hosts }}"
+
+- name: "Each machine's encrypted Tarsnap key"
+  copy:
+    content: "{{ supervisor__tarsnap_full_keys[item.name] }}"
+    dest: "/srv/commdata/supervisor/backups/{{ item.name }}/tarsnap-full.enc.key"
+    owner: backups
+    mode: u=r,g=,o=
+  with_items: "{{ supervisor__hosts }}"
+  no_log: true
+
+- name: "Each machine's Tarsnap cache directory"
+  file:
+    state: directory
+    path: "/srv/commdata/supervisor/backups/{{ item.name }}/cache"
+    owner: backups
+    mode: u=rwx,g=,o=
+  with_items: "{{ supervisor__hosts }}"

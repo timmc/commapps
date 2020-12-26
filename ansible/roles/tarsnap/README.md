@@ -118,7 +118,7 @@ tarsnap-keymgmt --outkeyfile "$TMPDIR/tarsnap-rw.key" -r -w "$TMPDIR/tarsnap-ful
 Read the tarsnap passphrase out of the supervisor's vars:
 
 ```
-ansible-vault decrypt --output - roles/supervisor/vars/vault.yml | grep vault_tarsnap__key_pass
+ansible-vault decrypt --output - roles/supervisor/vars/vault.yml | grep vault_supervisor__tarsnap_key_pass
 ```
 
 Make a passphrased version of the full key for the supervisor machine
@@ -126,7 +126,7 @@ to use. Use the passphrase printed above when prompted.
 
 ```
 tarsnap-keymgmt --outkeyfile "$TMPDIR/tarsnap-full.enc.key" -r -w -d --nuke --passphrased --passphrase-mem 25000000 --passphrase-time 8 "$TMPDIR/tarsnap-full.key"
-(ansible-vault decrypt --output - roles/supervisor/vars/vault.yml; echo "vault_tarsnap__full_enc_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.enc.key") | ansible-vault encrypt --output roles/supervisor/vars/vault.yml
+(ansible-vault decrypt --output - roles/supervisor/vars/vault.yml; echo "vault_supervisor__tarsnap_full_enc_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.enc.key") | ansible-vault encrypt --output roles/supervisor/vars/vault.yml
 ```
 
 Clean up by unmounting -- this is the safest way to do it.
@@ -187,9 +187,6 @@ tarsnap's fsck so that the next backup will work properly:
 ```
 tarsnap --fsck --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key --cache /srv/commdata/cache/tarsnap
 ```
-
-(TODO: Have hosts automatically run --fsck as part of their backup
-process so that the supervisor is free to perform deletions at will.)
 
 ## TODO
 
