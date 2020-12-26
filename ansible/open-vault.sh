@@ -1,6 +1,8 @@
 #!/bin/bash
 # Call with VAULT_PASSPHRASE_GPG_FILE environment variable pointing to
 # the vault_passphrase.gpg file.
+#
+# See ansible.cfg for more details.
 
 set -eu -o pipefail
 
