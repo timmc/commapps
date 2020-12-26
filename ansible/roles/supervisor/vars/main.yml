@@ -1,9 +1,11 @@
+# Passphrase to decrypt the full keys below.
+tarsnap__key_pass: "{{ vault_tarsnap__key_pass }}"
 # Full-powered Tarsnap keys for every host. See tarsnap role README.md
 # for details.
 #
 # TODO: Actually make use of these.
-tarsnap__full_keys:
+tarsnap__full_enc_keys:
   # Rotated 2020-12-20
-  toster: "{{ vault_tarsnap__full_key_toster }}"
+  toster: "{{ vault_tarsnap__full_enc_key_toster }}"
   # Rotated 2020-12-20
-  murphy: "{{ vault_tarsnap__full_key_murphy }}"
+  murphy: "{{ vault_tarsnap__full_enc_key_murphy }}"

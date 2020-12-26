@@ -21,22 +21,39 @@ NOT YET IMPLEMENTED
     - Delete and nuke access have been stripped from it so that if the
       machine is compromised the attacker cannot destroy existing
       backups.
+    - Read access is retained for two reasons: It's needed for at
+      least the initial cache dir setup, and because it's nice to be
+      able to do restores directly from the machine that needs them.
+      It's not strictly necessary, since the supervisor could perform
+      both of these actions, and theoretically an attacker might be
+      interested in reading deleted files that are still in the
+      archives, but it's likely not worth the trouble.
 - The supervisor has the full key for every service host
     - This is required for performing deletions. Read access is
       necessary because of the deduplication.
+    - The key is protected with a passphrase that is [TODO] stored on the
+      same host, but in a different file.
 - `/srv/commdata` is backed up nightly using the read-write key; all
   ansible roles must store any sensitive or important data in this
   directory.
 - The archive names contain the host name, rather than the roles the
-  host performs.
+  host performs. The roles change over time, but Tarsnap machine keys
+  are intended to be specific to a machine.
+    - They also contain the timestamp of their creation. This is not
+      just to make them unique and sortable, but to allow archive
+      deletions to choose which older archives to delete.
 - TODO: The supervisor has a daily task to rotate backups (that is,
   delete selected older backups) for each of those other hosts
-- TODO: Because tarsnap requires in up-to-date cache dir per key, each host
-  runs tarsnap with the `--fsck` flag before running a backup, since
-  any intervening archive deletions from the supervisor will have put
-  the cache dir out of sync. (Alternatively, the supervisor might be
-  able to copy its copy of the cache dir over after performing
-  rotations.)
+- TODO: Because tarsnap requires an up-to-date cache dir per key, the
+  supervisor must sync its version of the cache dir onto the focal
+  host after performing deletions.
+    - The supervisor would likely acquire a copy of the cache dir from
+      the host, run the deletions, and then ship the cache dir back
+      again.
+    - Alternatively, each host could run with `--fsck` before
+      performing a backup. (This is another reason to retain read
+      permissions on the key, since fsck requires read + write.) This
+      might also take longer and require more network traffic.
 
 ## Key provisioning
 
@@ -69,7 +86,7 @@ Trash. Not that that would have ever bitten me...
 ```
 sudo mount -t ramfs ramfs ~/tmp/ram && sudo chown `whoami`: ~/tmp/ram
 sudo mount -t ramfs ramfs ~/.ansible/tmp && sudo chown `whoami`: ~/.ansible/tmp
-unalias rm
+unalias rm rmdir
 ```
 
 Set up variables and a work directory.
@@ -98,10 +115,18 @@ tarsnap-keymgmt --outkeyfile "$TMPDIR/tarsnap-rw.key" -r -w "$TMPDIR/tarsnap-ful
 (ansible-vault decrypt --output - roles/tarsnap/vars/vault.yml; echo "vault_tarsnap__rw_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-rw.key") | ansible-vault encrypt --output roles/tarsnap/vars/vault.yml
 ``
 
-Save the full key for the supervisor machine to use.
+Read the tarsnap passphrase out of the supervisor's vars:
 
 ```
-(ansible-vault decrypt --output - roles/supervisor/vars/vault.yml; echo "vault_tarsnap__full_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.key") | ansible-vault encrypt --output roles/supervisor/vars/vault.yml
+ansible-vault decrypt --output - roles/supervisor/vars/vault.yml | grep vault_tarsnap__key_pass
+```
+
+Make a passphrased version of the full key for the supervisor machine
+to use. Use the passphrase printed above when prompted.
+
+```
+tarsnap-keymgmt --outkeyfile "$TMPDIR/tarsnap-full.enc.key" -r -w -d --nuke --passphrased --passphrase-mem 25000000 --passphrase-time 8 "$TMPDIR/tarsnap-full.key"
+(ansible-vault decrypt --output - roles/supervisor/vars/vault.yml; echo "vault_tarsnap__full_enc_key_$MACHINE_NAME: |"; sed 's/^/  /' < "$TMPDIR/tarsnap-full.enc.key") | ansible-vault encrypt --output roles/supervisor/vars/vault.yml
 ```
 
 Clean up by unmounting -- this is the safest way to do it.
@@ -126,7 +151,7 @@ Mount a ramdisk:
 
 ```
 sudo mount -t ramfs ramfs ~/tmp/ram && sudo chown `whoami`: ~/tmp/ram
-unalias rm
+unalias rm rmdir
 ```
 
 Retrieve the full key:
