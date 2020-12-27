@@ -203,32 +203,3 @@ After rebooting, insert the encryption key USB and run Ansible with
 If the host has the commdata role, copy text of
 `/mnt/not-an-hsm/commdata/enckey/pass.txt` into controller's
 `private-partition-passphrases.gpg` recovery file.
-
-
-
--------------
-SCRAP
-
-## Apt sources
-
-Regular Debian computers:
-
-```
-echo 'deb http://debian.csail.mit.edu/debian buster main contrib non-free
-deb-src http://debian.csail.mit.edu/debian buster main contrib non-free
-
-deb http://debian.csail.mit.edu/debian buster-updates main contrib non-free
-deb-src http://debian.csail.mit.edu/debian buster-updates main contrib non-free
-
-deb http://security.debian.org/ buster/updates main contrib non-free
-deb-src http://security.debian.org/ buster/updates main contrib non-free
-' | sudo tee /etc/apt/sources.list
-```
-
-Raspberry Pi:
-
-```
-echo 'deb http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
-deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
-' | sudo tee /etc/apt/sources.list
-```

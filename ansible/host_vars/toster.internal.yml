@@ -2,3 +2,4 @@
 commdata__key_partuuid: 0a546db8-c367-4a7e-bfee-e1a096e926ad
 commdata__luks_partuuid: 6c24c9d2-05
 host_shortname: toster
+common__host_type: stock

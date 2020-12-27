@@ -18,6 +18,39 @@
     group: root
     mode: 0644
 
+# Standardize sources
+
+- name: "Require setting a known host type"
+  fail:
+    msg: "Variable common__host_type not set to a supported value"
+  when: common__host_type != "rpi" and common__host_type != "stock"
+
+- name: "Install Raspberry Pi sources - main"
+  copy:
+    src: "{{ role_path }}/files/apt-sources/raspbian-main.list"
+    dest: /etc/apt/sources.list
+  when: common__host_type == "rpi"
+  register: common__sources_rpi_main
+
+- name: "Install Raspberry Pi sources - archive"
+  copy:
+    src: "{{ role_path }}/files/apt-sources/raspbian-archive.list"
+    dest: /etc/apt/sources.list.d/raspi.list
+  when: common__host_type == "rpi"
+  register: common__sources_rpi_archive
+
+- name: "Install stock Debian sources - main"
+  copy:
+    src: "{{ role_path }}/files/apt-sources/stock-debian.list"
+    dest: /etc/apt/sources.list
+  when: common__host_type == "stock"
+  register: common__sources_stock
+
+- name: "Run apt update if any sources changed"
+  apt:
+    update_cache: yes
+  when: (common__sources_rpi_main is changed) or (common__sources_rpi_archive is changed) or (common__sources_stock is changed)
+
 # Sane environment
 
 - name: "Install system fundamentals"
