@@ -19,5 +19,4 @@
     - laptop
     - role: sandstorm
       sandstorm_base_domain: sandstorm.appux.com
-      sandstorm_old_domain: sandy.parsni.ps
     - jabber

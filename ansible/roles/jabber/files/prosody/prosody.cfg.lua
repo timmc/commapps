@@ -70,7 +70,7 @@ s2s_require_encryption = true
 -- Force certificate authentication for server-to-server connections?
 s2s_secure_auth = false
 s2s_insecure_domains = { }
-s2s_secure_domains = { "appux.com", "parsni.ps", "brainonfire.net" }
+s2s_secure_domains = { "appux.com", "brainonfire.net" }
 
 -- Required for init scripts and prosodyctl [default]
 pidfile = "/var/run/prosody/prosody.pid"

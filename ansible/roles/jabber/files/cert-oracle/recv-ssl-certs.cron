@@ -9,5 +9,4 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Timed to run an hour or so after the NFSN script deposits certs here.
 39 6 * * * root /srv/commdata/jabber/cert-oracle/recv-ssl-certs.sh brainonfire.net >> /var/log/jabber-cert-oracle.log 2>&1
-39 7 * * * root /srv/commdata/jabber/cert-oracle/recv-ssl-certs.sh parsni.ps >> /var/log/jabber-cert-oracle.log 2>&1
 39 8 * * * root /srv/commdata/jabber/cert-oracle/recv-ssl-certs.sh appux.com >> /var/log/jabber-cert-oracle.log 2>&1

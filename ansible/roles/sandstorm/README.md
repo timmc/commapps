@@ -5,8 +5,6 @@
 DNS:
 
 ```
-sandy.parsni.ps CNAME t.timmc.org.
-*.sandy.parsni.ps CNAME t.timmc.org.
 sandstorm.appux.com CNAME t.timmc.org. 600
 *.sandstorm.appux.com CNAME t.timmc.org. 600
 ```

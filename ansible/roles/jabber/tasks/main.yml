@@ -96,12 +96,6 @@
     dest: /etc/prosody/conf.d/vhosts/brainonfire.net.cfg.lua
   notify: Restart prosody
 
-- name: "Supporting prosody configs: parsnips vhost"
-  copy:
-    src: "{{ role_path }}/files/prosody/vhosts/parsni.ps.cfg.lua"
-    dest: /etc/prosody/conf.d/vhosts/parsni.ps.cfg.lua
-  notify: Restart prosody
-
 - name: "Supporting prosody configs: appux vhost"
   copy:
     src: "{{ role_path }}/files/prosody/vhosts/appux.com.cfg.lua"
