@@ -71,19 +71,18 @@ rm -- "$snaptime_path"
 
 log "Releasing snapshot $snapshot_id"
 set +e
-# Destroy the snapshot as well as the clone (recursive). I would have
-# explicitly destroyed the clone, but zfs didn't let me!
+# Destroy the snapshot as well as the clone.
 #
 # The `destroy` command sometimes fails with "dataset is busy", and
 # I'm not sure why. It might have something to do with the order in
 # which snapshots are created and destroyed; in any event, looping
-# over all existing (Tarnsap) snapshots in timestamp order seems to
+# over all existing (Tarsnap) snapshots in timestamp order seems to
 # help if you end up in this situation:
 #
 #    for s in `zfs list -t snapshot | grep -F "tarsnap-periodic" | sort | awk '{ print $1 }'`; do echo "Destroying $s"; zfs destroy -R "$s"; done
 #
 # TODO: Switch to using ext4 and use LVM for snapshotting -- more reliable?
-zfs destroy -R commdata@"$snapshot_id"
+zfs destroy commdata/snapclone-"$snapshot_id" && zfs destroy commdata@"$snapshot_id"
 snapshot_destroy_exit=$?
 set -e
 
