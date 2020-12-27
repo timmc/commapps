@@ -105,7 +105,7 @@
   when: commdata__luks_service_file.changed
 
 # At boot this service will be started automatically, but at setup
-# need it open in order to set up ZFS.
+# need it open in order to set up LVM and run dependent roles.
 
 - name: Enable encrypted partition service
   service:

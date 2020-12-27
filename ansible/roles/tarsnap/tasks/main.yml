@@ -101,13 +101,12 @@
     state: directory
     path: /opt/commapps/backups
 
-- name: Install backup script
-  copy:
-    src: "{{ role_path }}/files/run-backup.sh"
-    dest: /opt/commapps/backups/run-backup.sh
-    mode: preserve
+- name: "Migration: ZFS-specific backup script"
+  file:
+    state: absent
+    path: /opt/commapps/backups/run-backup.sh
 
-- name: Install backup script - LVM variant
+- name: Install backup script
   copy:
     src: "{{ role_path }}/files/run-backup-lvm.sh"
     dest: /opt/commapps/backups/run-backup-lvm.sh
@@ -125,14 +124,12 @@
     dest: /opt/commapps/backups/restore-archive.sh
     mode: preserve
 
-- name: "Install cron job -- ZFS/sandstorm variant"
-  when: commdata__zfs
-  copy:
-    src: "{{ role_path }}/files/cron"
-    dest: /etc/cron.d/sandstorm-backup # TODO move
+- name: "Migration: Delete cron job for ZFS/sandstorm variant"
+  file:
+    state: absent
+    path: /etc/cron.d/sandstorm-backup
 
-- name: "Install cron job -- LVM/all variant"
-  when: commdata__lvm
+- name: "Install cron job"
   copy:
     content: |
       # crontab for commdata backups, installed by ansible

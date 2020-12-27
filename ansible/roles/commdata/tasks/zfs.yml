@@ -1,80 +1,46 @@
 ---
-# ZFS filesystem
-
-- name: Install ZFS
-  apt: name=zfs-fuse
-
-# For some reason, on zfs-fuse 0.7.0-16 on Debian 9, zfs-fuse doesn't
-# start after being installed. It seems to be OK after reboot, though.
-- name: Ensure zfs-fuse is running
+- name: "Migration: Disable ZFS mount service"
   service:
-    name: zfs-fuse
-    enabled: yes
-    state: started
+    name: commdata-fs
+    enabled: no
+    state: stopped
 
-# The ZFS tooling has the irritating property that when a pool exists,
-# it only shows up under `zpool import` when it is exported, and only
-# shows up under `zpool list` when it is imported. There doesn't seem
-# to be a command that will show it in both states.
-- name: Check if zpool exists
-  shell: '(zpool import; zpool list) | grep commdata >/dev/null'
-  register: commdata__check_zpool_exist
-  changed_when: commdata__check_zpool_exist.rc == 1 # commdata not found
-  failed_when: commdata__check_zpool_exist.rc > 1 # unknown codes
-  check_mode: no # Run in normal mode, since it registers a variable
-
-# If the mountpoint is ever changed, it will need to be modified on
-# existing hosts' commdata pools. It can only be checked after import,
-# so it's irritating to do from Ansible, but here's the command:
-# `zfs get -H mountpoint -o value commdata`
-- name: Create ZFS pool in encrypted partition
-  when: commdata__check_zpool_exist.rc == 1
-  shell: zpool create -m /srv/commdata commdata /dev/mapper/con-commdata
-
-- name: Mountpoint for encrypted partition
+- name: "Migration: Systemd unit file for mounting ZFS"
   file:
-    state: directory
-    path: /srv/commdata
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Location for ZFS scripts
-  file:
-    state: directory
-    path: /opt/commapps/encfs/zfs
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Script for mounting ZFS
-  copy:
-    src: "{{ role_path }}/files/zfs/mount.sh"
-    dest: /opt/commapps/encfs/zfs/mount.sh
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Script for unmounting ZFS
-  copy:
-    src: "{{ role_path }}/files/zfs/unmount.sh"
-    dest: /opt/commapps/encfs/zfs/unmount.sh
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Systemd unit file for mounting ZFS
-  copy:
-    src: "{{ role_path }}/files/zfs/commdata-fs.service"
-    dest: /etc/systemd/system/commdata-fs.service
+    state: absent
+    path: /etc/systemd/system/commdata-fs.service
   register: commdata__zfs_service_file
 
 - name: Reload systemd config if zfs unit file changed
   command: systemctl daemon-reload
   when: commdata__zfs_service_file.changed
 
-- name: Enable ZFS mount service
+- name: "Migration: Remove ZFS scripts - unmount"
+  file:
+    state: absent
+    path: /opt/commapps/encfs/zfs/unmount.sh
+
+- name: "Migration: Remove ZFS scripts - mount"
+  file:
+    state: absent
+    path: /opt/commapps/encfs/zfs/mount.sh
+
+- name: "Migration: Remove ZFS scripts - dir"
+  file:
+    state: absent
+    path: /opt/commapps/encfs/zfs
+
+- name: "Migration: Destroy ZFS pool in encrypted partition"
+  shell: zpool import commdata && zpool destroy commdata
+  failed_when: False
+
+- name: "Migration: Stop zfs-fuse"
   service:
-    name: commdata-fs
-    enabled: yes
-    state: started
+    name: zfs-fuse
+    enabled: no
+    state: stopped
+
+- name: "Migration: Remove ZFS"
+  apt:
+    name: zfs-fuse
+    state: absent

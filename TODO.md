@@ -30,8 +30,6 @@
     - **TODO**: Monitoring for missed/broken backups
         - Ideally, monitor should attempt to retrieve a file from the
           most recent backup and report the age of the backup.
-    - **TODO**: Monitoring for lingering ZFS snapshots
-        - Or switch to LVM snapshots (ready to act on, needs rebuild though)
     - **TODO**: Perform a restore-from-backup exercise & schedule for
       quarterly execution
         - **TODO**: Monitoring on this somehow?
