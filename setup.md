@@ -31,6 +31,8 @@ Debian installer choices:
 
 - Select whatever locale/keyboard/time zone information you want. Time
   zone will get reset to UTC during the Ansible run.
+- Use the host's shortname as the host name, and leave the domain name
+  empty
 - Skip root password
 - Put in your name and username when prompted for the regular user
   account. This account won't be used, but it should have good
