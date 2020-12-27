@@ -101,11 +101,6 @@
     state: directory
     path: /opt/commapps/backups
 
-- name: "Migration: ZFS-specific backup script"
-  file:
-    state: absent
-    path: /opt/commapps/backups/run-backup.sh
-
 - name: Install backup script
   copy:
     src: "{{ role_path }}/files/run-backup-lvm.sh"
@@ -123,11 +118,6 @@
     src: "{{ role_path }}/files/restore-archive.sh"
     dest: /opt/commapps/backups/restore-archive.sh
     mode: preserve
-
-- name: "Migration: Delete cron job for ZFS/sandstorm variant"
-  file:
-    state: absent
-    path: /etc/cron.d/sandstorm-backup
 
 - name: "Install cron job"
   copy:

@@ -14,7 +14,6 @@
 #     commdata__luks_partuuid: $PARTUUID
 
 - include: luks.yml
-- include: zfs.yml # migration for removal
 - include: lvm.yml
 
 # Make sure that no matter how the partition was set up, it is
