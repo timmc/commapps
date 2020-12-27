@@ -2,10 +2,17 @@
 
 Configures a Prosody server.
 
+## Setting up a new server
+
+- Add to role vars
+- Add a vhost configuration
+- Add to `secure_domains` in main Prosody config
+- Follow manual configuration instructions below
+
 ## Manual configuration
 
 Remember to follow these instructions for all domains hosted at appux,
-not just `appux.com`.
+not just `appux.com`. See role vars for list.
 
 ### DNS
 
@@ -26,13 +33,17 @@ _xmpp-server._tcp.muc.appux.com	SRV	10 0 5269 t.timmc.org.
 
 ### Cert oracle
 
-TLS certificates are delivered by a cron job called the "cert-oracle"
-on the web server that hosts `https://appux.com`.
+TLS certificates are produced by a cron job called the "cert-oracle"
+on the corresponding web servers for each domain name.
 
-Make sure that the server you're migrating to is in the cert-oracle's
-destination list and has received certs.
+The jabber host generates a TLS key and a certificate signing request
+(CSR). During the initial Ansible run, you'll be prompted to copy the
+CSR file to the cert-oracle on NFSN and run it once. This will
+generate a TLS certificate and place it in apublic place. (Neither
+certificates nor CSRs are sensitive, but the key must be kept
+private.) Continue the Ansible run once you've done so.
 
-Create a scheduled task on `appux` NFSN site:
+You'll also need to create a scheduled task on each NFSN site:
 
 - Name: CertOracle
 - Command: /home/private/sync/cert-oracle/update-certs.sh
@@ -42,9 +53,8 @@ Create a scheduled task on `appux` NFSN site:
 - Day of week: Every
 - Day of month: 28
 
-During the initial Ansible run, you'll be prompted to copy the CSR
-file to the cert-oracle on NFSN and run it once. Do so, then continue
-or re-run the Ansible scripts.
+This will take care of periodically regenerating the certificate, and
+the jabber host will download the certificate every few days.
 
 ## Sending out a maintenance announcement
 

@@ -5,8 +5,21 @@
   shell: mountpoint /srv/commdata
   changed_when: False
 
+
+#== Software ==#
+
 - name: Install prosody
   apt: name=prosody
+
+- name: "Directory for Prosody modules"
+  file:
+    state: directory
+    path: /opt/commapps/prosody/modules
+
+- name: "Install Prosody modules"
+  synchronize:
+    src: "{{ role_path }}/files/prosody/modules/"
+    dest: "/opt/commapps/prosody/modules/"
 
 - name: "Don't install extra prosody modules -- vendored in instead for consistent and recent versions"
   apt:
@@ -14,95 +27,87 @@
     state: absent
   notify: Restart prosody
 
-- name: Directory for Prosody modules
+
+#== Directory structure ==#
+
+- name: "Directory for scripts"
   file:
     state: directory
-    path: "/opt/commapps/prosody/modules/"
+    path: /opt/commapps/prosody/scripts
 
-- name: Install Prosody modules
-  synchronize:
-    src: "{{ role_path }}/files/prosody/modules/"
-    dest: "/opt/commapps/prosody/modules/"
-
-- name: Directory for scripts
-  file:
-    state: directory
-    path: "/opt/commapps/prosody/scripts/"
-
-- name: Setup-helper script
-  copy:
-    src: "{{ role_path }}/files/keygen/generate-tls-key-csr.sh"
-    dest: "/opt/commapps/prosody/scripts/generate-tls-key-csr.sh"
-    mode: 0755
-
-- name: Directory for Jabber data in general
+- name: "Directory for Jabber data in general"
   file:
     state: directory
     path: /srv/commdata/jabber
-    owner: prosody
-    group: prosody
-    mode: 0750
 
-# cert oracle depends on main jabber dir
-- include: cert-oracle.yml
-
-- name: Directory for Prosody data
+- name: "Directory for Prosody data"
   file:
     state: directory
     path: /srv/commdata/jabber/data
     owner: prosody
-    group: prosody
-    mode: 0750
+    mode: u=rwx,g=,o=
 
-- name: Directory for Jabber TLS secrets
+- name: "Directory for Jabber TLS secrets"
   file:
     state: directory
     path: /srv/commdata/jabber/tls
     owner: prosody
     group: prosody
-    mode: 0750
+    mode: u=rwx,g=,o=
 
-- name: Create TLS private key and CSR
-  command: /opt/commapps/prosody/scripts/generate-tls-key-csr.sh appux.com
-  args:
-    creates: "/srv/commdata/jabber/tls/appux.com.csr.pem"
-  register: jabber__csr_created
 
-- name: Give instructions if CSR and key were created
-  debug:
-    msg:
-    - "First-time setup for appux.com:"
-    - "» Cancel this ansible run and log into the server"
-    - "» Copy /srv/commdata/jabber/tls/appux.com.csr.pem to NFSN"
-    - "» Run the cert-oracle script on NFSN"
-    - "» Run receiver on the server: /srv/commdata/jabber/cert-oracle/recv-ssl-certs.sh appux.com"
-    verbosity: 0
-  when: jabber__csr_created.changed and not ansible_check_mode
+#== Certificate downloader ==#
 
-- name: Pause for manual intervention when key and CSR created
-  pause:
-  when: jabber__csr_created.changed and not ansible_check_mode
+- name: "Certificate downloader script"
+  copy:
+    src: "{{ role_path }}/files/fetch-ssl-cert.sh"
+    dest: /opt/commapps/prosody/scripts/fetch-ssl-cert.sh
+    mode: preserve
+
+- name: "Create log file with correct permissions for certificate downloader"
+  file:
+    path: /var/log/jabber-cert-updater.log
+    owner: prosody
+    group: prosody
+    # This is required in order to ensure the file is *present* and
+    # also gets correct mode/owner, but doesn't get touched if already
+    # present. Thanks to https://github.com/ansible/ansible/issues/7490
+    state: touch
+    modification_time: preserve
+    access_time: preserve
+
+- name: "Rotate logs from certificate downloader"
+  copy:
+    content: |
+      /var/log/jabber-cert-updater.log {
+        monthly
+        rotate 4
+        missingok
+        create prosody prosody
+      }
+    dest: /etc/logrotate.d/jabber-cert-updater
+
+- name: "Cron job to download certificates"
+  template:
+    src: "{{ role_path }}/files/fetch-ssl-cert.cron.j2"
+    dest: /etc/cron.d/jabber-cert-updater
+
+- name: "Per-domain TLS setup"
+  include_tasks: cert-setup.yml
+  loop: "{{ jabber__vhosts }}"
+
+
+#== Prosody configuration ==#
 
 # TODO: Use rsync module to convey the conf.d files all at once
 
-- name: Directories for supporting configs
-  file:
-    state: directory
-    path: /etc/prosody/conf.d/vhosts
-
-- name: "Supporting prosody configs: brainonfire vhost"
-  copy:
-    src: "{{ role_path }}/files/prosody/vhosts/brainonfire.net.cfg.lua"
-    dest: /etc/prosody/conf.d/vhosts/brainonfire.net.cfg.lua
+- name: "Virtualhosts for the various domains"
+  synchronize:
+    src: "{{ role_path }}/files/prosody/vhosts/"
+    dest: /etc/prosody/conf.d/vhosts/
   notify: Restart prosody
 
-- name: "Supporting prosody configs: appux vhost"
-  copy:
-    src: "{{ role_path }}/files/prosody/vhosts/appux.com.cfg.lua"
-    dest: /etc/prosody/conf.d/vhosts/appux.com.cfg.lua
-  notify: Restart prosody
-
-- name: Main prosody config
+- name: "Main prosody config"
   copy:
     src: "{{ role_path }}/files/prosody/prosody.cfg.lua"
     dest: /etc/prosody/prosody.cfg.lua

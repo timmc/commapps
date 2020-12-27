@@ -1,0 +1,12 @@
+# SSL cert updater for Prosody
+# Managed by Ansible
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# TODO Change this whole thing to use prosodyctl's cert installer?
+# https://prosody.im/doc/certificates#automatic_certificate_import
+
+{% for vhost in jabber__vhosts: %}
+39 {{ vhost.cron_hour | int }} * * * prosody /opt/commapps/prosody/scripts/fetch-ssl-cert.sh {{ vhost.domain | quote }} {{ vhost.cert_oracle_base_url | quote }} >> /var/log/jabber-cert-updater.log 2>&1
+{% endfor %}

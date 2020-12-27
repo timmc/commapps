@@ -1,0 +1,52 @@
+# Generate key, CSR, and certificate for one domain used by Prosody.
+---
+- name: "Create TLS private key"
+  shell:
+    creates: "/srv/commdata/jabber/tls/{{ item.domain }}.key"
+    chdir: /srv/commdata/jabber/tls
+    cmd: |
+      DOMAIN={{ item.domain | quote }}
+      (umask 077; openssl genrsa -out "$DOMAIN.key" 4096)
+      chown prosody:prosody -- "$DOMAIN.key"
+      # New key invalidates existing CSR and cert
+      rm -f -- "$DOMAIN.csr.pem" "$DOMAIN.chain.pem"
+  register: jabber__tls_create_key
+
+- name: "Create certificate signing request"
+  shell:
+    creates: "/srv/commdata/jabber/tls/{{ item.domain }}.csr.pem"
+    chdir: /srv/commdata/jabber/tls
+    cmd: |
+      DOMAIN={{ item.domain | quote }}
+      openssl req -out "$DOMAIN.csr.pem" \
+              -key "$DOMAIN.key" \
+              -new -sha256 -subj "/CN=$DOMAIN"
+  register: jabber__tls_create_csr
+
+- name: "Pause to allow upload of CSR and generation of new key"
+  when: (jabber__tls_create_key.changed or jabber__tls_create_csr.changed) and not ansible_check_mode
+  block:
+    - name: "Get contents of CSR for upload"
+      command: "cat /srv/commdata/jabber/tls/{{ item.domain | quote }}.csr.pem"
+      register: jabber__new_csr_contents
+
+    - name: "Pause and give manual instructions if key changed or CSR updated"
+      pause:
+        prompt: |
+          Manual setup step required for {{ item.domain }}.
+
+          Please upload the following certificate signing request as
+          {{ item.domain }}.csr.pem in the cert-oracle for
+          <{{ item.cert_oracle_base_url }}>.
+          Then run the update-certs.sh script and continue this Ansible run.
+
+          {{ jabber__new_csr_contents.stdout }}
+
+- name: "Download certificate if needed"
+  shell: |
+    sudo -u prosody /opt/commapps/prosody/scripts/fetch-ssl-cert.sh \
+         {{ item.domain|quote }} {{ item.cert_oracle_base_url|quote }}
+  register: jabber__cert_download
+  failed_when: jabber__cert_download.rc != 0 and jabber__cert_download.rc != 64
+  changed_when: jabber__cert_download.rc == 64
+  notify: Restart prosody
