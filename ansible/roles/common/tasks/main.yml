@@ -49,7 +49,7 @@
 - name: "Run apt update if any sources changed"
   apt:
     update_cache: yes
-  when: (common__sources_rpi_main is changed) or (common__sources_rpi_archive is changed) or (common__sources_stock is changed)
+  when: common__sources_rpi_main.changed or common__sources_rpi_archive.changed or common__sources_stock.changed
 
 # Sane environment
 
