@@ -5,6 +5,10 @@
 If the host uses the tarsnap role, create a Tarsnap key for it
 according to the README.
 
+Choose a hostname and add it to the `prod.ini` inventory file. Add the
+host to the playbook `appux.yml` as well if it will be hosting any
+services. (Check the role READMEs for any manual configuration steps.)
+
 
 ## Bootstrap
 
@@ -52,7 +56,7 @@ Debian installer choices:
 Reboot, and log in as the user you set up. Run `ip addr list` to
 discover the local IP address.
 
-Back on the controller, try to copy the Ansible root public key to the
+Back on the controller, copy the Ansible root public key to the
 home dir of the user you created. For example:
 
 ```
@@ -228,5 +232,3 @@ echo 'deb http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free
 deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
 ' | sudo tee /etc/apt/sources.list
 ```
-
-Now set up port forwarding in router and use SSH for remaining config.
