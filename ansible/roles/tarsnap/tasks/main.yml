@@ -9,6 +9,9 @@
 
 # ----
 
+- name: "Install GPG -- needed for installing Tarsnap deb packaging key"
+  apt: name=gpg
+
 # Fetch and compute fingerprint of current authoritative key:
 #
 # curl -sS https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc \

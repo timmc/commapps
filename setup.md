@@ -1,14 +1,90 @@
 # Initial setup for hosts
 
-## Installation and partitioning
+## Pre Ansible
 
-### Laptops and desktops
+If the host uses the tarsnap role, create a Tarsnap key for it
+according to the README.
 
-For laptops and desktops, use the Debian netinst installer.
 
-TODO: Rewrite instructions
+## Bootstrap
 
-### Raspberry Pi
+The following instructions have the following aim:
+
+- Install basic OS
+- Provide a `/dev/sda1` boot partition and `/dev/sda2` root partition
+  each sized to about 2-4x the expected usage
+- Provide an empty `/dev/sda5` partition as a site for a LUKS volume
+- Protect the host from SSH login by local-network attackers using
+  weak or default passwords while it is being set up, and securely
+  gather the host SSH fingerprint to prevent local-network MITM attack
+- Collect any host variables (partition UUIDs)
+- Prepare the host for public key root login and the first Ansible run
+
+
+### Bootstrap: Laptops and desktops
+
+For laptops and desktops, use the Debian installer ISO. These
+instructions were tested using the `debian-10.7.0-amd64-netinst.iso`
+image on a USB stick.
+
+Debian installer choices:
+
+- Select whatever locale/keyboard/time zone information you want. Time
+  zone will get reset to UTC during the Ansible run.
+- Skip root password
+- Put in your name and username when prompted for the regular user
+  account. This account won't be used, but it should have good
+  security, since the account will be sudo-capable -- choose a very
+  strong passphrase.
+- Manual partitioning:
+    - Wipe existing partitions
+    - Create 250 MB `primary` partition: ext4, mount as `/boot`, label
+      `boot`, bootable flag `on`
+    - Create 30 GB `primary` partition: ext4, mount as `/`, label `rootfs`
+    - Create a `logical` partition in remaining space: Use as `do not use`
+        - This will later be set up as the commdata LUKS/LVM partition
+    - Finish partitioning; ignore warning about swap space
+- On the Software Selection screen, choose only `SSH server` and
+  `standard system utilities`
+
+Reboot, and log in as the user you set up. Run `ip addr list` to
+discover the local IP address.
+
+Back on the controller, try to copy the Ansible root public key to the
+home dir of the user you created. For example:
+
+```
+scp ansible/roles/common/files/id_ansible_appux.pub timmc@10.0.1.2:
+```
+
+When prompted to confirm the SSH host key, go to the new host and
+print the fingerprint so you can compare it:
+
+```
+ssh-keygen -l -f /etc/ssh/ssh_host_ecdsa_key.pub
+```
+
+Once the file is transferred, SSH in to the host as your user;
+remaining steps will be completed over SSH. (You can log out of the
+terminal on the new host now.) Run `sudo su` and perform the
+following:
+
+```
+mkdir --mode=0700 /root/.ssh
+cp /home/timmc/id_ansible_appux.pub /root/.ssh/authorized_keys
+chown root: /root/.ssh/authorized_keys
+echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+apt-get update && apt-get dist-upgrade --auto-remove
+```
+
+Finally, and still on the host, collect any necessary information for
+host vars:
+
+- Run `blkid /dev/sda5` to get the value for `commdata__luks_partuuid`
+  (which is not a real UUID on an MBR partition layout)
+
+
+### Bootstrap: Raspberry Pi
 
 The Raspberry Pi setup involves modifying a fixed disk image to make
 it possible to SSH into without a keyboard and monitor, but also safe
@@ -79,14 +155,12 @@ As root, perform some final manual setup by running `raspi-config`:
 
 Collect any necessary information for host vars:
 
-- Run `blkid /dev/mmcblk0p5` to get the encrypted partition PARTUUID
+- Run `blkid /dev/mmcblk0p5` to get the value for `commdata__luks_partuuid`
   (which is not a real UUID on this MBR partition layout)
 
 Run `apt-get update && apt-get dist-upgrade --auto-remove` and reboot.
 
-Insert the encryption key USB and proceed to running Ansible.
-
-#### Variations
+#### Raspberry Pi SSH non-TOFU
 
 If you can't rely on TOFU SSH, you'll need to do one of the
 following.
@@ -112,31 +186,22 @@ You could likely also generate the keys on the controller and write them to the 
   the new host's hostname.
 
 
-# To incorporate
+## Ansible run
+
+After rebooting, insert the encryption key USB and run Ansible with
+`--limit=HOSTNAME.internal`
+
+
+## Post Ansible
+
+If the host has the commdata role, copy text of
+`/mnt/not-an-hsm/commdata/enckey/pass.txt` into controller's
+`private-partition-passphrases.gpg` recovery file.
 
 
 
-
-## Partitioning
-
-Sample partitioning result from toster:
-
-```
-$ fdisk -l
-
-Disk /dev/sda: 149.1 GiB, 160041885696 bytes, 312581808 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: dos
-Disk identifier: 0x453e050c
-
-Device     Boot     Start       End   Sectors   Size Id Type
-/dev/sda1  *         2048  58593279  58591232    28G 83 Linux
-/dev/sda2        58595326 312580095 253984770 121.1G  5 Extended
-/dev/sda5        58595328 299804671 241209344   115G 83 Linux
-/dev/sda6       299806720 312580095  12773376   6.1G 83 Linux
-```
+-------------
+SCRAP
 
 ## Apt sources
 
@@ -163,14 +228,3 @@ deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free r
 ```
 
 Now set up port forwarding in router and use SSH for remaining config.
-
-# Pre Ansible
-
-If the host uses the tarsnap role, create a Tarsnap key for it
-according to the README.
-
-# Post Ansible
-
-If the host has the commdata role, copy text of
-`/mnt/not-an-hsm/commdata/enckey/pass.txt` into controller's
-`private-partition-passphrases.gpg` recovery file.
