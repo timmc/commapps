@@ -1,7 +1,0 @@
-# crontab for sandstorm backups, installed by ansible
-
-SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-# Timing randomly chosen to reduce stress on Tarsnap servers
-39 4 * * * root /opt/commapps/backups/run-backup.sh >> /var/log/sandstorm-backup.log 2>&1

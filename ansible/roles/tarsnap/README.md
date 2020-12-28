@@ -7,6 +7,9 @@ locally.
 
 It's a bit slow, especially on the restore side, but it does the job.
 
+TODO: Also implement NAS backups for faster restores but less
+redundancy.
+
 ## General approach
 
 - Each service host has its own Tarsnap private key
