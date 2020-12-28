@@ -7,10 +7,20 @@
     cmd: |
       DOMAIN={{ item.domain | quote }}
       (umask 077; openssl genrsa -out "$DOMAIN.key" 4096)
-      chown prosody:prosody -- "$DOMAIN.key"
+      chown prosody: -- "$DOMAIN.key"
       # New key invalidates existing CSR and cert
       rm -f -- "$DOMAIN.csr.pem" "$DOMAIN.chain.pem"
   register: jabber__tls_create_key
+
+- name: "Ensure key ownership and permissions"
+  file:
+    path: "/srv/commdata/jabber/tls/{{ item.domain }}.key"
+    owner: prosody
+    group: prosody
+    mode: u=rw,g=,o=
+    state: touch
+    modification_time: preserve
+    access_time: preserve
 
 - name: "Create certificate signing request"
   shell:
@@ -21,7 +31,17 @@
       openssl req -out "$DOMAIN.csr.pem" \
               -key "$DOMAIN.key" \
               -new -sha256 -subj "/CN=$DOMAIN"
+      chown prosody: "$DOMAIN.csr.pem"
   register: jabber__tls_create_csr
+
+- name: "Ensure CSR ownership"
+  file:
+    path: "/srv/commdata/jabber/tls/{{ item.domain }}.csr.pem"
+    owner: prosody
+    group: prosody
+    state: touch
+    modification_time: preserve
+    access_time: preserve
 
 - name: "Pause to allow upload of CSR and generation of new key"
   when: (jabber__tls_create_key.changed or jabber__tls_create_csr.changed) and not ansible_check_mode
@@ -43,10 +63,21 @@
           {{ jabber__new_csr_contents.stdout }}
 
 - name: "Download certificate if needed"
-  shell: |
-    sudo -u prosody /opt/commapps/prosody/scripts/fetch-ssl-cert.sh \
-         {{ item.domain|quote }} {{ item.cert_oracle_base_url|quote }}
+  shell:
+    creates: "/srv/commdata/jabber/tls/{{ item.domain }}.chain.pem"
+    cmd: |
+      sudo -u prosody /opt/commapps/prosody/scripts/fetch-ssl-cert.sh \
+           {{ item.domain|quote }} {{ item.cert_oracle_base_url|quote }}
   register: jabber__cert_download
   failed_when: jabber__cert_download.rc != 0 and jabber__cert_download.rc != 64
   changed_when: jabber__cert_download.rc == 64
   notify: Restart prosody
+
+- name: "Ensure cert ownership"
+  file:
+    path: "/srv/commdata/jabber/tls/{{ item.domain }}.chain.pem"
+    owner: prosody
+    group: prosody
+    state: touch
+    modification_time: preserve
+    access_time: preserve
