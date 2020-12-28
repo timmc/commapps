@@ -64,13 +64,15 @@ if [[ -z "${backup_failure:-}" ]]; then
     # Back up the entire snapshot. There's no exclusion for the
     # Tarsnap cache directory, since Tarsnap is able to exclude that
     # on its own.
+    #
+    # Also back up user and group information so ownership can be
+    # remapped on restore.
     tarsnap -c -f "$(uname -n)-$(date --universal +%Y-%m-%d_%H-%M-%S)" \
             --cache /srv/commdata/cache/tarsnap \
             --keyfile /srv/commdata/backups/secrets/tarsnap-rw.key \
             --snaptime "$snaptime_path" \
-            -C /srv/active-snapshot \
             --humanize-numbers --aggressive-networking \
-            . || {
+            /srv/active-snapshot /etc/passwd /etc/groups || {
         log "ERROR: Tarsnap failed with exit code $?"
         backup_failure=true
     }
