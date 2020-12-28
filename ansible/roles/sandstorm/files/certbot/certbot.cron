@@ -1,4 +1,4 @@
-# crontab for TLS cert renewal
+# crontab for TLS cert renewal - managed by Ansible
 
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
