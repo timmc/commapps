@@ -82,6 +82,18 @@
     group: root
     mode: g=,o=
 
+# If tarsnap is called without the --cache option, it will try to
+# write in a default location that happens to not be in the encrypted
+# partition. Some sensitive information can be in the cache.
+#
+# If the partition isn't mounted, Tarsnap won't be able to get the
+# key, so we can assume this symlink will always resolve.
+- name: "Keep tarsnap from writing cache data outside of encrypted partition"
+  file:
+    state: link
+    src: /srv/commdata/cache/tarsnap
+    path: /usr/local/tarsnap-cache
+
 - name: Directory for tarsnap secrets
   file:
     state: directory
