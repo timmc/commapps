@@ -56,7 +56,19 @@
     mode: u=rwx,g=,o=
 
 
-#== Certificate downloader ==#
+#== Certificate management ==#
+
+- name: "TLS key generator"
+  copy:
+    src: "{{ role_path }}/files/create-tls-key.sh"
+    dest: /opt/commapps/prosody/scripts/create-tls-key.sh
+    mode: preserve
+
+- name: "CSR generator"
+  copy:
+    src: "{{ role_path }}/files/create-csr.sh"
+    dest: /opt/commapps/prosody/scripts/create-csr.sh
+    mode: preserve
 
 - name: "Certificate downloader script"
   copy:

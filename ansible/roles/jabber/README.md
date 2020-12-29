@@ -9,6 +9,20 @@ Configures a Prosody server.
 - Add to `secure_domains` in main Prosody config
 - Follow manual configuration instructions below
 
+## Rolling keys
+
+If you need to roll a server's key:
+
+1. Run `/opt/commapps/prosody/scripts/create-tls-key.sh DOMAIN` to
+   replace the TLS key
+2. Run `/opt/commapps/prosody/scripts/create-csr.sh DOMAIN` to
+   regenerate the certificate signing request
+3. Upload the CSR (`/srv/commdata/jabber/tls/DOMAIN.csr.pem`) to the
+   cert oracle and run the oracle
+4. Run `sudo -u prosody /opt/commapps/prosody/scripts/fetch-ssl-cert.sh DOMAIN BASE_URL`
+   (as seen in `/etc/cron.d/jabber-cert-updater`) to fetch down the cert chain
+5. Finally, `prosodyctl reload` to pick up the new key and cert chain
+
 ## Manual configuration
 
 Remember to follow these instructions for all domains hosted at appux,
