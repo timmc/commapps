@@ -65,6 +65,15 @@
     src: "{{ role_path }}/files/certbot/certbot.cron"
     dest: /etc/cron.d/commapps-certbot
 
+- name: "Log rotation for certbot cron"
+  copy:
+    content: |
+      /var/log/certbot-renewal.log {
+        monthly
+        rotate 5
+        missingok
+      }
+    dest: /etc/logrotate.d/certbot-renewal
 
 #== Sandstorm nginx ==#
 
