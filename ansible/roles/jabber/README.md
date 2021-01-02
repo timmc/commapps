@@ -74,6 +74,18 @@ You'll also need to create a scheduled task on each NFSN site:
 This will take care of periodically regenerating the certificate, and
 the jabber host will download the certificate every few days.
 
+### TLS debugging
+
+Check if the key, CSR, and cert all match:
+
+```
+openssl rsa -noout -modulus -in /srv/commdata/jabber/tls/appux.com.key | openssl md5
+openssl req -noout -modulus -in /srv/commdata/jabber/tls/appux.com.csr.pem | openssl md5
+openssl x509 -noout -modulus -in /srv/commdata/jabber/tls/appux.com.chain.pem | openssl md5
+```
+
+All should print the same hash.
+
 ## Sending out a maintenance announcement
 
 Send an IM to `appux.com/announce/online` and everyone online will
