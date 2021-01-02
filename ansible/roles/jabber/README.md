@@ -2,6 +2,10 @@
 
 Configures a Prosody server.
 
+## Adding a user
+
+`prosodyctl adduser NAME@appux.com`
+
 ## Setting up a new server
 
 - Add to role vars
