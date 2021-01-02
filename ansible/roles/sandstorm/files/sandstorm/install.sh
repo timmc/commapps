@@ -12,3 +12,5 @@ wget --output-document="$installer_file" --timeout=60 \
 export OVERRIDE_SANDSTORM_DEFAULT_DIR="$install_to"
 export REPORT=no
 bash -- "$installer_file" -d
+
+rm -- "$installer_file"
