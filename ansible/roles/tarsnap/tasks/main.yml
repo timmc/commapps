@@ -82,14 +82,6 @@
     group: root
     mode: g=,o=
 
-- name: "Cache tag for tarsnap cache (don't back up with borg or other tools)"
-  copy:
-    content: |
-      Signature: 8a477f597d28d172789f06886806bc55
-      # This file is a cache directory tag created by an Ansible playbook.
-      # For information about cache directory tags, see <https://bford.info/cachedir/>
-    dest: /srv/commdata/cache/tarsnap/CACHEDIR.TAG
-
 # If tarsnap is called without the --cache option, it will try to
 # write in a default location that happens to not be in the encrypted
 # partition. Some sensitive information can be in the cache.

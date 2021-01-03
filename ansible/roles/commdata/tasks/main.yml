@@ -35,3 +35,12 @@
   file:
     state: directory
     path: /srv/commdata/cache
+
+- name: "Tag for cache directory (don't back up with borg or other tools)"
+  copy:
+    content: |
+      Signature: 8a477f597d28d172789f06886806bc55
+      # This file is a cache directory tag created by an Ansible playbook.
+      # For information about cache directory tags, see <https://bford.info/cachedir/>
+    dest: /srv/commdata/cache/CACHEDIR.TAG
+    mode: a=r
