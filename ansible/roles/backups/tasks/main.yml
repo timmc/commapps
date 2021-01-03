@@ -107,6 +107,8 @@
 
 - name: "Initialize borg repo"
   shell:
+    # NB: This only implies that *at least one* repo has been
+    # initialized.
     creates: /srv/commdata/backups/borg/.config/borg/security/
     executable: /usr/bin/bash
     cmd: |
