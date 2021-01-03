@@ -3,3 +3,8 @@ commdata__key_partuuid: 151b866e-8711-4073-a8f7-226b5ac6791f
 commdata__luks_partuuid: 067e19d7-05
 host_shortname: murphy
 common__host_type: rpi
+borg__cron_timing: "53 9 * * *"
+borg__repo_address: "{{ vault_borg__repo_address }}"
+borg__repo_known_hosts: "{{ vault_borg__repo_known_hosts }}"
+borg__key_passphrase: "{{ vault_borg__key_passphrase }}"
+borg__ssh_priv_key_append: "{{ vault_borg__ssh_priv_key_append }}"
