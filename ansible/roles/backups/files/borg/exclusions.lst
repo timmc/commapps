@@ -1,0 +1,5 @@
+# System config backups (/etc/group and passwd included)
+/var/backups
+# Packages and installation state
+/var/lib/apt
+/var/lib/dpkg

@@ -3,3 +3,8 @@ commdata__key_partuuid: 0a546db8-c367-4a7e-bfee-e1a096e926ad
 commdata__luks_partuuid: 6c24c9d2-05
 host_shortname: toster
 common__host_type: stock
+borg__cron_timing: "53 9 * * *"
+borg__repo_address: "{{ vault_borg__repo_address }}"
+borg__repo_known_hosts: "{{ vault_borg__repo_known_hosts }}"
+borg__key_passphrase: "{{ vault_borg__key_passphrase }}"
+borg__ssh_priv_key_append: "{{ vault_borg__ssh_priv_key_append }}"

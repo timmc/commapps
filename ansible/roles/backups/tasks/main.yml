@@ -1,0 +1,136 @@
+---
+# Double-check. See redundant task in commdata for more info.
+- name: "Confirm that commdata is mounted"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+
+#== Software ==#
+
+- name: "Deps for borgbackup pip installation"
+  apt:
+    name:
+      # List taken from borgbackup installation documentation
+      - python3
+      - python3-dev
+      - python3-pip
+      - python-virtualenv
+      - libssl-dev
+      - openssl
+      - libacl1-dev
+      - libacl1
+      - build-essential
+
+- name: "Dir for borg"
+  file:
+    state: directory
+    path: /opt/commapps/backups/borg
+
+- name: "Install borg in virtualenv"
+  pip:
+    name:
+      - borgbackup
+    virtualenv: /opt/commapps/backups/borg/venv
+    virtualenv_python: python3
+
+
+#== Data/configuration ==#
+
+- name: "Borg configuration"
+  file:
+    state: directory
+    path: /srv/commdata/backups/borg
+
+- name: "Borg repository URL"
+  copy:
+    content: "{{ borg__repo_address }}"
+    dest: /srv/commdata/backups/borg/repo_address
+
+- name: "Borg repository SSH known_hosts"
+  copy:
+    content: "{{ borg__repo_known_hosts }}"
+    dest: /srv/commdata/backups/borg/repo_known_hosts
+
+- name: "Passphrase for unlocking repokey"
+  copy:
+    content: "{{ borg__key_passphrase }}"
+    dest: /srv/commdata/backups/borg/key_passphrase
+    owner: root
+    group: root
+    mode: u=r,g=,o=
+  no_log: true
+
+- name: "SSH key for append-only access to borg server"
+  copy:
+    content: "{{ borg__ssh_priv_key_append }}"
+    dest: /srv/commdata/backups/borg/ssh_priv_key_append
+    owner: root
+    group: root
+    mode: u=r,g=,o=
+  no_log: true
+
+- name: "Directory for borg's own files"
+  file:
+    state: directory
+    path: /srv/commdata/backups/borg
+    owner: root
+    group: root
+    mode: g=,o=
+
+- name: "Directory for borg cache"
+  file:
+    state: directory
+    path: /srv/commdata/cache/borg
+    owner: root
+    group: root
+    mode: g=,o=
+
+#== Scripting ==#
+
+- name: "Borg scripts and other files"
+  copy:
+    src: "{{ role_path }}/files/borg/{{ item }}"
+    dest: "/opt/commapps/backups/borg/{{ item }}"
+    mode: preserve
+  with_items:
+    - exclusions.lst
+    - env.sh
+    - archive-snapshot.sh
+
+- name: "Borg-specific backup script"
+  copy:
+    src: "{{ role_path }}/files/make-backup-borg-lvm.sh"
+    dest: /opt/commapps/backups/make-backup-borg-lvm.sh
+    mode: preserve
+
+#== Initialization ==#
+
+- name: "Initialize borg repo"
+  shell:
+    creates: /srv/commdata/backups/borg/.config/borg/security/
+    executable: /usr/bin/bash
+    cmd: |
+      set -eu -o pipefail
+      source /opt/commapps/backups/borg/env.sh
+      /opt/commapps/backups/borg/venv/bin/borg init --encryption repokey-blake2
+
+#== Automation ==#
+
+- name: "Install cron job"
+  copy:
+    content: |
+      # crontab for borg system backups, installed by ansible
+      SHELL=/bin/bash
+      PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      {{ borg__cron_timing }} root /opt/commapps/backups/make-backup-borg-lvm.sh >> /var/log/borg-backup.log 2>&1
+    dest: /etc/cron.d/borg-backup
+
+- name: "Log rotation"
+  copy:
+    content: |
+      /var/log/borg-backup.log {
+          weekly
+          rotate 10
+          missingok
+      }
+    dest: /etc/logrotate.d/borg-backup
