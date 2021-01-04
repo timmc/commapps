@@ -107,14 +107,13 @@
 
 - name: "Initialize borg repo"
   shell:
-    # NB: This only implies that *at least one* repo has been
-    # initialized.
-    creates: /srv/commdata/backups/borg/.config/borg/security/
+    creates: /srv/commdata/backups/borg/init_marker
     executable: /usr/bin/bash
     cmd: |
       set -eu -o pipefail
       source /opt/commapps/backups/borg/env.sh
       /opt/commapps/backups/borg/venv/bin/borg init --encryption repokey-blake2
+      echo "Marker file for Ansible indicating that borg repo has been initialized." > /srv/commdata/backups/borg/init_marker
 
 #== Automation ==#
 
