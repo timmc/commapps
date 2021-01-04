@@ -118,6 +118,17 @@
 
 #== Automation ==#
 
+- name: "Permissions on log file"
+  file:
+    path: /var/log/borg-backup.log
+    owner: root
+    group: root
+    # Log may contain sensitive file names
+    mode: u=rw,g=,o=
+    state: touch
+    modification_time: preserve
+    access_time: preserve
+
 - name: "Install cron job"
   copy:
     content: |
@@ -134,5 +145,6 @@
           weekly
           rotate 10
           missingok
+          create 600 root root
       }
     dest: /etc/logrotate.d/borg-backup
