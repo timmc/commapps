@@ -61,7 +61,7 @@ source /opt/commapps/backups/borg/env.sh
      --exclude-caches --exclude-from /opt/commapps/backups/borg/exclusions.lst \
      --stats --list --filter='E?' \
      "::drive_selective_{utcnow}" \
-     /srv /srv/commdata /etc /var /home /root || {
+     /srv /srv/active-commdata-snapshot /etc /var /home /root || {
     borg_exit="$?"
     log "Borg died with non-zero exit $borg_exit"
     exit "$borg_exit"
