@@ -4,9 +4,6 @@
   shell: mountpoint /srv/commdata
   changed_when: False
 
-# Mechanism for vars/vault separation for role vars
-- include_vars: "{{ role_path }}/vars/vault.yml"
-
 # ----
 
 - name: "Directory for supervisor data"
