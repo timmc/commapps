@@ -37,26 +37,21 @@
     mode: u=rx,g=,o=
   with_items: "{{ supervisor__hosts }}"
 
-- name: "Each machine's encrypted Tarsnap key"
-  copy:
-    content: "{{ supervisor__tarsnap_full_keys[item.name] }}"
-    dest: "/srv/commdata/supervisor/backups/{{ item.name }}/tarsnap-full.enc.key"
-    owner: backups
-    mode: u=r,g=,o=
+- name: "Migration to remove: Each machine's encrypted Tarsnap key"
+  file:
+    state: absent
+    path: "/srv/commdata/supervisor/backups/{{ item.name }}/tarsnap-full.enc.key"
   with_items: "{{ supervisor__hosts }}"
   no_log: true
 
-- name: "Each machine's Tarsnap cache directory"
+- name: "Migration to remove: Each machine's Tarsnap cache directory"
   file:
-    state: directory
+    state: absent
     path: "/srv/commdata/supervisor/backups/{{ item.name }}/cache"
-    owner: backups
-    mode: u=rwx,g=,o=
   with_items: "{{ supervisor__hosts }}"
 
-# TODO: Split out tarsnap role into "tarsnap" (which just installs
-# tarsnap) and "backups" (which installs the r/w key and a cron job).
-# Then the supervisor role can depend on tarsnap, but not actually get
+# TODO: Split out "borg" role from "backups" that just installs borg.
+# Then the supervisor role can depend on borg, but not actually get
 # backups installed. (I'm not sure the supervisor will need backups,
 # and I don't like the idea of shipping sensitive credentials up to
 # the cloud, even encrypted, if not absolutely necessary.)

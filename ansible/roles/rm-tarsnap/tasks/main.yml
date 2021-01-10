@@ -1,0 +1,41 @@
+---
+# Double-check. See redundant task in commdata for more info.
+- name: "Confirm that commdata is mounted"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+# ----
+  
+- name: "Delete scripts and automation"
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - /etc/logrotate.d/commdata-tarsnap-backup
+    - /etc/cron.d/commdata-tarsnap-backup
+    - /opt/commapps/backups/run-backup-lvm.sh
+    - /opt/commapps/backups/list-archives.sh
+    - /opt/commapps/backups/restore-archive.sh
+    - /srv/commdata/backups/secrets/tarsnap-rw.key
+    - /srv/commdata/backups/secrets
+    - /srv/commdata/cache/tarsnap
+    - /usr/local/tarsnap-cache
+
+- name: "Uninstall tarsnap"
+  apt:
+    name: tarsnap
+    state: absent
+
+- name: "Package repo"
+  file:
+    state: absent
+    path: /etc/apt/sources.list.d/tarsnap.list
+
+- name: "Tarsnap deb packaging key"
+  apt_key:
+    state: absent
+    id: "6D1A57E4FA6982AAA2049EB6FC72A10BF6B692AA"
+
+- name: "Update apt after repo change"
+  apt:
+    update_cache: yes
