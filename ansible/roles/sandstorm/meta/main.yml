@@ -1,6 +1,5 @@
 ---
 dependencies:
   - role: commdata
-  - role: rm-tarsnap
   - role: backups
   - role: terminate-tls

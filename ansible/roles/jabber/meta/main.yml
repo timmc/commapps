@@ -1,5 +1,4 @@
 ---
 dependencies:
   - role: commdata
-  - role: rm-tarsnap
   - role: backups

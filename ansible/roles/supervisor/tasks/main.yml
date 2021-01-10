@@ -37,18 +37,7 @@
     mode: u=rx,g=,o=
   with_items: "{{ supervisor__hosts }}"
 
-- name: "Migration to remove: Each machine's encrypted Tarsnap key"
-  file:
-    state: absent
-    path: "/srv/commdata/supervisor/backups/{{ item.name }}/tarsnap-full.enc.key"
-  with_items: "{{ supervisor__hosts }}"
-  no_log: true
-
-- name: "Migration to remove: Each machine's Tarsnap cache directory"
-  file:
-    state: absent
-    path: "/srv/commdata/supervisor/backups/{{ item.name }}/cache"
-  with_items: "{{ supervisor__hosts }}"
+# TODO: Monitoring of backups of other hosts.
 
 # TODO: Split out "borg" role from "backups" that just installs borg.
 # Then the supervisor role can depend on borg, but not actually get
