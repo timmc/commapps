@@ -17,6 +17,7 @@
   remote_user: root
   roles:
     - laptop
+    - matrix
     - role: sandstorm
       sandstorm_base_domain: sandstorm.appux.com
     - jabber

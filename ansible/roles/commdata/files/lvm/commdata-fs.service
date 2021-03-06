@@ -7,6 +7,8 @@ Before=sandstorm.service
 Before=nginx.service
 # Account data is stored in /srv/commdata/jabber/data
 Before=prosody.service
+# matrix role's PostgreSQL DB is in commdata partition
+Before=postgresql.service
 
 Requires=commdata-luks.service
 After=commdata-luks.service
@@ -22,6 +24,7 @@ ExecStop=/opt/commapps/encfs/lvm/unmount.sh
 RequiredBy=sandstorm.service
 RequiredBy=nginx.service
 RequiredBy=prosody.service
+RequiredBy=postgresql.service
 # Mount commdata even if no services are running so that backups can run
 # but also so administrators aren't confused.
 WantedBy=multi-user.target

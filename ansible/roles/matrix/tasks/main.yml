@@ -1,0 +1,192 @@
+---
+# Double-check. See redundant task in commdata for more info.
+- name: "Confirm that commdata is mounted"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+# Mechanism for vars/vault separation for role vars
+- include_vars: "{{ role_path }}/vars/vault.yml"
+
+# ----
+
+- name: "Dir for matrix files"
+  file:
+    path: "/srv/commdata/matrix"
+    state: directory
+
+- name: "User and home dir for dendrite"
+  user:
+    name: dendrite
+    system: yes
+    home: /srv/commdata/matrix/dendrite
+    shell: /bin/bash
+
+- name: "PostgreSQL for backing store"
+  apt:
+    name:
+      - postgresql
+      - python3-psycopg2 # Python adapter, required for postgresql ansible modules
+
+- name: "A place for dendrite postgres data"
+  file:
+    state: directory
+    path: "/srv/commdata/matrix/dendrite/postgres"
+    owner: postgres
+    group: postgres
+
+# NB: This relies on a hacky Before+RequiredBy declaration in commdata-fs.service
+- name: "Allow postgres to store dendrite tables in commdata"
+  community.postgresql.postgresql_tablespace:
+    tablespace: commdata_dendrite
+    location: "/srv/commdata/matrix/dendrite/postgres"
+  become: true
+  become_user: postgres
+
+- name: "Dendrite DB, stored in commdata"
+  community.postgresql.postgresql_db:
+    name: dendrite
+    tablespace: commdata_dendrite
+  become: true
+  become_user: postgres
+
+- name: "Dendrite user account in postgres"
+  community.postgresql.postgresql_user:
+    name: dendrite
+    password: "{{ matrix__postgres_password }}"
+    db: dendrite
+  no_log: true # secrets
+  become: true
+  become_user: postgres
+
+
+#== Building dendrite
+
+- name: "Dir for matrix binaries and builds"
+  file:
+    path: "/opt/commapps/matrix"
+    state: directory
+
+- name: "Dir for building"
+  file:
+    path: "/opt/commapps/matrix/dendrite"
+    state: directory
+    owner: dendrite
+
+- name: "Build script"
+  template:
+    src: "{{ role_path }}/templates/build-dendrite.sh.j2"
+    dest: "/opt/commapps/matrix/build-dendrite.sh"
+    mode: a=rx
+
+- name: "Build dendrite"
+  command:
+    creates: "/srv/commdata/matrix/dendrite/bin/dendrite-{{ matrix__dendrite_version }}/dendrite-monolith-server"
+    cmd: /opt/commapps/matrix/build-dendrite.sh
+  become: yes
+  become_user: dendrite
+
+- name: "Symlink to current version for ease of reference"
+  file:
+    state: link
+    path: /srv/commdata/matrix/dendrite/bin/current
+    src: "dendrite-{{ matrix__dendrite_version }}"
+
+#== TLS termination via nginx
+
+- name: "Certificate config"
+  copy:
+    content: "{{ item.config | to_nice_json }}"
+    dest: "/opt/commapps/certbot/domains.d/{{ item.filename }}"
+  loop:
+    - filename: matrix-sub.json
+      config:
+        sub: matrix
+        base: appux.com
+        wild: false
+  notify: "certs config update"
+
+- name: "Install nginx proxy"
+  copy:
+    content: |
+      # Configuration for matrix.appux.com reverse proxy
+      server {
+        listen 443 ssl;
+        server_name matrix.appux.com;
+
+        ssl_certificate /srv/commdata/etc-letsencrypt/live/matrix.appux.com/fullchain.pem;
+        ssl_certificate_key /srv/commdata/etc-letsencrypt/live/matrix.appux.com/privkey.pem;
+
+        location / {
+          proxy_pass http://127.0.0.1:{{ matrix__dendrite_listen_port }};
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_read_timeout 600;
+        }
+      }
+    dest: "/etc/nginx/sites-available/matrix.appux.com.conf"
+  notify: "nginx reload config"
+
+- name: "Enable nginx proxy"
+  file:
+    src: "/etc/nginx/sites-available/matrix.appux.com.conf"
+    dest: "/etc/nginx/sites-enabled/matrix.appux.com.conf"
+    state: link
+  notify: "nginx reload config"
+
+#== Configuration
+
+- name: "Directory for dendrite logs"
+  file:
+    path: /srv/commdata/matrix/dendrite/logs
+    state: directory
+    owner: dendrite
+    group: dendrite
+    # Logs could contain user info
+    mode: u=rwx,g=,o=
+
+# TODO: Check if dendrite logs need rotating
+
+- name: "Signing key"
+  copy:
+    content: "{{ matrix__signing_key }}"
+    dest: /srv/commdata/matrix/dendrite/matrix_key.pem
+    owner: dendrite
+    mode: u=r,g=,o=
+  no_log: true
+
+- name: "Dendrite config file"
+  template:
+    src: "{{ role_path }}/templates/dendrite.yaml.j2"
+    dest: /srv/commdata/matrix/dendrite/dendrite.yaml
+    owner: dendrite
+    mode: u=r,g=,o=
+  no_log: true # contains secrets
+  notify: "dendrite config change"
+
+- name: "Dendrite systemd service unit file"
+  copy:
+    content: |
+      [Unit]
+      Description=Dendrite Matrix server
+      # nginx not listed, since it's not a hard requirement for the
+      # process, just the service being reachable.
+      Requires=commdata-fs.service
+      Requires=postgresql.service
+      After=commdata-fs.service
+      After=postgresql.service
+
+      [Service]
+      Type=simple
+      ExecStart=/srv/commdata/matrix/dendrite/bin/current/dendrite-monolith-server --config /srv/commdata/matrix/dendrite/dendrite.yaml --http-bind-address localhost:{{ matrix__dendrite_listen_port }}
+    dest: /etc/systemd/system/dendrite.service
+  register: matrix__dendrite_service_file
+
+- name: "Reload systemd config if dendrite unit file changed"
+  command: systemctl daemon-reload
+  when: matrix__dendrite_service_file.changed
+
+- name: "Enable dendrite service"
+  service:
+    name: dendrite
+    enabled: yes
+    state: started

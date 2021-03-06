@@ -1,0 +1,24 @@
+# Dendrite 0.3.11 says it needs Golang >= 1.13 for compilation
+
+matrix__golang_version: "1.16"
+matrix__golang_archive_sha256: "013a489ebb3e24ef3d915abe5b94c3286c070dfe0818d5bca8108f1d6e8440d2"
+
+matrix__dendrite_version: "0.3.11"
+matrix__dendrite_commit_sha1: "6a35d9f1b1cf817a9102131d84aab611f9ed355c"
+
+matrix__dendrite_listen_port: 8008
+
+# Generated 2021-03-06 on toster as dendrite user with command:
+#   (cd /srv/commdata/matrix/dendrite; bin/current/generate-keys --private-key matrix_key.pem)
+# after running playbook to point of building dendrite and symlinking
+# the installation.
+matrix__signing_key: "{{ vault_matrix__signing_key }}"
+
+# Shared secret which can be given out to bypass registration.
+# Set 2021-03-06 to a diceware phrase.
+matrix__registration_shared_secret: "{{ vault_matrix__registration_shared_secret }}"
+
+# Postgres DB user password for dendrite user account.
+# Must be URL-safe and SQL-safe characters.
+# Set 2021-03-06 to a diceware phrase with no spaces.
+matrix__postgres_password: "{{ vault_matrix__postgres_password }}"

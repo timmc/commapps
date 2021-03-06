@@ -1,0 +1,14 @@
+---
+- name: "certs config update"
+  command: /opt/commapps/certbot/scripts/renew-certs.sh
+
+- name: "nginx reload config"
+  service:
+    name: nginx
+    state: reloaded
+    enabled: yes
+
+- name: "dendrite config change"
+  service:
+    name: dendrite
+    state: restarted # reload not implemented
