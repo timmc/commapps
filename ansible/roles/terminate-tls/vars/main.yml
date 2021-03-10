@@ -1,2 +1,2 @@
 # API key for NFSN, acquired from NearlyFreeSpeech.net support request.
-sandstorm__nfsn_api_key: "{{ vault_sandstorm__nfsn_api_key }}"
+terminate_tls__nfsn_api_key: "{{ vault_terminate_tls__nfsn_api_key }}"
