@@ -8,7 +8,7 @@ matrix__dendrite_commit_sha1: "6a35d9f1b1cf817a9102131d84aab611f9ed355c"
 
 matrix__dendrite_listen_port: 8008
 
-# Generated 2021-03-06 on toster as dendrite user with command:
+# Generated 2021-03-06 (key ID ed25519:dWfnyY) on toster as dendrite user with command:
 #   (cd /srv/commdata/matrix/dendrite; bin/current/generate-keys --private-key matrix_key.pem)
 # after running playbook to point of building dendrite and symlinking
 # the installation.
