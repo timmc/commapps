@@ -1,6 +1,21 @@
 ---
-- name: Install nginx
-  apt: name=nginx
+# Double-check. See redundant task in commdata for more info.
+- name: "Confirm that commdata is mounted"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+# Mechanism for vars/vault separation for role vars
+- include_vars: "{{ role_path }}/vars/vault.yml"
+
+# ----
+
+#== Base nginx install ==#
+
+- name: Install packages
+  apt:
+    name:
+      - nginx
+      - jq # for cert renewal param parsing
 
 - name: Directory for nginx ssl params
   file:
@@ -18,3 +33,76 @@
     src: "{{ role_path }}/files/nginx.conf"
     dest: "/etc/nginx/nginx.conf"
   notify: nginx reload config
+
+
+#== ACME wildcard cert renewal ==#
+
+- name: Install certbot
+  apt: name=certbot
+
+- name: Certbot secrets directory
+  file:
+    path: "/srv/commdata/secrets/certbot"
+    state: directory
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Certbot config directory
+  file:
+    path: "/srv/commdata/etc-letsencrypt" # Replaces /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Certbot configuration"
+  copy:
+    src: "{{ role_path }}/files/certbot/certbot.ini"
+    dest: "/srv/commdata/etc-letsencrypt/certbot.ini"
+
+- name: NFSN API key
+  copy:
+    content: "{{ terminate_tls__nfsn_api_key }}"
+    dest: "/srv/commdata/secrets/certbot/nfsn-api-key"
+    owner: root
+    group: root
+    mode: 0600
+  no_log: true
+
+- name: Certbot management files
+  file:
+    state: directory
+    path: /opt/commapps/certbot
+
+# Any time the files here change, the renew-certs.sh script should be
+# re-run so that nginx will be able to start properly.
+- name: "Directory for cert renewal configs"
+  file:
+    state: directory
+    path: /opt/commapps/certbot/domains.d
+
+- name: Certbot cert scipts
+  synchronize:
+    src: "{{ role_path }}/files/certbot/scripts/"
+    dest: /opt/commapps/certbot/scripts/
+  register: certbot__scripts
+
+- name: "Re-run renewal when scripts have changed"
+  command: /opt/commapps/certbot/scripts/renew-certs.sh
+  when: certbot__scripts.changed
+
+- name: Schedule daily renewal check
+  copy:
+    src: "{{ role_path }}/files/certbot/certbot.cron"
+    dest: /etc/cron.d/commapps-certbot
+
+- name: "Log rotation for certbot cron"
+  copy:
+    content: |
+      /var/log/certbot-renewal.log {
+        monthly
+        rotate 5
+        missingok
+      }
+    dest: /etc/logrotate.d/certbot-renewal

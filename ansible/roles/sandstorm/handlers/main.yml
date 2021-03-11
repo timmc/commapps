@@ -1,4 +1,7 @@
 ---
+- name: "certs config update"
+  command: /opt/commapps/certbot/scripts/renew-certs.sh
+
 - name: nginx reload config
   service:
     name: nginx
