@@ -27,9 +27,6 @@ global:
 
     naffka_database:
       connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-      max_open_conns: 10
-      max_idle_conns: 2
-      conn_max_lifetime: -1
 
   metrics:
     enabled: false # don't enable without setting a password
@@ -43,22 +40,12 @@ global:
 app_service_api:
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
-
-  disable_tls_validation: false
-
-  # Appservice configuration files to load into this homeserver.
-  config_files: []
 
 
 client_api:
   registration_disabled: false
   # Let people register anyway if they have this secret.
   registration_shared_secret: "{{ matrix__registration_shared_secret }}"
-
-  enable_registration_captcha: false
 
   rate_limiting:
     enabled: true
@@ -75,30 +62,16 @@ federation_api:
 federation_sender:
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
-
-  # backoff is 2**x seconds
-  send_max_retries: 16
-
-  disable_tls_validation: false
 
 
 key_server:
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
 
 
 media_api:
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
 
   # Storage path for uploaded media. May be relative or absolute.
   base_path: /srv/commdata/matrix/dendrite/media_store
@@ -134,25 +107,16 @@ mscs:
   mscs: []
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
 
 
 room_server:
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
 
 
 signing_key_server:
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
 
   # Perspective keyservers to use as a backup when direct key fetches fail. This may
   # be required to satisfy key requests for servers that are no longer online when
@@ -174,9 +138,6 @@ signing_key_server:
 sync_api:
   database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
 
   # Set by nginx to client's apparent IP address
   real_ip_header: X-Real-IP
@@ -185,14 +146,8 @@ sync_api:
 user_api:
   account_database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
   device_database:
     connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
-    max_open_conns: 10
-    max_idle_conns: 2
-    conn_max_lifetime: -1
 
 
 # Logging configuration, in addition to the standard logging that is sent to
