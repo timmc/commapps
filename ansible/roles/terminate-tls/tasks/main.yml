@@ -11,8 +11,11 @@
 
 #== Base nginx install ==#
 
-- name: Install nginx
-  apt: name=nginx
+- name: Install packages
+  apt:
+    name:
+      - nginx
+      - jq # for cert renewal param parsing
 
 - name: Directory for nginx ssl params
   file:
@@ -72,13 +75,20 @@
     state: directory
     path: /opt/commapps/certbot
 
+# Any time the files here change, the renew-certs.sh script should be
+# re-run so that nginx will be able to start properly.
+- name: "Directory for cert renewal configs"
+  file:
+    state: directory
+    path: /opt/commapps/certbot/domains.d
+
 - name: Certbot cert scipts
   synchronize:
     src: "{{ role_path }}/files/certbot/scripts/"
     dest: /opt/commapps/certbot/scripts/
   register: certbot__scripts
 
-- name: Initial certbot run so nginx can start
+- name: "Re-run renewal when scripts have changed"
   command: /opt/commapps/certbot/scripts/renew-certs.sh
   when: certbot__scripts.changed
 

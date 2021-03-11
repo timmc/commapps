@@ -7,6 +7,27 @@
 
 # ----
 
+#== Cert config ==#
+
+- name: "Certificate config for Sandstorm and sites"
+  copy:
+    content: "{{ item.config | to_nice_json }}"
+    dest: "/opt/commapps/certbot/domains.d/{{ item.filename }}"
+  loop:
+    # Main Sandstorm site
+    - filename: sandstorm-main.json
+      config:
+        sub: sandstorm
+        base: appux.com
+        wild: true
+    # Certificate config for integration test site for Spelunk's WebDAV support
+    - filename: sandstorm-spelunk-webdav-integration-test.json
+      config:
+        sub: spelunk-webdav-testing
+        base: spidersge.org
+        wild: false
+  notify: "certs config update"
+
 #== Sandstorm nginx ==#
 
 - name: Sandstorm nginx configuration
