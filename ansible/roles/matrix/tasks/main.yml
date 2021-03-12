@@ -144,7 +144,9 @@
     # Logs could contain user info
     mode: u=rwx,g=,o=
 
-# TODO: Check if dendrite logs need rotating
+# TODO: Check if dendrite logs need rotating -- Monolith.log is
+# managed by dendrite, but I also redirect I/O to stdout.log and
+# stderr.log
 
 - name: "Signing key"
   copy:
@@ -163,11 +165,26 @@
   no_log: true # contains secrets
   notify: "dendrite config change"
 
+- name: "Dendrite launcher"
+  copy:
+    content: |
+      #!/bin/bash
+      set -eu -o pipefail
+      /srv/commdata/matrix/dendrite/bin/current/dendrite-monolith-server \
+          --config /srv/commdata/matrix/dendrite/dendrite.yaml \
+          --http-bind-address localhost:{{ matrix__dendrite_listen_port }} \
+          > /srv/commdata/matrix/dendrite/logs/stdout.log \
+          2> /srv/commdata/matrix/dendrite/logs/stderr.log
+    dest: /srv/commdata/matrix/dendrite/run.sh
+    mode: a+x
+  notify: "dendrite config change"
+
 - name: "Dendrite systemd service unit file"
   copy:
     content: |
       [Unit]
       Description=Dendrite Matrix server
+
       # nginx not listed, since it's not a hard requirement for the
       # process, just the service being reachable.
       Requires=commdata-fs.service
@@ -175,9 +192,17 @@
       After=commdata-fs.service
       After=postgresql.service
 
+      # If it auto-restarts this many times in this many seconds, stop
+      # auto-restarting.
+      StartLimitBurst=3
+      StartLimitIntervalSec=30
+
       [Service]
       Type=simple
-      ExecStart=/srv/commdata/matrix/dendrite/bin/current/dendrite-monolith-server --config /srv/commdata/matrix/dendrite/dendrite.yaml --http-bind-address localhost:{{ matrix__dendrite_listen_port }}
+      ExecStart=/srv/commdata/matrix/dendrite/run.sh
+
+      Restart=on-failure
+      RestartSec=5s
     dest: /etc/systemd/system/dendrite.service
   register: matrix__dendrite_service_file
 
