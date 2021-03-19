@@ -203,6 +203,9 @@
 
       Restart=on-failure
       RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
     dest: /etc/systemd/system/dendrite.service
   register: matrix__dendrite_service_file
 
