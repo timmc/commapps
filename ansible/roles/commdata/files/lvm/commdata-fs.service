@@ -24,6 +24,11 @@ ExecStop=/opt/commapps/encfs/lvm/unmount.sh
 RequiredBy=sandstorm.service
 RequiredBy=nginx.service
 RequiredBy=prosody.service
+# TODO: Can this be changed to WantedBy? There might be some services
+# that use postgresql but don't store data in the commdata
+# partition. I'm not sure what happens if postgresql tries to start
+# and some of its tablespaces are missing, but... maybe it will still
+# load the available databases?
 RequiredBy=postgresql.service
 # Mount commdata even if no services are running so that backups can run
 # but also so administrators aren't confused.

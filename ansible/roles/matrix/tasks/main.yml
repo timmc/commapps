@@ -34,7 +34,9 @@
     owner: postgres
     group: postgres
 
-# NB: This relies on a hacky Before+RequiredBy declaration in commdata-fs.service
+# NB: This relies on a hacky Before+RequiredBy declaration in
+# commdata-fs.service that ensures postgresql won't start until after
+# the commdata filesystem is mounted.
 - name: "Allow postgres to store dendrite tables in commdata"
   community.postgresql.postgresql_tablespace:
     tablespace: commdata_dendrite
