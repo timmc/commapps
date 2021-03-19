@@ -146,10 +146,6 @@
     # Logs could contain user info
     mode: u=rwx,g=,o=
 
-# TODO: Check if dendrite logs need rotating -- Monolith.log is
-# managed by dendrite, but I also redirect I/O to stdout.log and
-# stderr.log
-
 - name: "Signing key"
   copy:
     content: "{{ matrix__signing_key }}"
@@ -180,6 +176,20 @@
     dest: /srv/commdata/matrix/dendrite/run.sh
     mode: a+x
   notify: "dendrite config change"
+
+# Only needed for stderr/stdout files; dendrite rotates its own logs.
+# stderr.log actually seems to just be a terser version of what's in
+# Monolith.log, but keeping it anyway for now.
+- name: "Log rotation"
+  copy:
+    content: |
+      /srv/commdata/matrix/dendrite/logs/stdout.log /srv/commdata/matrix/dendrite/logs/stderr.log {
+          daily
+          rotate 10
+          missingok
+          create 600 dendrite dendrite
+      }
+    dest: /etc/logrotate.d/dendrite-launcher
 
 - name: "Dendrite systemd service unit file"
   copy:
