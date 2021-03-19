@@ -15,7 +15,9 @@ global:
   - matrix.org
   - vector.im
 
-  disable_federation: false
+  # Dendrite doesn't federate well yet -- in particular, if someone
+  # joins a huge room, it can take down this host!
+  disable_federation: true
 
   # Configuration for Kafka/Naffka.
   kafka:
