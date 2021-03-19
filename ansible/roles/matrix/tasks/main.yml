@@ -175,8 +175,8 @@
       /srv/commdata/matrix/dendrite/bin/current/dendrite-monolith-server \
           --config /srv/commdata/matrix/dendrite/dendrite.yaml \
           --http-bind-address localhost:{{ matrix__dendrite_listen_port }} \
-          > /srv/commdata/matrix/dendrite/logs/stdout.log \
-          2> /srv/commdata/matrix/dendrite/logs/stderr.log
+          >> /srv/commdata/matrix/dendrite/logs/stdout.log \
+          2>> /srv/commdata/matrix/dendrite/logs/stderr.log
     dest: /srv/commdata/matrix/dendrite/run.sh
     mode: a+x
   notify: "dendrite config change"
