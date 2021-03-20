@@ -118,7 +118,14 @@
         ssl_certificate /srv/commdata/etc-letsencrypt/live/matrix.appux.com/fullchain.pem;
         ssl_certificate_key /srv/commdata/etc-letsencrypt/live/matrix.appux.com/privkey.pem;
 
-        location / {
+        # If someone opens the subdomain in their browser, send them
+        # to a useful page.
+        location ~ ^/$ {
+          return 302 https://www.appux.com/matrix.html;
+        }
+
+        # Everything else goes to Dendrite.
+        location ~ ^/.+ {
           proxy_pass http://127.0.0.1:{{ matrix__dendrite_listen_port }};
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
