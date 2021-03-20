@@ -21,7 +21,7 @@ install_path="$dest_dir/$DOMAIN.chain.pem"
 fetch_url="$BASE_URL/$DOMAIN.chain.pem"
 
 old_data="$(cat -- "$install_path" || true)"
-new_data="$(curl -sS -m 10 -- "$fetch_url")"
+new_data="$(curl -sS -m 10 -H 'Cache-Control: no-cache' -- "$fetch_url")"
 if [[ ! "$new_data" =~ BEGIN\ CERTIFICATE ]]; then
     log -e "Could not fetch new certificate from $fetch_url. Response was: \n$new_data"
     exit 65
