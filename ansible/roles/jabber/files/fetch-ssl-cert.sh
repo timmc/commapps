@@ -11,6 +11,8 @@
 
 set -eu -o pipefail
 
+log() { echo >&2 "$(date -u "+%Y-%m-%d %H:%M:%S"):" "$@"; }
+
 DOMAIN="$1"
 BASE_URL="$2"
 
@@ -21,15 +23,15 @@ fetch_url="$BASE_URL/$DOMAIN.chain.pem"
 old_data="$(cat -- "$install_path" || true)"
 new_data="$(curl -sS -m 10 -- "$fetch_url")"
 if [[ ! "$new_data" =~ BEGIN\ CERTIFICATE ]]; then
-    echo >&2 -e "Could not fetch new certificate from $fetch_url. Response was: \n$new_data"
+    log -e "Could not fetch new certificate from $fetch_url. Response was: \n$new_data"
     exit 65
 fi
 
 if [[ "$old_data" = "$new_data" ]]; then
-    echo >&2 "Not installing new cert, hasn't changed: $install_path"
+    log "Not installing new cert, hasn't changed: $install_path"
     exit 0
 fi
 
-echo >&2 "Installing certificate to $install_path and reloading Prosody"
+log "Installing certificate to $install_path and reloading Prosody"
 echo "$new_data" > "$install_path"
 exit 64
