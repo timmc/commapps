@@ -27,11 +27,11 @@ git clone "$DENDRITE_REPO_URL" src
 
 cd /srv/commdata/matrix/dendrite/src # push
 
-[ "$(git rev-parse "v${DENDRITE_VER}")" = "${DENDRITE_COMMIT_SHA1}" ] || {
+[ "$(git rev-parse "${DENDRITE_VER}")" = "${DENDRITE_COMMIT_SHA1}" ] || {
     echo "Unexpected commit SHA for dendrite tag -- did the tag change?"
     exit 1
 }
-git checkout "v${DENDRITE_VER}"
+git checkout "${DENDRITE_VER}"
 export PATH="$PATH:/srv/commdata/matrix/dendrite/build/golang-${GOLANG_VER}/go/bin"
 ./build.sh
 
