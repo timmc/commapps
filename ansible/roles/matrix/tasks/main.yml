@@ -74,9 +74,9 @@
     state: directory
     owner: dendrite
 
-- name: "Build script"
-  template:
-    src: "{{ role_path }}/templates/build-dendrite.sh.j2"
+- name: "Script to build from source"
+  copy:
+    src: "{{ role_path }}/files/build-dendrite.sh"
     dest: "/opt/commapps/matrix/build-dendrite.sh"
     mode: a=rx
 
@@ -86,6 +86,11 @@
     cmd: /opt/commapps/matrix/build-dendrite.sh
   become: yes
   become_user: dendrite
+  environment:
+    GOLANG_VER: "{{ matrix__golang_version }}"
+    GOLANG_SHA256: "{{ matrix__golang_archive_sha256 }}"
+    DENDRITE_VER: "{{ matrix__dendrite_version }}"
+    DENDRITE_COMMIT_SHA1: "{{ matrix__dendrite_commit_sha1 }}"
 
 - name: "Symlink to current version for ease of reference"
   file:

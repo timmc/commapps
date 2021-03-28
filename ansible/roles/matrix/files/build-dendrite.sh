@@ -3,12 +3,6 @@
 # /srv/commdata/matrix/dendrite/bin/dendrite-VERSION/
 set -eu -o pipefail
 
-# Translate ansible settings to shell env
-GOLANG_VER={{ matrix__golang_version|quote }}
-GOLANG_SHA256={{ matrix__golang_archive_sha256|quote }}
-DENDRITE_VER={{ matrix__dendrite_version|quote }}
-DENDRITE_COMMIT_SHA1={{ matrix__dendrite_commit_sha1|quote }}
-
 cd /srv/commdata/matrix/dendrite
 
 # Temporary build dir
