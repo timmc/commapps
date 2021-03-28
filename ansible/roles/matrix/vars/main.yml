@@ -3,9 +3,9 @@
 matrix__golang_version: "1.16"
 matrix__golang_archive_sha256: "013a489ebb3e24ef3d915abe5b94c3286c070dfe0818d5bca8108f1d6e8440d2"
 
-matrix__dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-matrix__dendrite_version: "v0.3.11"
-matrix__dendrite_commit_sha1: "6a35d9f1b1cf817a9102131d84aab611f9ed355c"
+matrix__dendrite_repo_url: "https://github.com/timmc/dendrite"
+matrix__dendrite_version: "v0.3.11-timmc-password-prefix-hack"
+matrix__dendrite_commit_sha1: "5b0b0c62553bc489adf95944678a87ff6725f2bd"
 
 matrix__dendrite_listen_port: 8008
 
@@ -15,8 +15,23 @@ matrix__dendrite_listen_port: 8008
 # the installation.
 matrix__signing_key: "{{ vault_matrix__signing_key }}"
 
-# Shared secret which can be given out to bypass registration.
-# Set 2021-03-06 to a diceware phrase.
+# Shared secrets which can be given out to allow registration.  If
+# empty string, registration is enabled. If pipe-delimited string, new
+# user's initial password must start with one of those values in order
+# for registration to proceed.
+#
+# This is a gross hack that only works with certain commits on the
+# timmc fork of dendrite.
+#
+# Secret management: First in list is the one to give out; others in
+# list are older values that were previously given out and have not
+# yet been retired.
+#
+# - 2021-03-06: Set to a diceware phrase, when originally trying to
+#   use for intended purpose.
+# - 2021-03-28: Set to two 8-character lower alphanumeric strings for
+#   use with password prefix hack. (Used two in order to test out
+#   multi-value functionality.)
 matrix__registration_shared_secret: "{{ vault_matrix__registration_shared_secret }}"
 
 # Postgres DB user password for dendrite user account.
