@@ -23,7 +23,7 @@ tar xzf "build/golang-${GOLANG_VER}.tar.gz" --directory "build/golang-${GOLANG_V
 
 # Download dendrite and build it
 
-git clone "https://github.com/matrix-org/dendrite" src
+git clone "$DENDRITE_REPO_URL" src
 
 cd /srv/commdata/matrix/dendrite/src # push
 

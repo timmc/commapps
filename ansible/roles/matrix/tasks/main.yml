@@ -89,6 +89,7 @@
   environment:
     GOLANG_VER: "{{ matrix__golang_version }}"
     GOLANG_SHA256: "{{ matrix__golang_archive_sha256 }}"
+    DENDRITE_REPO_URL: "{{ matrix__dendrite_repo_url }}"
     DENDRITE_VER: "{{ matrix__dendrite_version }}"
     DENDRITE_COMMIT_SHA1: "{{ matrix__dendrite_commit_sha1 }}"
 

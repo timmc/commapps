@@ -4,6 +4,7 @@ matrix__golang_version: "1.16"
 matrix__golang_archive_sha256: "013a489ebb3e24ef3d915abe5b94c3286c070dfe0818d5bca8108f1d6e8440d2"
 
 matrix__dendrite_version: "0.3.11"
+matrix__dendrite_repo_url: "https://github.com/matrix-org/dendrite"
 matrix__dendrite_commit_sha1: "6a35d9f1b1cf817a9102131d84aab611f9ed355c"
 
 matrix__dendrite_listen_port: 8008
