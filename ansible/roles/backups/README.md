@@ -27,6 +27,25 @@ with an append-only key, first remove all access to the repo for
 non-append-only keys and then seek assistance. A single access with a
 full-powered key can make an attacker's changes permanent!
 
+If there was any malicious activity on the computer that was backed
+up, this needs to handled very carefully. **Do not perform any
+operations with the non-append-only key**, as this could make an
+attacker's changes permanent (such as archive deletions).
+
+Otherwise, a straightforward mount or extract is appropriate:
+
+```
+source /opt/commapps/backups/borg/env.sh
+cd /srv/commdata/tmp/restore/...
+/opt/commapps/backups/borg/venv/bin/borg extract ::ARCHIVE srv/active-commdata-snapshot/...
+```
+
+Notes:
+
+- This extract command will extract files into the current directory
+- Leave off the leading slash from the paths to extract
+- Paths to extract start with the *snapshot* dir, not `/srv/commdata`
+
 ## Host configuration
 
 Create a borg repository somewhere. <https://www.borgbase.com> is a
