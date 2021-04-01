@@ -73,6 +73,7 @@
     path: "/opt/commapps/matrix/dendrite"
     state: directory
     owner: dendrite
+    group: dendrite
 
 - name: "Script to build from source"
   copy:
@@ -98,6 +99,9 @@
     state: link
     path: /srv/commdata/matrix/dendrite/bin/current
     src: "dendrite-{{ matrix__dendrite_version }}"
+    follow: false # set ownership on link, not dest
+    owner: dendrite
+    group: dendrite
 
 #== TLS termination via nginx
 
@@ -164,6 +168,7 @@
     content: "{{ matrix__signing_key }}"
     dest: /srv/commdata/matrix/dendrite/matrix_key.pem
     owner: dendrite
+    group: dendrite
     mode: u=r,g=,o=
   no_log: true
 
@@ -172,6 +177,7 @@
     src: "{{ role_path }}/templates/dendrite.yaml.j2"
     dest: /srv/commdata/matrix/dendrite/dendrite.yaml
     owner: dendrite
+    group: dendrite
     mode: u=r,g=,o=
   no_log: true # contains secrets
   notify: "dendrite config change"
@@ -187,6 +193,8 @@
           >> /srv/commdata/matrix/dendrite/logs/stdout.log \
           2>> /srv/commdata/matrix/dendrite/logs/stderr.log
     dest: /srv/commdata/matrix/dendrite/run.sh
+    owner: dendrite
+    group: dendrite
     mode: a+x
   notify: "dendrite config change"
 
@@ -225,6 +233,8 @@
       [Service]
       Type=simple
       ExecStart=/srv/commdata/matrix/dendrite/run.sh
+      User=dendrite
+      Group=dendrite
 
       Restart=on-failure
       RestartSec=5s
