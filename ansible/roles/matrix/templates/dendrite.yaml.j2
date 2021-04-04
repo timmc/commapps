@@ -82,7 +82,8 @@ media_api:
   # Storage path for uploaded media. May be relative or absolute.
   base_path: /srv/commdata/matrix/dendrite/media_store
 
-  # Max allowed media upload (in bytes, 0 = unlimited)
+  # Max allowed media upload (in bytes, 0 = unlimited).
+  # nginx config needs to allow uploads of at least this size.
   max_file_size_bytes: 10485760
 
   # Whether to dynamically generate thumbnails if needed.

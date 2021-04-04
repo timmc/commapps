@@ -141,6 +141,10 @@
           proxy_set_header X-Real-IP $remote_addr;
           proxy_read_timeout 600;
         }
+
+        # Allow file uploads. Dendrite has its own config on the Media
+        # API side, so this can be somewhat permissive.
+        client_max_body_size 15m;
       }
     dest: "/etc/nginx/sites-available/matrix.appux.com.conf"
   notify: "nginx reload config"
