@@ -243,6 +243,13 @@
       Restart=on-failure
       RestartSec=5s
 
+      # Dendrite needs to talk to lots of homeservers
+      LimitNOFILE=8K
+      # Dendrite is experimental and sometimes leaks memory. If
+      # there's an OOM situation, it's probably Dendrite, so prefer to
+      # kill it.
+      OOMScoreAdjust=500
+
       [Install]
       WantedBy=multi-user.target
     dest: /etc/systemd/system/dendrite.service
