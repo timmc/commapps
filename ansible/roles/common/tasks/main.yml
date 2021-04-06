@@ -91,3 +91,19 @@
     group: root
     mode: 0644
   notify: reload sshd config
+
+# 0xF4 is the sum of:
+#
+#   0x4 - enable control of keyboard (SAK, unraw)
+#  0x10 - enable sync command
+#  0x20 - enable remount read-only
+#  0x40 - enable signalling of processes (term, kill, oom-kill)
+#  0x80 - allow reboot/poweroff
+#
+# https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html
+
+- name: "Magic SysRq key config"
+  ansible.posix.sysctl:
+    name: kernel.sysrq
+    value: "0xF4"
+    sysctl_set: true
