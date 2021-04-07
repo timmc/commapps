@@ -1,5 +1,7 @@
 # TODO list
 
+Figure out how to bring up system with SSH but without community services, perhaps by unplugging not-an-hsm.
+
 - Control
     - Done: Move to my own domain name; prerequisites follow:
         - Done: Get wildcard cert for Sandstorm (Let's Encrypt)
