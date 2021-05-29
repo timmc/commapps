@@ -44,6 +44,9 @@ Notes:
 
 - This extract command will extract files into the current directory
 - Leave off the leading slash from the paths to extract
+- If you extract a file or directory in a deeper path, the parent dirs
+  will be created as `root:root` because they aren't being explicitly
+  extracted
 - Paths to extract start with the *snapshot* dir, not `/srv/commdata`
 
 ## Host configuration
