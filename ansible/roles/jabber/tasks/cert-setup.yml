@@ -43,4 +43,3 @@
   register: jabber__cert_download
   failed_when: jabber__cert_download.rc != 0 and jabber__cert_download.rc != 64
   changed_when: jabber__cert_download.rc == 64
-  notify: Restart prosody

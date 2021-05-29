@@ -34,4 +34,5 @@ fi
 
 log "Installing certificate to $install_path and reloading Prosody"
 echo "$new_data" > "$install_path"
+systemctl reload prosody
 exit 64
