@@ -30,3 +30,19 @@ Add file `https://www.appux.com/.well-known/matrix/server`:
   "m.server": "matrix.appux.com:443"
 }
 ```
+
+## Reset a user password
+
+If someone forgets their password, a new password can be generated for
+the database like so:
+
+```
+htpasswd -nBC10 "" | sed 's/^:\$2y\$/$2a$/'
+```
+
+And then in the DB (`sudo -u postgres psql`):
+
+```
+\c dendrite
+update account_accounts set password_hash = '$2a$10$...' where localpart = '...';
+```
