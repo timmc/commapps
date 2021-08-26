@@ -27,7 +27,7 @@ EOF
     if [[ "$answer" = "YES" ]]; then
         break
     else
-        echo >&2 -e "\n\nUnknown response.\n\n"
+        echo >&2 -e "\n\nUnknown response. Rechecking...\n\n"
     fi
 done
 
