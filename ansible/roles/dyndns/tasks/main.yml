@@ -1,6 +1,6 @@
 ---
 # Double-check. See redundant task in commdata for more info.
-- name: "Confirm that commdata is mounted"
+- name: "Confirm that commdata is mounted (for dyndns data)"
   shell: mountpoint /srv/commdata
   changed_when: False
 

@@ -1,6 +1,6 @@
 ---
 # Double-check. See redundant task in commdata for more info.
-- name: "Confirm that commdata is mounted"
+- name: "Confirm that commdata is mounted (for supervisor data and secrets)"
   shell: mountpoint /srv/commdata
   changed_when: False
 

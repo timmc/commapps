@@ -27,7 +27,7 @@
 #
 # Lack of this directive has caused secrets to be written to disk
 # unencrypted before, thanks to a mis-written systemd service file.
-- name: "Confirm that commdata is mounted"
+- name: "Confirm that commdata is mounted (before initializing dir structure)"
   shell: mountpoint /srv/commdata
   changed_when: False
 
