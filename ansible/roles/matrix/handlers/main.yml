@@ -12,3 +12,8 @@
   service:
     name: dendrite
     state: restarted # reload not implemented
+
+- name: "regui config change"
+  service:
+    name: matrix-registration
+    state: restarted

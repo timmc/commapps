@@ -45,12 +45,8 @@ app_service_api:
 
 
 client_api:
-  registration_disabled: false
-  # Registration override if registration is disabled (except maybe doesn't
-  # work yet, or with most clients?)
-  #
-  # If using certain timmc fork commits, also used for in-band registration
-  # filter (password prefixes).
+  registration_disabled: true
+  # Registration override if registration is disabled. Used by matrix-registration UI.
   registration_shared_secret: "{{ matrix__registration_shared_secret }}"
 
   rate_limiting:

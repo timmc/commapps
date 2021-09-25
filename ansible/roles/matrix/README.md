@@ -46,3 +46,32 @@ And then in the DB (`sudo -u postgres psql`):
 \c dendrite
 update account_accounts set password_hash = '$2a$10$...' where localpart = '...';
 ```
+
+## Registration UI
+
+Administration is performed as the `matreg` user from its home directory.
+
+### First-time setup
+
+On the server, generate a token for users:
+
+`./venv/bin/matrix-registration --config-path config.yaml generate`
+
+This will output a token made of several dictionary words.
+
+(FIXME: In v0.9.1 and current master branch, there is a bug in the
+`POST /api/token` code, so we can't use the `admin.sh` script here.)
+
+### Giving out a registration link
+
+A URL like this can now be given to people to allow registration:
+
+`https://matrix.appux.com/regui/register?token=GENERATED_TOKEN`
+
+### If a token is compromised
+
+Disable the old token:
+
+`./admin.sh /api/token/OLD_TOKEN_NAME -X PATCH -d '{"disabled": true}'`
+
+Then generate a new one, as in the first-time setup.

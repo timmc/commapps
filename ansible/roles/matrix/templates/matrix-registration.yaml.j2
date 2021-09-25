@@ -1,0 +1,50 @@
+host: "localhost"
+port: "{{ matrix__regui_listen_port }}"
+base_url: /regui
+
+# Yes, that's four slashes
+db: "sqlite:////srv/commdata/matrix/regui/db.sqlite3"
+
+# The Matrix server
+server_name: appux.com
+server_location: "http://localhost:{{ matrix__dendrite_listen_port }}"
+
+registration_shared_secret: "{{ matrix__registration_shared_secret }}"
+admin_api_shared_secret: "{{ matrix__regui_admin_password }}"
+
+client_redirect: "https://app.element.io/#/login"
+client_logo: "static/images/element-logo.png"
+
+# security
+rate_limit: ["100 per day", "10 per minute"]
+allow_cors: false
+ip_logging: true
+
+logging:
+  disable_existing_loggers: false
+  version: 1
+  root:
+    level: DEBUG
+    handlers: [console]
+  formatters:
+    brief:
+      format: '%(name)s - %(levelname)s - %(message)s'
+    precise:
+      format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  handlers:
+    # Removed the default file-based handler -- sending everything to
+    # stdout, where it is redirected to a rotated log file.
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: precise
+      stream: ext://sys.stdout
+
+# password requirements
+password:
+  min_length: 8
+
+# username requirements
+#username:
+#  validation_regex: [] #list of regexes name must match
+#  invalidation_regex: [] #list of regexes name must *not* match

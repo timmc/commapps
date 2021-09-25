@@ -134,6 +134,14 @@
           return 302 https://www.appux.com/matrix.html;
         }
 
+        # Registration UI is separate application. Only expose routes
+        # that need to be public; admin API will only be callable from
+        # on-host.
+        location ~ ^/regui/(static|register) {
+          proxy_pass http://localhost:{{ matrix__regui_listen_port }};
+          proxy_read_timeout 30;
+        }
+
         # Everything else goes to Dendrite.
         location ~ ^/.+ {
           proxy_pass http://127.0.0.1:{{ matrix__dendrite_listen_port }};
@@ -262,5 +270,141 @@
 - name: "Enable dendrite service"
   service:
     name: dendrite
+    enabled: yes
+    state: started
+
+#== Matrix registration frontend
+
+- name: "User and home dir for matreg"
+  user:
+    name: matreg
+    system: yes
+    home: /srv/commdata/matrix/regui
+    shell: /bin/bash
+
+- name: "Deps for matrix-registration virtualenv"
+  apt:
+    name:
+      - python3
+      - python3-pip
+      - python-virtualenv
+
+- name: "Setup by matreg user"
+  become: yes
+  become_user: matreg
+  block:
+    - name: "Install matrix-registration in virtualenv"
+      pip:
+        name:
+          # Tagged v0.9.1 but author forgot to bump the version; this is
+          # probably the one labeled 0.9.1.post1 on PyPI
+          - "git+https://github.com/ZerataX/matrix-registration@ac0291749c869e258fa7d3fbdd84fb25f1fa9b50#egg=matrix-registration==0.9.0"
+        virtualenv: /srv/commdata/matrix/regui/venv
+        virtualenv_python: python3
+
+    - name: "Directory for regui logs"
+      file:
+        path: /srv/commdata/matrix/regui/logs
+        state: directory
+        # Logs could contain user info
+        mode: u=rwx,g=,o=
+
+    - name: "Configuration for registration app"
+      template:
+        src: "{{ role_path }}/templates/matrix-registration.yaml.j2"
+        dest: /srv/commdata/matrix/regui/config.yaml
+      no_log: true # secrets
+
+    - name: "Registration app launcher"
+      copy:
+        content: |
+          #!/bin/bash
+          set -eu -o pipefail
+          /srv/commdata/matrix/regui/venv/bin/matrix-registration \
+            --config-path /srv/commdata/matrix/regui/config.yaml \
+            serve \
+            >> /srv/commdata/matrix/regui/logs/stdout.log \
+            2>> /srv/commdata/matrix/regui/logs/stderr.log
+        dest: /srv/commdata/matrix/regui/run.sh
+        mode: a+x
+      notify: "regui config change"
+
+    - name: "Registration app admin script"
+      copy:
+        content: |
+          #!/bin/bash
+          # Make calls to admin API via curl
+          set -eu -o pipefail
+
+          if [[ "$#" -lt 1 ]]; then
+            echo "Usage: admin.sh /api/... [optional curl args...]"
+            exit 1
+          fi
+
+          api_path="$1" # e.g. "version"
+          shift
+
+          if [[ ! "$api_path" =~ ^/api/.* ]]; then
+            echo "Path must start with /api/"
+            exit 1
+          fi
+
+          curl -sS \
+            -H "Authorization: SharedSecret {{ matrix__regui_admin_password }}" \
+            "http://localhost:{{ matrix__regui_listen_port }}${api_path}" \
+            "$@"
+        dest: /srv/commdata/matrix/regui/admin.sh
+        mode: u=rwx,g=,o=
+      no_log: true # secrets
+
+
+- name: "Log rotation"
+  copy:
+    content: |
+      /srv/commdata/matrix/regui/logs/stdout.log /srv/commdata/matrix/regui/logs/stderr.log {
+          daily
+          rotate 20
+          missingok
+          create 600 matreg matreg
+      }
+    dest: /etc/logrotate.d/matrix-registration-launcher
+
+- name: "Registration systemd service unit file"
+  copy:
+    content: |
+      [Unit]
+      Description=Matrix registration service
+
+      # nginx not listed, since it's not a hard requirement for the
+      # process, just the service being reachable.
+      Requires=commdata-fs.service
+      After=commdata-fs.service
+
+      # If it auto-restarts this many times in this many seconds, stop
+      # auto-restarting.
+      StartLimitBurst=3
+      StartLimitIntervalSec=30
+
+      [Service]
+      Type=simple
+      ExecStart=/srv/commdata/matrix/regui/run.sh
+      User=matreg
+      Group=matreg
+
+      Restart=on-failure
+      RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
+    dest: /etc/systemd/system/matrix-registration.service
+  register: matrix__regui_service_file
+
+- name: "Reload systemd config if registration unit file changed"
+  command: systemctl daemon-reload
+  when: matrix__regui_service_file.changed
+
+- name: "Enable registration service"
+  service:
+    name: matrix-registration
     enabled: yes
     state: started
