@@ -92,7 +92,7 @@
     mode: 0644
   notify: reload sshd config
 
-# 0xF4 is the sum of:
+# 244 is the sum of:
 #
 #   0x4 - enable control of keyboard (SAK, unraw)
 #  0x10 - enable sync command
@@ -105,5 +105,8 @@
 - name: "Magic SysRq key config"
   ansible.posix.sysctl:
     name: kernel.sysrq
-    value: "0xF4"
+    # Has to be decimal or ansible will always think it has changed,
+    # since sysctl reports it back as decimal even if you set it using
+    # hexadecimal.
+    value: "244"
     sysctl_set: true
