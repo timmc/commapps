@@ -8,10 +8,12 @@
     state: reloaded
     enabled: yes
 
-- name: "dendrite config change"
+# Note that reload is not implemented for this service, so config
+# changes should target this handler too.
+- name: "dendrite change"
   service:
     name: dendrite
-    state: restarted # reload not implemented
+    state: restarted
 
 - name: "regui config change"
   service:

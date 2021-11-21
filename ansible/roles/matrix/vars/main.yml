@@ -2,13 +2,13 @@
 
 # Golang package version and hash, from https://golang.org/dl/
 # Use the linux-amd64.tar.gz packages.
-matrix__golang_version: "1.17.1"
-matrix__golang_archive_sha256: "dab7d9c34361dc21ec237d584590d72500652e7c909bf082758fb63064fca0ef"
+matrix__golang_version: "1.17.3"
+matrix__golang_archive_sha256: "550f9845451c0c94be679faf116291e7807a8d78b43149f9506c1b15eb89008c"
 
 # Dendrite version, from https://github.com/matrix-org/dendrite/tags
 matrix__dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-matrix__dendrite_version: "v0.5.0"
-matrix__dendrite_commit_sha1: "037ff4fb2364cbee7a3a9a856cd2a711f5398682"
+matrix__dendrite_version: "v0.5.1"
+matrix__dendrite_commit_sha1: "e81ef1649b468126a88a5ccce925f4e4ac865bf4"
 
 matrix__dendrite_listen_port: 8008
 
