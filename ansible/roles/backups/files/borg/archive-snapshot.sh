@@ -12,6 +12,9 @@ mountpoint -q /srv/active-commdata-snapshot || {
 # Configure borg via environment variables
 source /opt/commapps/backups/borg/env.sh
 
+# Print version for debugging purposes
+/opt/commapps/backups/borg/venv/bin/borg --version
+
 # Compression:
 #
 # I'm going to saturate my uplink very easily, so compress as much as
