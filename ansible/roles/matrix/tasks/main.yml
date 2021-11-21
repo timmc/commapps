@@ -289,20 +289,39 @@
     name:
       - python3
       - python3-pip
-      - python-virtualenv
+      - python3-virtualenv
 
 - name: "Setup by matreg user"
   become: yes
   become_user: matreg
   block:
+    # Maintain a different virtualenv for each Python version so that when
+    # the operating system upgrades Python and *uninstalls the old default
+    # Python* that the venv pointed to, the next Ansible run will recreate
+    # the venv with the new Python version.
+
+    - name: "Discover Python version"
+      shell: |
+        python3 -c "import platform; print(platform.python_version(), end='')"
+      failed_when: False
+      changed_when: False
+      register: matreg__pyver
+      check_mode: no # Run in normal mode, since it registers a variable
+
     - name: "Install matrix-registration in virtualenv"
       pip:
         name:
           # Tagged v0.9.1 but author forgot to bump the version; this is
           # probably the one labeled 0.9.1.post1 on PyPI
           - "git+https://github.com/ZerataX/matrix-registration@ac0291749c869e258fa7d3fbdd84fb25f1fa9b50#egg=matrix-registration==0.9.0"
-        virtualenv: /srv/commdata/matrix/regui/venv
+        virtualenv: "/srv/commdata/matrix/regui/venv_py{{ matreg__pyver.stdout}}"
         virtualenv_python: python3
+
+    - name: "Symlink for virtualenv matching current Python"
+      file:
+        state: link
+        src: "/srv/commdata/matrix/regui/venv_py{{ matreg__pyver.stdout }}"
+        dest: "/srv/commdata/matrix/regui/venv"
 
     - name: "Directory for regui logs"
       file:

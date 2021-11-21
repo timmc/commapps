@@ -1,11 +1,13 @@
 # Managed by Ansible.
 #
-# This is the stock config for Debian Buster, minus comments and minus
+# This is the stock config for Debian Bullseye, minus comments and minus
 # an additional label=Debian line -- we just want security upgrades, not
 # feature upgrades.
 
 Unattended-Upgrade::Origins-Pattern {
+  // "origin=Debian,codename=${distro_codename},label=Debian";
   "origin=Debian,codename=${distro_codename},label=Debian-Security";
+  "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";
 };
 
 Unattended-Upgrade::Package-Blacklist {

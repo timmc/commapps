@@ -14,7 +14,7 @@
       - python3
       - python3-dev
       - python3-pip
-      - python-virtualenv
+      - python3-virtualenv
       - libssl-dev
       - openssl
       - libacl1-dev
@@ -26,12 +26,31 @@
     state: directory
     path: /opt/commapps/backups/borg
 
+# Maintain a different virtualenv for each Python version so that when
+# the operating system upgrades Python and *uninstalls the old default
+# Python* that the venv pointed to, the next Ansible run will recreate
+# the venv with the new Python version.
+
+- name: "Discover Python version"
+  shell: |
+    python3 -c "import platform; print(platform.python_version(), end='')"
+  failed_when: False
+  changed_when: False
+  register: backups__pyver
+  check_mode: no # Run in normal mode, since it registers a variable
+
 - name: "Install borg in virtualenv"
   pip:
     name:
       - borgbackup
-    virtualenv: /opt/commapps/backups/borg/venv
+    virtualenv: "/opt/commapps/backups/borg/venv_py{{ backups__pyver.stdout }}"
     virtualenv_python: python3
+
+- name: "Symlink for virtualenv matching current Python"
+  file:
+    state: link
+    src: "/opt/commapps/backups/borg/venv_py{{ backups__pyver.stdout }}"
+    dest: "/opt/commapps/backups/borg/venv"
 
 
 #== Data/configuration ==#

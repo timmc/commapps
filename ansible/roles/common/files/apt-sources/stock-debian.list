@@ -1,13 +1,12 @@
 # Managed by Ansible.
 #
-# Stock Debian 10 Buster configuration, minus comments.
+# Stock Debian 11 Bullseye configuration, minus comments.
 
-deb http://debian.csail.mit.edu/debian/ buster main
-deb-src http://debian.csail.mit.edu/debian/ buster main
+deb http://deb.debian.org/debian/ bullseye main
+deb-src http://deb.debian.org/debian/ bullseye main
 
-deb http://security.debian.org/debian-security buster/updates main
-deb-src http://security.debian.org/debian-security buster/updates main
+deb http://security.debian.org/debian-security bullseye-security main
+deb-src http://security.debian.org/debian-security bullseye-security main
 
-# buster-updates, previously known as 'volatile'
-deb http://debian.csail.mit.edu/debian/ buster-updates main
-deb-src http://debian.csail.mit.edu/debian/ buster-updates main
+deb http://deb.debian.org/debian/ bullseye-updates main
+deb-src http://deb.debian.org/debian/ bullseye-updates main
