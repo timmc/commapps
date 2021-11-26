@@ -267,12 +267,15 @@
     home: "{{ matrix__cfg.data_dir }}/regui"
     shell: /bin/bash
 
-- name: "Deps for matrix-registration virtualenv"
+- name: "Deps for matrix-registration"
   apt:
     name:
+      # Virtualenv
       - python3
       - python3-pip
       - python3-virtualenv
+      # Administration
+      - sqlite3
 
 - name: "Setup by matreg user"
   become: yes
