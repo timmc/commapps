@@ -1,7 +1,50 @@
 # Golang package version and hash, from https://golang.org/dl/
 # Use the linux-amd64.tar.gz packages.
 matrix__deployments:
-  prod:
+  staging:
+    user: stg_dendrite
+    service_name: stg_dendrite
+
+    data_dir: /srv/commdata/stg_matrix
+
+    pg:
+      user: stg_dendrite
+      password: "{{ vault_matrix__stg_postgres_password }}"
+      db: stg_dendrite
+      tablespace: stg_commdata_dendrite
+
+    domain_host: m.staging.appux.com
+    domain_identity: staging.appux.com
+
+    root_url_redirect: https://www.appux.com/matrix.html
+
+    certificates:
+      - filename: stg_matrix-sub.json
+        config:
+          sub: m.staging
+          base: appux.com
+          wild: false
+
+    golang_version: "1.17.3"
+    golang_archive_sha256: "550f9845451c0c94be679faf116291e7807a8d78b43149f9506c1b15eb89008c"
+
+    dendrite_repo_url: "https://github.com/matrix-org/dendrite"
+    dendrite_version: "v0.5.1"
+    dendrite_commit_sha1: "e81ef1649b468126a88a5ccce925f4e4ac865bf4"
+
+    dendrite_listen_port: 7008
+
+    signing_key: "{{ vault_matrix__stg_signing_key }}"
+    registration_shared_secret: "{{ vault_matrix__stg_registration_shared_secret }}"
+
+    regui:
+      user: stg_matreg
+      listen_port: 7009
+      admin_password: "{{ vault_matrix__stg_regui_admin_password }}"
+      service_name: stg_matrix-registration
+
+
+  production:
     # OS user account
     user: dendrite
 

@@ -18,7 +18,9 @@
   roles:
     - laptop
     - role: matrix
-      matrix__cfg: "{{ matrix__deployments.prod }}"
+      matrix__cfg: "{{ matrix__deployments.production }}"
+    - role: matrix
+      matrix__cfg: "{{ matrix__deployments.staging }}"
     - role: sandstorm
       sandstorm_base_domain: sandstorm.appux.com
     - jabber
