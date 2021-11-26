@@ -1,16 +1,16 @@
 host: "localhost"
-port: "{{ matrix__regui_listen_port }}"
+port: "{{ matrix__cfg.regui.listen_port }}"
 base_url: /regui
 
-# Yes, that's four slashes
-db: "sqlite:////srv/commdata/matrix/regui/db.sqlite3"
+# Yes, that's three slashes even before the root slash
+db: "sqlite:///{{ matrix__cfg.data_dir }}/regui/db.sqlite3"
 
 # The Matrix server
-server_name: appux.com
-server_location: "http://localhost:{{ matrix__dendrite_listen_port }}"
+server_name: "{{ matrix__cfg.domain_identity }}"
+server_location: "http://localhost:{{ matrix__cfg.dendrite_listen_port }}"
 
-registration_shared_secret: "{{ matrix__registration_shared_secret }}"
-admin_api_shared_secret: "{{ matrix__regui_admin_password }}"
+registration_shared_secret: "{{ matrix__cfg.registration_shared_secret }}"
+admin_api_shared_secret: "{{ matrix__cfg.regui.admin_password }}"
 
 client_redirect: "https://app.element.io/#/login"
 client_logo: "static/images/element-logo.png"

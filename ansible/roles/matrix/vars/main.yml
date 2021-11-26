@@ -1,41 +1,69 @@
-# Dendrite 0.5.0 says it needs Golang >= 1.15 for compilation
-
 # Golang package version and hash, from https://golang.org/dl/
 # Use the linux-amd64.tar.gz packages.
-matrix__golang_version: "1.17.3"
-matrix__golang_archive_sha256: "550f9845451c0c94be679faf116291e7807a8d78b43149f9506c1b15eb89008c"
+matrix__deployments:
+  prod:
+    # systemd service name
+    service_name: dendrite
 
-# Dendrite version, from https://github.com/matrix-org/dendrite/tags
-matrix__dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-matrix__dendrite_version: "v0.5.1"
-matrix__dendrite_commit_sha1: "e81ef1649b468126a88a5ccce925f4e4ac865bf4"
+    data_dir: /srv/commdata/matrix
+    build_dir: /opt/commapps/matrix
 
-matrix__dendrite_listen_port: 8008
+    pg:
+      user: dendrite
+      # Postgres DB user password for dendrite user account.
+      # Must be safe for URL, SQL, and YAML.
+      #
+      # Set 2021-03-06 to a diceware phrase with no spaces.
+      password: "{{ vault_matrix__prod_postgres_password }}"
+      db: dendrite
+      tablespace: commdata_dendrite
 
-# Generated 2021-03-06 (key ID ed25519:dWfnyY) on toster as dendrite user with command:
-#   (cd /srv/commdata/matrix/dendrite; bin/current/generate-keys --private-key matrix_key.pem)
-# after running playbook to point of building dendrite and symlinking
-# the installation.
-matrix__signing_key: "{{ vault_matrix__signing_key }}"
+    # "Real" domain name (hosting the server)
+    domain_host: matrix.appux.com
+    # Domain name used in server identity (in user IDs, etc.)
+    domain_identity: appux.com
 
-# Shared secret used to enable registration. Not revealed to user --
-# this is shared between Dendrite and matrix-registration.
-# Must be safe for use in a YAML string.
-#
-# - 2021-09-25: Set to four random dictionary words joined by hyphens.
-matrix__registration_shared_secret: "{{ vault_matrix__registration_shared_secret }}"
+    root_url_redirect: https://www.appux.com/matrix.html
 
-# Postgres DB user password for dendrite user account.
-# Must be safe for URL, SQL, and YAML.
-#
-# Set 2021-03-06 to a diceware phrase with no spaces.
-matrix__postgres_password: "{{ vault_matrix__postgres_password }}"
+    certificates:
+      - filename: matrix-sub.json
+        config:
+          sub: matrix
+          base: appux.com
+          wild: false
+
+    # Dendrite 0.5.0 says it needs Golang >= 1.15 for compilation
+    golang_version: "1.17.3"
+    golang_archive_sha256: "550f9845451c0c94be679faf116291e7807a8d78b43149f9506c1b15eb89008c"
+
+    # Dendrite version, from https://github.com/matrix-org/dendrite/tags
+    dendrite_repo_url: "https://github.com/matrix-org/dendrite"
+    dendrite_version: "v0.5.1"
+    dendrite_commit_sha1: "e81ef1649b468126a88a5ccce925f4e4ac865bf4"
+
+    dendrite_listen_port: 8008
+
+    # Generated 2021-03-06 (key ID ed25519:dWfnyY) on toster as dendrite user with command:
+    #   (cd /srv/commdata/matrix/dendrite; bin/current/generate-keys --private-key matrix_key.pem)
+    # after running playbook to point of building dendrite and symlinking
+    # the installation.
+    signing_key: "{{ vault_matrix__prod_signing_key }}"
+
+    # Shared secret used to enable registration. Not revealed to user --
+    # this is shared between Dendrite and matrix-registration.
+    # Must be safe for use in a YAML string.
+    #
+    # - 2021-09-25: Set to four random dictionary words joined by hyphens.
+    registration_shared_secret: "{{ vault_matrix__prod_registration_shared_secret }}"
 
 
-matrix__regui_listen_port: 8009
+    regui:
+      listen_port: 8009
 
-# Used to authenticate to registration UI's admin API (token revocation, etc.)
-# Must be safe for use in a YAML or Bash string and not contain whitespace.
-#
-# - 2021-09-25: Set to four random dictionary words joined by hyphens.
-matrix__regui_admin_password: "{{ vault_matrix__regui_admin_password }}"
+      # Used to authenticate to registration UI's admin API (token revocation, etc.)
+      # Must be safe for use in a YAML or Bash string and not contain whitespace.
+      #
+      # - 2021-09-25: Set to four random dictionary words joined by hyphens.
+      admin_password: "{{ vault_matrix__prod_regui_admin_password }}"
+
+      service_name: matrix-registration

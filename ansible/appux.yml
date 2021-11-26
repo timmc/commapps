@@ -17,7 +17,8 @@
   remote_user: root
   roles:
     - laptop
-    - matrix
+    - role: matrix
+      matrix__cfg: "{{ matrix__deployments.prod }}"
     - role: sandstorm
       sandstorm_base_domain: sandstorm.appux.com
     - jabber

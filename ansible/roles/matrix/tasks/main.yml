@@ -11,14 +11,14 @@
 
 - name: "Dir for matrix files"
   file:
-    path: "/srv/commdata/matrix"
+    path: "{{ matrix__cfg.data_dir }}"
     state: directory
 
 - name: "User and home dir for dendrite"
   user:
     name: dendrite
     system: yes
-    home: /srv/commdata/matrix/dendrite
+    home: "{{ matrix__cfg.data_dir }}/dendrite"
     shell: /bin/bash
 
 - name: "PostgreSQL for backing store"
@@ -30,7 +30,7 @@
 - name: "A place for dendrite postgres data"
   file:
     state: directory
-    path: "/srv/commdata/matrix/dendrite/postgres"
+    path: "{{ matrix__cfg.data_dir }}/dendrite/postgres"
     owner: postgres
     group: postgres
 
@@ -39,23 +39,23 @@
 # the commdata filesystem is mounted.
 - name: "Allow postgres to store dendrite tables in commdata"
   community.postgresql.postgresql_tablespace:
-    tablespace: commdata_dendrite
-    location: "/srv/commdata/matrix/dendrite/postgres"
+    tablespace: "{{ matrix__cfg.pg.tablespace }}"
+    location: "{{ matrix__cfg.data_dir }}/dendrite/postgres"
   become: true
   become_user: postgres
 
 - name: "Dendrite DB, stored in commdata"
   community.postgresql.postgresql_db:
-    name: dendrite
-    tablespace: commdata_dendrite
+    name: "{{ matrix__cfg.pg.db }}"
+    tablespace: "{{ matrix__cfg.pg.tablespace }}"
   become: true
   become_user: postgres
 
 - name: "Dendrite user account in postgres"
   community.postgresql.postgresql_user:
-    name: dendrite
-    password: "{{ matrix__postgres_password }}"
-    db: dendrite
+    name: "{{ matrix__cfg.pg.user }}"
+    password: "{{ matrix__cfg.pg.password }}"
+    db: "{{ matrix__cfg.pg.db }}"
   no_log: true # secrets
   become: true
   become_user: postgres
@@ -65,40 +65,40 @@
 
 - name: "Dir for matrix binaries and builds"
   file:
-    path: "/opt/commapps/matrix"
+    path: "{{ matrix__cfg.build_dir }}"
     state: directory
 
 - name: "Dir for building"
   file:
-    path: "/opt/commapps/matrix/dendrite"
+    path: "{{ matrix__cfg.build_dir }}/dendrite"
     state: directory
     owner: dendrite
     group: dendrite
 
 - name: "Script to build from source"
-  copy:
-    src: "{{ role_path }}/files/build-dendrite.sh"
-    dest: "/opt/commapps/matrix/build-dendrite.sh"
+  template:
+    src: "{{ role_path }}/templates/build-dendrite.sh.j2"
+    dest: "{{ matrix__cfg.build_dir }}/build-dendrite.sh"
     mode: a=rx
 
 - name: "Build dendrite"
   command:
-    creates: "/srv/commdata/matrix/dendrite/bin/dendrite-{{ matrix__dendrite_version }}/dendrite-monolith-server"
-    cmd: /opt/commapps/matrix/build-dendrite.sh
+    creates: "{{ matrix__cfg.data_dir }}/dendrite/bin/dendrite-{{ matrix__cfg.dendrite_version }}/dendrite-monolith-server"
+    cmd: "{{ matrix__cfg.build_dir }}/build-dendrite.sh"
   become: yes
   become_user: dendrite
   environment:
-    GOLANG_VER: "{{ matrix__golang_version }}"
-    GOLANG_SHA256: "{{ matrix__golang_archive_sha256 }}"
-    DENDRITE_REPO_URL: "{{ matrix__dendrite_repo_url }}"
-    DENDRITE_VER: "{{ matrix__dendrite_version }}"
-    DENDRITE_COMMIT_SHA1: "{{ matrix__dendrite_commit_sha1 }}"
+    GOLANG_VER: "{{ matrix__cfg.golang_version }}"
+    GOLANG_SHA256: "{{ matrix__cfg.golang_archive_sha256 }}"
+    DENDRITE_REPO_URL: "{{ matrix__cfg.dendrite_repo_url }}"
+    DENDRITE_VER: "{{ matrix__cfg.dendrite_version }}"
+    DENDRITE_COMMIT_SHA1: "{{ matrix__cfg.dendrite_commit_sha1 }}"
 
 - name: "Symlink to current version for ease of reference"
   file:
     state: link
-    path: /srv/commdata/matrix/dendrite/bin/current
-    src: "dendrite-{{ matrix__dendrite_version }}"
+    path: "{{ matrix__cfg.data_dir }}/dendrite/bin/current"
+    src: "dendrite-{{ matrix__cfg.dendrite_version }}"
     follow: false # set ownership on link, not dest
     owner: dendrite
     group: dendrite
@@ -110,42 +110,37 @@
   copy:
     content: "{{ item.config | to_nice_json }}"
     dest: "/opt/commapps/certbot/domains.d/{{ item.filename }}"
-  loop:
-    - filename: matrix-sub.json
-      config:
-        sub: matrix
-        base: appux.com
-        wild: false
+  loop: "{{ matrix__cfg.certificates}}"
   notify: "certs config update"
 
 - name: "Install nginx proxy"
   copy:
     content: |
-      # Configuration for matrix.appux.com reverse proxy
+      # Configuration for {{ matrix__cfg.domain_host }} reverse proxy
       server {
         listen 443 ssl;
-        server_name matrix.appux.com;
+        server_name {{ matrix__cfg.domain_host }};
 
-        ssl_certificate /srv/commdata/etc-letsencrypt/live/matrix.appux.com/fullchain.pem;
-        ssl_certificate_key /srv/commdata/etc-letsencrypt/live/matrix.appux.com/privkey.pem;
+        ssl_certificate /srv/commdata/etc-letsencrypt/live/{{ matrix__cfg.domain_host }}/fullchain.pem;
+        ssl_certificate_key /srv/commdata/etc-letsencrypt/live/{{ matrix__cfg.domain_host }}/privkey.pem;
 
         # If someone opens the subdomain in their browser, send them
         # to a useful page.
         location ~ ^/$ {
-          return 302 https://www.appux.com/matrix.html;
+          return 302 {{ matrix__cfg.root_url_redirect }};
         }
 
         # Registration UI is separate application. Only expose routes
         # that need to be public; admin API will only be callable from
         # on-host.
         location ~ ^/regui/(static|register) {
-          proxy_pass http://localhost:{{ matrix__regui_listen_port }};
+          proxy_pass http://localhost:{{ matrix__cfg.regui.listen_port }};
           proxy_read_timeout 30;
         }
 
         # Everything else goes to Dendrite.
         location ~ ^/.+ {
-          proxy_pass http://127.0.0.1:{{ matrix__dendrite_listen_port }};
+          proxy_pass http://127.0.0.1:{{ matrix__cfg.dendrite_listen_port }};
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_read_timeout 600;
@@ -155,13 +150,13 @@
         # API side, so this can be somewhat permissive.
         client_max_body_size 15m;
       }
-    dest: "/etc/nginx/sites-available/matrix.appux.com.conf"
+    dest: "/etc/nginx/sites-available/{{ matrix__cfg.domain_host }}.conf"
   notify: "nginx reload config"
 
 - name: "Enable nginx proxy"
   file:
-    src: "/etc/nginx/sites-available/matrix.appux.com.conf"
-    dest: "/etc/nginx/sites-enabled/matrix.appux.com.conf"
+    src: "/etc/nginx/sites-available/{{ matrix__cfg.domain_host }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ matrix__cfg.domain_host }}.conf"
     state: link
   notify: "nginx reload config"
 
@@ -169,7 +164,7 @@
 
 - name: "Directory for dendrite logs"
   file:
-    path: /srv/commdata/matrix/dendrite/logs
+    path: "{{ matrix__cfg.data_dir }}/dendrite/logs"
     state: directory
     owner: dendrite
     group: dendrite
@@ -178,8 +173,8 @@
 
 - name: "Signing key"
   copy:
-    content: "{{ matrix__signing_key }}"
-    dest: /srv/commdata/matrix/dendrite/matrix_key.pem
+    content: "{{ matrix__cfg.signing_key }}"
+    dest: "{{ matrix__cfg.data_dir }}/dendrite/matrix_key.pem"
     owner: dendrite
     group: dendrite
     mode: u=r,g=,o=
@@ -189,7 +184,7 @@
 - name: "Dendrite config file"
   template:
     src: "{{ role_path }}/templates/dendrite.yaml.j2"
-    dest: /srv/commdata/matrix/dendrite/dendrite.yaml
+    dest: "{{ matrix__cfg.data_dir }}/dendrite/dendrite.yaml"
     owner: dendrite
     group: dendrite
     mode: u=r,g=,o=
@@ -201,12 +196,12 @@
     content: |
       #!/bin/bash
       set -eu -o pipefail
-      /srv/commdata/matrix/dendrite/bin/current/dendrite-monolith-server \
-          --config /srv/commdata/matrix/dendrite/dendrite.yaml \
-          --http-bind-address localhost:{{ matrix__dendrite_listen_port }} \
-          >> /srv/commdata/matrix/dendrite/logs/stdout.log \
-          2>> /srv/commdata/matrix/dendrite/logs/stderr.log
-    dest: /srv/commdata/matrix/dendrite/run.sh
+      {{ matrix__cfg.data_dir|quote }}/dendrite/bin/current/dendrite-monolith-server \
+          --config {{ matrix__cfg.data_dir|quote }}/dendrite/dendrite.yaml \
+          --http-bind-address localhost:{{ matrix__cfg.dendrite_listen_port|quote }} \
+          >> {{ matrix__cfg.data_dir|quote }}/dendrite/logs/stdout.log \
+          2>> {{ matrix__cfg.data_dir|quote }}/dendrite/logs/stderr.log
+    dest: "{{ matrix__cfg.data_dir }}/dendrite/run.sh"
     owner: dendrite
     group: dendrite
     mode: a+x
@@ -218,13 +213,13 @@
 - name: "Log rotation"
   copy:
     content: |
-      /srv/commdata/matrix/dendrite/logs/stdout.log /srv/commdata/matrix/dendrite/logs/stderr.log {
+      {{ matrix__cfg.data_dir|quote }}/dendrite/logs/stdout.log {{ matrix__cfg.data_dir|quote }}/dendrite/logs/stderr.log {
           daily
           rotate 10
           missingok
           create 600 dendrite dendrite
       }
-    dest: /etc/logrotate.d/dendrite-launcher
+    dest: "/etc/logrotate.d/{{ matrix__cfg.service_name }}-launcher"
 
 - name: "Dendrite systemd service unit file"
   copy:
@@ -246,7 +241,7 @@
 
       [Service]
       Type=simple
-      ExecStart=/srv/commdata/matrix/dendrite/run.sh
+      ExecStart={{ matrix__cfg.data_dir }}/dendrite/run.sh
       User=dendrite
       Group=dendrite
 
@@ -262,7 +257,7 @@
 
       [Install]
       WantedBy=multi-user.target
-    dest: /etc/systemd/system/dendrite.service
+    dest: "/etc/systemd/system/{{ matrix__cfg.service_name }}.service"
   register: matrix__dendrite_service_file
 
 - name: "Reload systemd config if dendrite unit file changed"
@@ -271,7 +266,7 @@
 
 - name: "Enable dendrite service"
   service:
-    name: dendrite
+    name: "{{ matrix__cfg.service_name }}"
     enabled: yes
     state: started
 
@@ -281,7 +276,7 @@
   user:
     name: matreg
     system: yes
-    home: /srv/commdata/matrix/regui
+    home: "{{ matrix__cfg.data_dir }}/regui"
     shell: /bin/bash
 
 - name: "Deps for matrix-registration virtualenv"
@@ -314,18 +309,18 @@
           # Tagged v0.9.1 but author forgot to bump the version; this is
           # probably the one labeled 0.9.1.post1 on PyPI
           - "git+https://github.com/ZerataX/matrix-registration@ac0291749c869e258fa7d3fbdd84fb25f1fa9b50#egg=matrix-registration==0.9.0"
-        virtualenv: "/srv/commdata/matrix/regui/venv_py{{ matreg__pyver.stdout}}"
+        virtualenv: "{{ matrix__cfg.data_dir }}/regui/venv_py{{ matreg__pyver.stdout}}"
         virtualenv_python: python3
 
     - name: "Symlink for virtualenv matching current Python"
       file:
         state: link
-        src: "/srv/commdata/matrix/regui/venv_py{{ matreg__pyver.stdout }}"
-        dest: "/srv/commdata/matrix/regui/venv"
+        src: "{{ matrix__cfg.data_dir }}/regui/venv_py{{ matreg__pyver.stdout }}"
+        dest: "{{ matrix__cfg.data_dir }}/regui/venv"
 
     - name: "Directory for regui logs"
       file:
-        path: /srv/commdata/matrix/regui/logs
+        path: "{{ matrix__cfg.data_dir }}/regui/logs"
         state: directory
         # Logs could contain user info
         mode: u=rwx,g=,o=
@@ -333,7 +328,7 @@
     - name: "Configuration for registration app"
       template:
         src: "{{ role_path }}/templates/matrix-registration.yaml.j2"
-        dest: /srv/commdata/matrix/regui/config.yaml
+        dest: "{{ matrix__cfg.data_dir }}/regui/config.yaml"
       no_log: true # secrets
 
     - name: "Registration app launcher"
@@ -341,12 +336,12 @@
         content: |
           #!/bin/bash
           set -eu -o pipefail
-          /srv/commdata/matrix/regui/venv/bin/matrix-registration \
-            --config-path /srv/commdata/matrix/regui/config.yaml \
+          {{ matrix__cfg.data_dir|quote }}/regui/venv/bin/matrix-registration \
+            --config-path {{ matrix__cfg.data_dir|quote }}/regui/config.yaml \
             serve \
-            >> /srv/commdata/matrix/regui/logs/stdout.log \
-            2>> /srv/commdata/matrix/regui/logs/stderr.log
-        dest: /srv/commdata/matrix/regui/run.sh
+            >> {{ matrix__cfg.data_dir|quote }}/regui/logs/stdout.log \
+            2>> {{ matrix__cfg.data_dir|quote }}/regui/logs/stderr.log
+        dest: "{{ matrix__cfg.data_dir }}/regui/run.sh"
         mode: a+x
       notify: "regui config change"
 
@@ -371,10 +366,10 @@
           fi
 
           curl -sS \
-            -H "Authorization: SharedSecret {{ matrix__regui_admin_password }}" \
-            "http://localhost:{{ matrix__regui_listen_port }}${api_path}" \
+            -H "Authorization: SharedSecret {{ matrix__cfg.regui.admin_password }}" \
+            "http://localhost:{{ matrix__cfg.regui.listen_port }}${api_path}" \
             "$@"
-        dest: /srv/commdata/matrix/regui/admin.sh
+        dest: "{{ matrix__cfg.data_dir }}/regui/admin.sh"
         mode: u=rwx,g=,o=
       no_log: true # secrets
 
@@ -382,13 +377,13 @@
 - name: "Log rotation"
   copy:
     content: |
-      /srv/commdata/matrix/regui/logs/stdout.log /srv/commdata/matrix/regui/logs/stderr.log {
+      {{ matrix__cfg.data_dir|quote }}/regui/logs/stdout.log {{ matrix__cfg.data_dir|quote }}/regui/logs/stderr.log {
           daily
           rotate 20
           missingok
           create 600 matreg matreg
       }
-    dest: /etc/logrotate.d/matrix-registration-launcher
+    dest: "/etc/logrotate.d/{{ matrix__cfg.regui.service_name }}-launcher"
 
 - name: "Registration systemd service unit file"
   copy:
@@ -408,7 +403,7 @@
 
       [Service]
       Type=simple
-      ExecStart=/srv/commdata/matrix/regui/run.sh
+      ExecStart={{ matrix__cfg.data_dir }}/regui/run.sh
       User=matreg
       Group=matreg
 
@@ -417,7 +412,7 @@
 
       [Install]
       WantedBy=multi-user.target
-    dest: /etc/systemd/system/matrix-registration.service
+    dest: "/etc/systemd/system/{{ matrix__cfg.regui.service_name }}.service"
   register: matrix__regui_service_file
 
 - name: "Reload systemd config if registration unit file changed"
@@ -426,6 +421,6 @@
 
 - name: "Enable registration service"
   service:
-    name: matrix-registration
+    name: "{{ matrix__cfg.regui.service_name }}"
     enabled: yes
     state: started

@@ -2,10 +2,10 @@
 version: 1
 
 global:
-  server_name: appux.com
+  server_name: "{{ matrix__cfg.domain_identity }}"
 
   # Server signing key (identity, not TLS).
-  private_key: /srv/commdata/matrix/dendrite/matrix_key.pem
+  private_key: "{{ matrix__cfg.data_dir }}/dendrite/matrix_key.pem"
 
   key_validity_period: 168h0m0s
 
@@ -28,7 +28,7 @@ global:
     use_naffka: true
 
     naffka_database:
-      connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+      connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
   metrics:
     enabled: false # don't enable without setting a password
@@ -41,13 +41,13 @@ global:
 
 app_service_api:
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
 
 client_api:
   registration_disabled: true
   # Registration override if registration is disabled. Used by matrix-registration UI.
-  registration_shared_secret: "{{ matrix__registration_shared_secret }}"
+  registration_shared_secret: "{{ matrix__cfg.registration_shared_secret }}"
 
   rate_limiting:
     enabled: true
@@ -58,25 +58,25 @@ client_api:
 federation_api:
   # X.509 certs to advertise to other servers, in PEM format.
   federation_certificates:
-    - /srv/commdata/etc-letsencrypt/live/matrix.appux.com/cert.pem
+    - /srv/commdata/etc-letsencrypt/live/{{ matrix__cfg.domain_host }}/cert.pem
 
 
 federation_sender:
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
 
 key_server:
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
 
 media_api:
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
   # Storage path for uploaded media. May be relative or absolute.
-  base_path: /srv/commdata/matrix/dendrite/media_store
+  base_path: "{{ matrix__cfg.data_dir }}/dendrite/media_store"
 
   # Max allowed media upload (in bytes, 0 = unlimited).
   # nginx config needs to allow uploads of at least this size.
@@ -109,17 +109,17 @@ mscs:
   # - msc2946    (Spaces Summary, see https://github.com/matrix-org/matrix-doc/pull/2946)
   mscs: []
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
 
 room_server:
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
 
 signing_key_server:
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
   # Perspective keyservers to use as a backup when direct key fetches fail. This may
   # be required to satisfy key requests for servers that are no longer online when
@@ -140,7 +140,7 @@ signing_key_server:
 
 sync_api:
   database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
   # Set by nginx to client's apparent IP address
   real_ip_header: X-Real-IP
@@ -148,9 +148,9 @@ sync_api:
 
 user_api:
   account_database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
   device_database:
-    connection_string: "postgres://dendrite:{{ matrix__postgres_password }}@localhost/dendrite"
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
 
 
 # Logging configuration, in addition to the standard logging that is sent to
@@ -159,4 +159,4 @@ logging:
 - type: file
   level: info
   params:
-    path: /srv/commdata/matrix/dendrite/logs
+    path: "{{ matrix__cfg.data_dir }}/dendrite/logs"
