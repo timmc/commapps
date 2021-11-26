@@ -2,11 +2,13 @@
 # Use the linux-amd64.tar.gz packages.
 matrix__deployments:
   prod:
+    # OS user account
+    user: dendrite
+
     # systemd service name
     service_name: dendrite
 
     data_dir: /srv/commdata/matrix
-    build_dir: /opt/commapps/matrix
 
     pg:
       user: dendrite
@@ -43,8 +45,8 @@ matrix__deployments:
 
     dendrite_listen_port: 8008
 
-    # Generated 2021-03-06 (key ID ed25519:dWfnyY) on toster as dendrite user with command:
-    #   (cd /srv/commdata/matrix/dendrite; bin/current/generate-keys --private-key matrix_key.pem)
+    # Generated 2021-03-06 (key ID ed25519:dWfnyY) on toster:
+    #   (cd /srv/commdata/DATA_DIR/dendrite; sudo -u USER bin/current/generate-keys --private-key tmp_key.pem)
     # after running playbook to point of building dendrite and symlinking
     # the installation.
     signing_key: "{{ vault_matrix__prod_signing_key }}"
@@ -58,6 +60,9 @@ matrix__deployments:
 
 
     regui:
+      # OS user account
+      user: matreg
+
       listen_port: 8009
 
       # Used to authenticate to registration UI's admin API (token revocation, etc.)

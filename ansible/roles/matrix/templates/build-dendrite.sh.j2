@@ -1,5 +1,5 @@
 #!/bin/bash
-# As dendrite user, build dendrite binaries to location
+# As {{ matrix__cfg.user }} user, build dendrite binaries to location
 # {{ matrix__cfg.data_dir|quote }}/dendrite/bin/dendrite-VERSION/
 set -eu -o pipefail
 

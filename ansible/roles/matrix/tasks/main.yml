@@ -16,7 +16,7 @@
 
 - name: "User and home dir for dendrite"
   user:
-    name: dendrite
+    name: "{{ matrix__cfg.user }}"
     system: yes
     home: "{{ matrix__cfg.data_dir }}/dendrite"
     shell: /bin/bash
@@ -63,30 +63,18 @@
 
 #== Building dendrite
 
-- name: "Dir for matrix binaries and builds"
-  file:
-    path: "{{ matrix__cfg.build_dir }}"
-    state: directory
-
-- name: "Dir for building"
-  file:
-    path: "{{ matrix__cfg.build_dir }}/dendrite"
-    state: directory
-    owner: dendrite
-    group: dendrite
-
 - name: "Script to build from source"
   template:
     src: "{{ role_path }}/templates/build-dendrite.sh.j2"
-    dest: "{{ matrix__cfg.build_dir }}/build-dendrite.sh"
+    dest: "{{ matrix__cfg.data_dir }}/build-dendrite.sh"
     mode: a=rx
 
 - name: "Build dendrite"
   command:
     creates: "{{ matrix__cfg.data_dir }}/dendrite/bin/dendrite-{{ matrix__cfg.dendrite_version }}/dendrite-monolith-server"
-    cmd: "{{ matrix__cfg.build_dir }}/build-dendrite.sh"
+    cmd: "{{ matrix__cfg.data_dir }}/build-dendrite.sh"
   become: yes
-  become_user: dendrite
+  become_user: "{{ matrix__cfg.user }}"
   environment:
     GOLANG_VER: "{{ matrix__cfg.golang_version }}"
     GOLANG_SHA256: "{{ matrix__cfg.golang_archive_sha256 }}"
@@ -100,8 +88,8 @@
     path: "{{ matrix__cfg.data_dir }}/dendrite/bin/current"
     src: "dendrite-{{ matrix__cfg.dendrite_version }}"
     follow: false # set ownership on link, not dest
-    owner: dendrite
-    group: dendrite
+    owner: "{{ matrix__cfg.user }}"
+    group: "{{ matrix__cfg.user }}"
   notify: "dendrite change"
 
 #== TLS termination via nginx
@@ -166,8 +154,8 @@
   file:
     path: "{{ matrix__cfg.data_dir }}/dendrite/logs"
     state: directory
-    owner: dendrite
-    group: dendrite
+    owner: "{{ matrix__cfg.user }}"
+    group: "{{ matrix__cfg.user }}"
     # Logs could contain user info
     mode: u=rwx,g=,o=
 
@@ -175,8 +163,8 @@
   copy:
     content: "{{ matrix__cfg.signing_key }}"
     dest: "{{ matrix__cfg.data_dir }}/dendrite/matrix_key.pem"
-    owner: dendrite
-    group: dendrite
+    owner: "{{ matrix__cfg.user }}"
+    group: "{{ matrix__cfg.user }}"
     mode: u=r,g=,o=
   no_log: true
   notify: "dendrite change"
@@ -185,8 +173,8 @@
   template:
     src: "{{ role_path }}/templates/dendrite.yaml.j2"
     dest: "{{ matrix__cfg.data_dir }}/dendrite/dendrite.yaml"
-    owner: dendrite
-    group: dendrite
+    owner: "{{ matrix__cfg.user }}"
+    group: "{{ matrix__cfg.user }}"
     mode: u=r,g=,o=
   no_log: true # contains secrets
   notify: "dendrite change"
@@ -202,8 +190,8 @@
           >> {{ matrix__cfg.data_dir|quote }}/dendrite/logs/stdout.log \
           2>> {{ matrix__cfg.data_dir|quote }}/dendrite/logs/stderr.log
     dest: "{{ matrix__cfg.data_dir }}/dendrite/run.sh"
-    owner: dendrite
-    group: dendrite
+    owner: "{{ matrix__cfg.user }}"
+    group: "{{ matrix__cfg.user }}"
     mode: a+x
   notify: "dendrite change"
 
@@ -217,7 +205,7 @@
           daily
           rotate 10
           missingok
-          create 600 dendrite dendrite
+          create 600 {{ matrix__cfg.user }} {{ matrix__cfg.user }}
       }
     dest: "/etc/logrotate.d/{{ matrix__cfg.service_name }}-launcher"
 
@@ -242,8 +230,8 @@
       [Service]
       Type=simple
       ExecStart={{ matrix__cfg.data_dir }}/dendrite/run.sh
-      User=dendrite
-      Group=dendrite
+      User={{ matrix__cfg.user }}
+      Group={{ matrix__cfg.user }}
 
       Restart=on-failure
       RestartSec=5s
@@ -274,7 +262,7 @@
 
 - name: "User and home dir for matreg"
   user:
-    name: matreg
+    name: "{{ matrix__cfg.regui.user }}"
     system: yes
     home: "{{ matrix__cfg.data_dir }}/regui"
     shell: /bin/bash
@@ -288,7 +276,7 @@
 
 - name: "Setup by matreg user"
   become: yes
-  become_user: matreg
+  become_user: "{{ matrix__cfg.regui.user }}"
   block:
     # Maintain a different virtualenv for each Python version so that when
     # the operating system upgrades Python and *uninstalls the old default
@@ -381,7 +369,7 @@
           daily
           rotate 20
           missingok
-          create 600 matreg matreg
+          create 600 {{ matrix__cfg.regui.user }} {{ matrix__cfg.regui.user }}
       }
     dest: "/etc/logrotate.d/{{ matrix__cfg.regui.service_name }}-launcher"
 
@@ -404,8 +392,8 @@
       [Service]
       Type=simple
       ExecStart={{ matrix__cfg.data_dir }}/regui/run.sh
-      User=matreg
-      Group=matreg
+      User={{ matrix__cfg.regui.user }}
+      Group={{ matrix__cfg.regui.user }}
 
       Restart=on-failure
       RestartSec=5s
