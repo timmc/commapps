@@ -1,5 +1,5 @@
 host: "localhost"
-port: "{{ matrix__cfg.regui.listen_port }}"
+port: {{ matrix__cfg.regui.listen_port }}
 base_url: /regui
 
 # Yes, that's three slashes even before the root slash
@@ -45,6 +45,6 @@ password:
   min_length: 8
 
 # username requirements
-#username:
-#  validation_regex: [] #list of regexes name must match
-#  invalidation_regex: [] #list of regexes name must *not* match
+username:
+  validation_regex: [] #list of regexes name must match
+  invalidation_regex: [] #list of regexes name must *not* match

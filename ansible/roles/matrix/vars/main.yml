@@ -39,6 +39,7 @@ matrix__deployments:
 
     regui:
       user: stg_matreg
+      package: 'git+https://github.com/timmc/matrix-registration@226bfd78e197ab3070585ba801315e6efdebd2cc#egg=matrix-registration==0.9.2.dev2~appux0'
       listen_port: 7009
       admin_password: "{{ vault_matrix__stg_regui_admin_password }}"
       service_name: stg_matrix-registration
@@ -105,6 +106,9 @@ matrix__deployments:
     regui:
       # OS user account
       user: matreg
+
+      # My fork with some corrections.
+      package: 'git+https://github.com/timmc/matrix-registration@8c58a2018056d8d8ae26f72fc06a0d566391471f#egg=matrix-registration==0.9.0~timmc1'
 
       listen_port: 8009
 

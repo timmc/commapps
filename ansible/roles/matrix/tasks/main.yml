@@ -300,8 +300,7 @@
     - name: "Install matrix-registration in virtualenv"
       pip:
         name:
-          # My fork with some corrections.
-          - "git+https://github.com/timmc/matrix-registration@8c58a2018056d8d8ae26f72fc06a0d566391471f#egg=matrix-registration==0.9.0~timmc1"
+          - "{{ matrix__cfg.regui.package }}"
         virtualenv: "{{ matrix__cfg.data_dir }}/regui/venv_py{{ matreg__pyver.stdout}}"
         virtualenv_python: python3
       notify: "regui change"
@@ -421,3 +420,7 @@
     name: "{{ matrix__cfg.regui.service_name }}"
     enabled: yes
     state: started
+
+# Flushing handlers here allows them to use role variables
+- name: "Flush handlers"
+  meta: flush_handlers
