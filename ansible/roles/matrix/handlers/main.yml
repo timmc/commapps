@@ -15,7 +15,7 @@
     name: "{{ matrix__cfg.service_name }}"
     state: restarted
 
-- name: "regui config change"
+- name: "regui change"
   service:
     name: "{{ matrix__cfg.regui.service_name }}"
     state: restarted
