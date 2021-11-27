@@ -12,10 +12,10 @@
 # changes should target this handler too.
 - name: "dendrite change"
   service:
-    name: dendrite
+    name: "{{ matrix__cfg.service_name }}"
     state: restarted
 
 - name: "regui config change"
   service:
-    name: matrix-registration
+    name: "{{ matrix__cfg.regui.service_name }}"
     state: restarted
