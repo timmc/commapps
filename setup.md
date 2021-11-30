@@ -99,16 +99,17 @@ to enable SSH on. (It has a default pi/raspberry user.)
 Write the disk image:
 
 - Download latest Raspberry Pi OS (previously known as Raspbian) from
-  here, preferably the Lite version: Raspberry Pi OS Lite
-    - Last tested with `2020-12-02-raspios-buster-armhf-lite` on a
-      Raspberry Pi 3.
+  <https://www.raspberrypi.com/software/operating-systems/>,
+  preferably the Lite version: Raspberry Pi OS Lite
+    - Last tested with `2021-10-30-raspios-bullseye-armhf-lite` on a
+      Raspberry Pi 2.
 - Write .img to SD card with `dd`
 
 Set up partitions. There should already be two partitions: A small
 (~200 MB) FAT partition labeled "boot" and a larger (~2 GB) ext4
 partition labeled "rootfs".
 
-In `sudo parted /dev/sdXXX`:
+In `sudo parted /dev/sdXXX` (e.g. `sde`):
 
 - `print` to confirm correct device
 - Expand rootfs partition to 5 GB in size: `resizepart 2 5.2GB`
@@ -121,10 +122,13 @@ In `sudo parted /dev/sdXXX`:
 Now expand the rootfs filesystem into the new space:
 `sudo resize2fs /dev/sdXXX2`
 
-Mount rootfs, set `ROOTFS=<path to rootfs mount>` and
-`HOSTNAME=<shortname>`, and make the following changes as root from
-the base of the repo:
+Mount rootfs and write some files to it:
 
+- Enter a root shell session and cd to the config repo dir
+- Set `set -u` in the so that any unset variables will result in an
+  error rather than overwriting the controller's own files (thinking
+  of `ROOTFS` of course)
+- Set `ROOTFS=<path to rootfs mount>` and `HOSTNAME=<shortname>`
 - Set the hostname:
   `echo "$HOSTNAME" > "$ROOTFS"/etc/hostname`
 - In `"$ROOTFS"/etc/shadow` replace the `pi` user's (default) password
@@ -180,7 +184,7 @@ following.
     3. Complete the password locking step before attaching to ethernet
 - Read the keys off the SD card:
     1. Run through the steps and allow the host to boot normally, then
-       shut it down.
+       shut it down. (Give it about 5 minutes, then unplug it.)
     2. Extract the public key fingerprints from the SD card
 
 You could likely also generate the keys on the controller and write them to the SD card. A few wrinkles:
