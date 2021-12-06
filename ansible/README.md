@@ -1,6 +1,22 @@
-# Ansible config for Appux
+# Ansible config for Appux Community Services
 
-Configuration management for Appux servers using Ansible.
+A repository of scripts and other files that are deployed to the
+community apps hosts using Ansible.
+
+Notable files:
+
+- [bootstrap.md](bootstrap.md) contains the initial-setup runbook,
+  required for getting any new server ready for configuration with
+  Ansible.
+- `appux.yml` is the playbook for all servers together (see
+  instructions below on how to use)
+- [TODO.md](TODO.md) is a checklist of work required in order to
+  develop this repo and set up external services and procedures --
+  including the parts I haven't finished yet. There are some important
+  caveats in there for anyone who wants to use this work.
+
+License is not yet determined, and be aware that some files have been
+vendored in from other sources.
 
 ## Requirements
 
