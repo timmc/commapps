@@ -26,6 +26,7 @@ Figure out how to bring up system with SSH but without community services, perha
 - Backups
     - Done: Tarsnap account set up and funded (probably will cost
       $20–100 per year)
+        - Later switched to borg-backup onto BorgBase
     - Done: Script for snapshotted backups written and deployed
     - Done: Append-only key created and deployed
     - Done: cron job for automating backups
