@@ -60,7 +60,7 @@ Back on the controller, copy the Ansible root public key to the
 home dir of the user you created. For example:
 
 ```
-scp ansible/roles/common/files/id_ansible_appux.pub timmc@10.0.1.2:
+scp roles/common/files/id_ansible_appux.pub timmc@10.0.1.2:
 ```
 
 When prompted to confirm the SSH host key, go to the new host and
@@ -135,7 +135,7 @@ Mount rootfs and write some files to it:
   hash with an asterisk so that it's safe to enable SSH. The line
   should now start `pi:*:` meaning that the password is unset.
 - Configure the ansible SSH public key for root:
-  `mkdir --mode=0700 "$ROOTFS"/root/.ssh; cat ansible/roles/common/files/id_ansible_appux.pub > "$ROOTFS"/root/.ssh/authorized_keys`
+  `mkdir --mode=0700 "$ROOTFS"/root/.ssh; cat roles/common/files/id_ansible_appux.pub > "$ROOTFS"/root/.ssh/authorized_keys`
 - Create and initialize a random seed file so first boot will have
   sufficient entropy to safely create SSH host keys:
   `dd if=/dev/urandom of="$ROOTFS"/var/lib/systemd/random-seed count=1 bs=4096; chmod u=rw,g=,o= "$ROOTFS"/var/lib/systemd/random-seed`

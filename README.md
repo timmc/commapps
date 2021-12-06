@@ -79,7 +79,7 @@ Remove `--check` if the output looks reasonable.
 
 ## Secrets
 
-Secrets are stored in `ansible/roles/*/vars/vault.yml` vault variable
+Secrets are stored in `roles/*/vars/vault.yml` vault variable
 files for each relevant host group. Each secret variable has the
 `vault_` prefix, and is accompanied by an assignment in an
 accompanying `main.yml` file to a variable *without* that
