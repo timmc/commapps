@@ -55,10 +55,13 @@
 
 #== Data/configuration ==#
 
-- name: "Borg configuration"
+- name: "Borg config and data directory"
   file:
     state: directory
     path: /srv/commdata/backups/borg
+    owner: root
+    group: root
+    mode: g=,o=
 
 - name: "Borg repository URL"
   copy:
@@ -87,14 +90,6 @@
     group: root
     mode: u=r,g=,o=
   no_log: true
-
-- name: "Directory for borg's own files"
-  file:
-    state: directory
-    path: /srv/commdata/backups/borg
-    owner: root
-    group: root
-    mode: g=,o=
 
 - name: "Directory for borg cache"
   file:
