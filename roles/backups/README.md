@@ -80,17 +80,21 @@ generate:
 `ssh-keyscan -t rsa,ecdsa,ed25519 a4b3c2d1.repo.borgbase.com 2>/dev/null > a4b3c2d1_known_hosts`
 
 Then generate fingerprints (SHA256 hashes of the public keys) so you
-can verify them against the server's advertised fingerprints:
+can verify them against the server's advertised fingerprints. This can
+be done by piping the known-hosts file into `ssh-keygen`:
 
 ```
-$ cat a4b3c2d1_known_hosts | while IFS= read -r line; do echo "$line" | cut -d' ' -f2; echo "$line" | cut -d' ' -f3 | base64 -d | sha256sum | cut -d' ' -f1 | xxd -r -p | base64; done
-ssh-rsa
-Wyt7NfJy9XSVeGFBG5RIbIukYMetp2kMy8o/GQ2V/5w=
-ecdsa-sha2-nistp256
-BmYzPJ4GEOilkv1z1nwhHMkkFv/FRyYOAcVRZKf0NVQ=
-ssh-ed25519
-tlz8o+DhESqRqmPaDA1yOlT7avGqCEqdhbjB8h6R29s=
+$ ssh-keygen -l -f a4b3c2d1_known_hosts
+2048 SHA256:WxH/nSI4xcqPYTnOTdmb27xHeAGGhxEUd03HXm+6OKQ= a4b3c2d1.repo.borgbase.com (RSA)
+256 SHA256:nLrl9pUXZ8y8/nzyAkUj8Yl5/x/zWnYK6uiIrj/J2fw= a4b3c2d1.repo.borgbase.com (ECDSA)
+256 SHA256:6glyjSRjZjoVXe3oC0+ervgica9HLQu+D+PKbo8G69Y= a4b3c2d1.repo.borgbase.com (ED25519)
 ```
+
+If using BorgBase, these fingerprints can be compared to those listed
+on the repo's setup page.
+
+(`ssh-keygen` can also accept the known-hosts text on stdin using `-f -`,
+e.g. `xsel -bo | ssh-keygen -l -f -`)
 
 ### `vault_borg__key_passphrase`
 
