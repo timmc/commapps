@@ -21,7 +21,7 @@ install_path="$dest_dir/$DOMAIN.chain.pem"
 fetch_url="$BASE_URL/$DOMAIN.chain.pem"
 
 old_data="$(cat -- "$install_path" || true)"
-new_data="$(curl -sS -m 10 -H 'Cache-Control: no-cache' -- "$fetch_url")"
+new_data="$(curl -sS -L -m 10 -H 'Cache-Control: no-cache' -- "$fetch_url")"
 if [[ ! "$new_data" =~ BEGIN\ CERTIFICATE ]]; then
     log -e "Could not fetch new certificate from $fetch_url. Response was: \n$new_data"
     exit 65
@@ -34,5 +34,7 @@ fi
 
 log "Installing certificate to $install_path and reloading Prosody"
 echo "$new_data" > "$install_path"
-systemctl reload prosody
+# prosody recommends using `systemctl reload prosody` instead, but
+# prosody user can't run that command.
+prosodyctl reload
 exit 64

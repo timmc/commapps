@@ -2,8 +2,8 @@
 # Cron hours randomly chosen.
 jabber__vhosts:
   - domain: appux.com
-    cert_oracle_base_url: https://www.appux.com/cert-oracle
+    cert_oracle_base_url: https://appux.com/cert-oracle
     cron_hour: 8
   - domain: brainonfire.net
-    cert_oracle_base_url: https://www.brainonfire.net/cert-oracle
+    cert_oracle_base_url: https://brainonfire.net/cert-oracle
     cron_hour: 6
