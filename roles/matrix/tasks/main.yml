@@ -174,7 +174,7 @@
 
 - name: "Dendrite config file"
   template:
-    src: "{{ role_path }}/templates/dendrite.yaml.j2"
+    src: "{{ role_path }}/templates/{{ matrix__cfg.dendrite_config_template }}"
     dest: "{{ matrix__cfg.data_dir }}/dendrite/dendrite.yaml"
     owner: "{{ matrix__cfg.user }}"
     group: "{{ matrix__cfg.user }}"

@@ -7,6 +7,11 @@ The homeserver is `https://matrix.appux.com` but users are
 
 The dendrite service is compiled from source given a pinned Git commit.
 
+The role must be run with a `matrix__cfg` object containing the bulk
+of the config; this allows for a staging and a production environment
+to be defined in vars rather than the runbook. (In my case,
+`m.staging.appux.com` and `matrix.appux.com`.)
+
 ## Setup
 
 Dendrite is configured with a `server_name` of `appux.com`. That
@@ -75,3 +80,7 @@ Disable the old token:
 `./admin.sh /api/token/OLD_TOKEN_NAME -X PATCH -d '{"disabled": true}'`
 
 Then generate a new one, as in the first-time setup.
+
+## TODO
+
+- Remove old naffka DB tables from pre-0.6 dendrite?
