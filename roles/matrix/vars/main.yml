@@ -25,16 +25,21 @@ matrix__deployments:
 
     # Golang package version and hash, from https://go.dev/dl/
     # Use the linux-amd64.tar.gz packages.
-    # Dendrite 0.6.2 says it needs Golang >= 1.16 for compilation
-    golang_version: "1.17.6"
-    golang_archive_sha256: "231654bbf2dab3d86c1619ce799e77b03d96f9b50770297c8f4dff8836fc8ca2"
+    # Dendrite 0.9.6 says it needs Golang >= 1.18 for compilation:
+    #   https://github.com/matrix-org/dendrite/blob/main/docs/installation/1_planning.md#go
+    golang_version: "1.19"
+    golang_archive_sha256: "464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6"
 
     # Dendrite version, from https://github.com/matrix-org/dendrite/tags
     dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-    dendrite_version: "a4e7d471af7e2cf902404f6740f0932a088cb660" # v0.6.3 + #2174 (federation log spam)
-    dendrite_commit_sha1: "a4e7d471af7e2cf902404f6740f0932a088cb660"
-    # v2 for dendrite >= 0.6
-    dendrite_config_template: "dendrite-config-v2.yaml.j2"
+    dendrite_version: "v0.9.6"
+    dendrite_commit_sha1: "304acd7adc4929f64af930d0b5801e33ba101193"
+    # Versioning in the config file names like "0.9.6-plus" means
+    # "this has the correct shape as of 0.9.6 but might contain newer
+    # features". Dendrite has a habit of making breaking changes in
+    # the config file unpredictably, so this is what we're going
+    # with for now...
+    dendrite_config_template: "dendrite-config-0.9.6-plus.yaml.j2"
 
     dendrite_listen_port: 7008
 
@@ -82,13 +87,13 @@ matrix__deployments:
           base: appux.com
           wild: false
 
-    golang_version: "1.17.6"
-    golang_archive_sha256: "231654bbf2dab3d86c1619ce799e77b03d96f9b50770297c8f4dff8836fc8ca2"
+    golang_version: "1.19"
+    golang_archive_sha256: "464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6"
 
     dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-    dendrite_version: "a4e7d471af7e2cf902404f6740f0932a088cb660" # v0.6.3 + #2174 (federation log spam)
-    dendrite_commit_sha1: "a4e7d471af7e2cf902404f6740f0932a088cb660"
-    dendrite_config_template: "dendrite-config-v2.yaml.j2"
+    dendrite_version: "v0.9.6"
+    dendrite_commit_sha1: "304acd7adc4929f64af930d0b5801e33ba101193"
+    dendrite_config_template: "dendrite-config-0.9.6-plus.yaml.j2"
 
     dendrite_listen_port: 8008
 
