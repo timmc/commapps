@@ -82,13 +82,13 @@ matrix__deployments:
           base: appux.com
           wild: false
 
-    golang_version: "1.17.3"
-    golang_archive_sha256: "550f9845451c0c94be679faf116291e7807a8d78b43149f9506c1b15eb89008c"
+    golang_version: "1.17.6"
+    golang_archive_sha256: "231654bbf2dab3d86c1619ce799e77b03d96f9b50770297c8f4dff8836fc8ca2"
 
     dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-    dendrite_version: "v0.5.1"
-    dendrite_commit_sha1: "e81ef1649b468126a88a5ccce925f4e4ac865bf4"
-    dendrite_config_template: "dendrite-config-v1.yaml.j2"
+    dendrite_version: "a4e7d471af7e2cf902404f6740f0932a088cb660" # v0.6.3 + #2174 (federation log spam)
+    dendrite_commit_sha1: "a4e7d471af7e2cf902404f6740f0932a088cb660"
+    dendrite_config_template: "dendrite-config-v2.yaml.j2"
 
     dendrite_listen_port: 8008
 
