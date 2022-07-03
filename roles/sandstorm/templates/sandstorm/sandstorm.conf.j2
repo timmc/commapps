@@ -15,4 +15,6 @@ WILDCARD_HOST=*.{{ sandstorm_base_domain }}
 # Close the client-side hole in Sandstorm's security model (may cause some
 # apps to break). Enforces CSP to prevent loading from and exfiltration to
 # other-origin sites.
-ALLOW_LEGACY_RELAXED_CSP=false
+#
+# 2022-06-30: Changed from false to true due to new Etherpad (1.8.14-1) breaking in Firefox with strict CSP.
+ALLOW_LEGACY_RELAXED_CSP=true
