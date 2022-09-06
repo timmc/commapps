@@ -47,4 +47,5 @@ password:
 # username requirements
 username:
   validation_regex: [] #list of regexes name must match
-  invalidation_regex: [] #list of regexes name must *not* match
+  # Reserve usernames beginning with underscore for admin/system use.
+  invalidation_regex: ["^_"] #list of regexes name must *not* match

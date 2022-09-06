@@ -1,0 +1,162 @@
+# Config file version
+version: 2
+
+global:
+  server_name: "{{ matrix__cfg.domain_identity }}"
+
+  # Server signing key (identity, not TLS).
+  private_key: "{{ matrix__cfg.data_dir }}/dendrite/matrix_key.pem"
+
+  key_validity_period: 168h0m0s
+
+  database:
+    connection_string: "postgres://{{ matrix__cfg.pg.user }}:{{ matrix__cfg.pg.password }}@localhost/{{ matrix__cfg.pg.db }}"
+
+  # Domains trusted to verify phone numbers and email addresses; using
+  # default list.
+  trusted_third_party_id_servers:
+  - matrix.org
+  - vector.im
+
+  # Dendrite doesn't federate well yet -- in particular, if someone
+  # joins a huge room, it can take down this host!
+  disable_federation: true
+
+  # Presence notifications, inbound to our server, and outbound to others
+  presence:
+    enable_inbound: false
+    enable_outbound: false
+
+  report_stats:
+    enabled: true
+    endpoint: https://matrix.org/report-usage-stats/push
+
+  # Server notices allows server admins to send messages to all users on the server.
+  server_notices:
+    enabled: true
+    # The local part, display name and avatar URL (as a mxc:// URL) for the user that
+    # will send the server notices. These are visible to all users on the deployment.
+    local_part: "_server"
+    display_name: "Server notice"
+    avatar_url: ""
+    # The room name to be used when sending server notices. This room name will
+    # appear in user clients.
+    room_name: "Server notices"
+
+  # Configuration for NATS JetStream
+  jetstream:
+    # Empty list for monolith mode (use internal server)
+    addresses: []
+    # Dir under which to maintain the "jetstream" dir (defaults to /tmp/nats)
+    storage_path: "{{ matrix__cfg.data_dir }}/dendrite"
+    # Standard topic prefix for Dendrite.
+    topic_prefix: Dendrite
+
+  metrics:
+    enabled: false # don't enable without setting a password
+
+  dns_cache:
+    enabled: true
+    cache_size: 256 # entries
+    cache_lifetime: 149 # seconds, randomly chosen between 1 and 5 minutes
+
+
+client_api:
+  registration_disabled: true
+  # Guest registration is disabled implicitly by disabling
+  # registration, but make it explicit here anyhow.
+  guests_disabled: true
+  # Registration override if registration is disabled. Used by matrix-registration UI.
+  registration_shared_secret: "{{ matrix__cfg.registration_shared_secret }}"
+
+  rate_limiting:
+    enabled: true
+    threshold: 5
+    cooloff_ms: 500
+
+
+federation_api:
+  # X.509 certs to advertise to other servers, in PEM format.
+  federation_certificates:
+    - /srv/commdata/etc-letsencrypt/live/{{ matrix__cfg.domain_host }}/cert.pem
+
+  # Perspective keyservers to use as a backup when direct key fetches fail. This may
+  # be required to satisfy key requests for servers that are no longer online when
+  # joining some rooms.
+  key_perspectives:
+  - server_name: matrix.org
+    keys:
+    - key_id: ed25519:auto
+      public_key: Noi6WqcDj0QmPxCNQqgezwTlBKrfqehY1u2FyWP9uYw
+    - key_id: ed25519:a_RXGa
+      public_key: l8Hft5qXKn1vfHrg3p4+W8gELQVo8N13JkluMfmn2sQ
+
+  # This option will control whether Dendrite will prefer to look up keys directly
+  # or whether it should try perspective servers first, using direct fetches as a
+  # last resort.
+  prefer_direct_fetch: false
+
+
+key_server: {}
+
+
+media_api:
+  # Storage path for uploaded media. May be relative or absolute.
+  base_path: "{{ matrix__cfg.data_dir }}/dendrite/media_store"
+
+  # Max allowed media upload (in bytes, 0 = unlimited).
+  # nginx config needs to allow uploads of at least this size.
+  max_file_size_bytes: 10485760
+
+  # Whether to dynamically generate thumbnails if needed.
+  dynamic_thumbnails: false
+
+  # The maximum number of simultaneous thumbnail generators to run.
+  max_thumbnail_generators: 10
+
+  # A list of thumbnail sizes to be generated for media content.
+  thumbnail_sizes:
+  - width: 32
+    height: 32
+    method: crop
+  - width: 96
+    height: 96
+    method: crop
+  - width: 640
+    height: 480
+    method: scale
+
+
+# Configuration for enabling experimental MSCs on this homeserver.
+mscs:
+  mscs:
+    - msc2836  # Threading, see https://github.com/matrix-org/matrix-doc/pull/2836
+    - msc2946  # Spaces Summary, see https://github.com/matrix-org/matrix-doc/pull/2946
+
+
+room_server: {}
+
+
+sync_api:
+  # Set by nginx to client's apparent IP address
+  real_ip_header: X-Real-IP
+
+
+user_api:
+  # The cost when hashing passwords on registration/login. Default: 10. Min: 4, Max: 31
+  bcrypt_cost: 10
+
+  # The length of time that a token issued for a relying party from
+  # /_matrix/client/r0/user/{userId}/openid/request_token endpoint
+  # is considered to be valid in milliseconds.
+  # The default lifetime is 3600000ms (60 minutes).
+  openid_token_lifetime_ms: 3600000
+
+
+# Logging configuration (can also configure a `type: std` for stdout/err)
+logging:
+- type: file
+  # The logging level, must be one of debug, info, warn, error.
+  level: info
+  params:
+    path: "{{ matrix__cfg.data_dir }}/dendrite/logs"
