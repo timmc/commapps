@@ -25,15 +25,15 @@ matrix__deployments:
 
     # Golang package version and hash, from https://go.dev/dl/
     # Use the linux-amd64.tar.gz packages.
-    # Dendrite 0.9.6 says it needs Golang >= 1.18 for compilation:
+    # Dendrite 0.9.7 says it needs Golang >= 1.18 for compilation:
     #   https://github.com/matrix-org/dendrite/blob/main/docs/installation/1_planning.md#go
     golang_version: "1.19"
     golang_archive_sha256: "464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6"
 
     # Dendrite version, from https://github.com/matrix-org/dendrite/tags
     dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-    dendrite_version: "v0.9.6"
-    dendrite_commit_sha1: "304acd7adc4929f64af930d0b5801e33ba101193"
+    dendrite_version: "v0.9.7"
+    dendrite_commit_sha1: "e8687f6f8255a978a8200b19c7a28581397ad455"
     # Versioning in the config file names like "0.9.6-plus" means
     # "this has the correct shape as of 0.9.6 but might contain newer
     # features". Dendrite has a habit of making breaking changes in
@@ -91,8 +91,8 @@ matrix__deployments:
     golang_archive_sha256: "464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6"
 
     dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-    dendrite_version: "v0.9.6"
-    dendrite_commit_sha1: "304acd7adc4929f64af930d0b5801e33ba101193"
+    dendrite_version: "v0.9.7"
+    dendrite_commit_sha1: "e8687f6f8255a978a8200b19c7a28581397ad455"
     dendrite_config_template: "dendrite-config-0.9.6-plus.yaml.j2"
 
     dendrite_listen_port: 8008
