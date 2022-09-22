@@ -32,8 +32,8 @@ matrix__deployments:
 
     # Dendrite version, from https://github.com/matrix-org/dendrite/tags
     dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-    dendrite_version: "v0.9.8"
-    dendrite_commit_sha1: "47b2a5d6b8d2704950170cc636ed3dabdad59c06"
+    dendrite_version: "v0.9.9"
+    dendrite_commit_sha1: "f40e2803276001cafd4d382c64a661d6ea740870"
     # Versioning in the config file names like "0.9.6-plus" means
     # "this has the correct shape as of 0.9.6 but might contain newer
     # features". Dendrite has a habit of making breaking changes in
@@ -91,8 +91,8 @@ matrix__deployments:
     golang_archive_sha256: "464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6"
 
     dendrite_repo_url: "https://github.com/matrix-org/dendrite"
-    dendrite_version: "v0.9.8"
-    dendrite_commit_sha1: "47b2a5d6b8d2704950170cc636ed3dabdad59c06"
+    dendrite_version: "v0.9.9"
+    dendrite_commit_sha1: "f40e2803276001cafd4d382c64a661d6ea740870"
     dendrite_config_template: "dendrite-config-0.9.6-plus.yaml.j2"
 
     dendrite_listen_port: 8008
