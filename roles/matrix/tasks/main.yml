@@ -48,6 +48,7 @@
   community.postgresql.postgresql_db:
     name: "{{ matrix__cfg.pg.db }}"
     tablespace: "{{ matrix__cfg.pg.tablespace }}"
+    encoding: UTF-8
   become: true
   become_user: postgres
 
