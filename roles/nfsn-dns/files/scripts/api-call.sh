@@ -4,7 +4,7 @@
 # Usage: $0 <http-method> <uri-path> <req-body>
 #
 # - http-method: GET, POST, or PUT
-# - uri-path: Path component of API call URL
+# - uri-path: Path and query component of API call URL
 # - req-body: Request body, form-encoded (possibly empty)
 #
 # Optional overrides:
@@ -19,8 +19,8 @@ NFSN_REQUEST_BODY="$3"
 
 #== Auth header ==#
 
-NFSN_API_KEY=${NFSN_API_KEY:-`cat /srv/commdata/secrets/certbot/nfsn-api-key`}
-NFSN_USERNAME=${NFSN_USERNAME:-phyzome}
+NFSN_API_KEY=${NFSN_API_KEY:-`cat /srv/commdata/nfsn-dns/secrets/api-key`}
+NFSN_USERNAME=${NFSN_USERNAME:-`cat /srv/commdata/nfsn-dns/secrets/username`}
 
 auth_timestamp=`date +%s`
 auth_salt=`head --bytes=8 /dev/urandom | xxd -p`

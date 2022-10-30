@@ -1,0 +1,46 @@
+---
+# Double-check. See redundant task in commdata for more info.
+- name: "Confirm that commdata is mounted (for NFSN API secrets)"
+  shell: mountpoint /srv/commdata
+  changed_when: False
+
+# Mechanism for vars/vault separation for role vars
+- include_vars: "{{ role_path }}/vars/vault.yml"
+
+# ----
+
+- name: NFSN API secrets directory
+  file:
+    path: "/srv/commdata/nfsn-dns/secrets"
+    state: directory
+    owner: root
+    group: root
+    mode: 0600
+
+- name: NFSN API key
+  copy:
+    content: "{{ nfsn_dns__api_key }}"
+    dest: "/srv/commdata/nfsn-dns/secrets/api-key"
+    owner: root
+    group: root
+    mode: 0600
+  no_log: true
+
+- name: NFSN username
+  copy:
+    content: "{{ nfsn_dns__username }}"
+    dest: "/srv/commdata/nfsn-dns/secrets/username"
+    owner: root
+    group: root
+    mode: 0600
+  no_log: true
+
+- name: NFSN files dir
+  file:
+    state: directory
+    path: /opt/commapps/nfsn-dns
+
+- name: NFSN API scripts
+  synchronize:
+    src: "{{ role_path }}/files/scripts/"
+    dest: /opt/commapps/nfsn-dns/scripts/

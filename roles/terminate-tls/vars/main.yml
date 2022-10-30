@@ -1,2 +1,0 @@
-# API key for NFSN, acquired from NearlyFreeSpeech.net support request.
-terminate_tls__nfsn_api_key: "{{ vault_terminate_tls__nfsn_api_key }}"

@@ -45,6 +45,6 @@ certbot certonly --noninteractive \
         "${domain_args[@]}" \
         --preferred-challenges 'dns-01' \
         --server 'https://acme-v02.api.letsencrypt.org/directory' \
-        --manual-auth-hook "$scripts/nfsn-dns-01-setup.sh" \
-        --manual-cleanup-hook "$scripts/nfsn-dns-01-cleanup.sh" \
+        --manual-auth-hook "$scripts/dns-01-setup.sh" \
+        --manual-cleanup-hook "$scripts/dns-01-cleanup.sh" \
         --deploy-hook "$scripts/install-certs.sh"
