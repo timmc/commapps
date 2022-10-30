@@ -40,7 +40,7 @@ fi
 # versions of certbot don't default to v2, I think...
 certbot certonly --noninteractive \
         --config-dir "$configdir" \
-        --agree-tos --manual-public-ip-logging-ok --email "$email" \
+        --agree-tos --email "$email" \
         --manual \
         "${domain_args[@]}" \
         --preferred-challenges 'dns-01' \
