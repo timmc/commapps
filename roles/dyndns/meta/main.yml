@@ -1,3 +1,4 @@
 ---
 dependencies:
   - role: commdata
+  - role: nfsn-dns

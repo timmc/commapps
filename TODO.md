@@ -8,8 +8,7 @@ Figure out how to bring up system with SSH but without community services, perha
         - Done: Set up nginx with reverse proxy terminating wildcard
           TLS for Sandstorm
         - Done: Wildcard DNS via NFSN
-    - **TODO**: Move from afraid.org freedns to using NFSN DNS API
-        - https://members.nearlyfreespeech.net/wiki/API/Reference
+    - Done: Move from afraid.org freedns to using NFSN DNS API
 - Repeatability
     - Done: Server rebuilt from (manual) runbook
     - **TODO**: Create automated runbook for post-OS setup

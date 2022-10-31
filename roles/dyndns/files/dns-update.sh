@@ -1,20 +1,24 @@
 #!/bin/bash
 # Update DNS records to point to this server's public IP.
-#
-# Set DYNDNS_SLEEP to a fixed random number of seconds 0-59 when
-# running from a cron job to help level load on the dyndns service.
 
 set -eu -o pipefail
 
 function log {
-  echo `date --universal "+%Y-%m-%d %H:%M:%S"`: "$@"
+  echo >&2 `date --universal "+%Y-%m-%d %H:%M:%S"`: "$@"
 }
-
-sleep "${DYNDNS_SLEEP:-0}"
 
 log "Running dyndns updater"
 
-token="$(cat /srv/commdata/dyndns/secrets/afraid.org-token-home)"
-curl -sS "https://sync.afraid.org/u/$token/?content-type=json" -m10 || true
+source /srv/commdata/dyndns/config
 
-log "Dyndns update complete"
+current_public_ip4=`dig +short -4 @resolver1.opendns.com myip.opendns.com`
+dns_ip4=`dig +short "${DYNDNS_RECORD}.${DYNDNS_BASE_DOMAIN}" A`
+
+if [[ "$current_public_ip4" = "$dns_ip4" ]]; then
+    log "Record is up to date"
+else
+    log "Record is out of date, updating"
+    /opt/commapps/nfsn-dns/scripts/dns-rr-replace.sh \
+        -n "$DYNDNS_RECORD" -b "$DYNDNS_BASE_DOMAIN" \
+        -t "A" -d "$current_public_ip4" -l "$DYNDNS_TTL_S"
+fi

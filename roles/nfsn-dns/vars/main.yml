@@ -1,3 +1,5 @@
+---
 # API key for NFSN, acquired from NearlyFreeSpeech.net support request.
 nfsn_dns__api_key: "{{ vault_nfsn_dns__api_key }}"
+# Login username on NFSN
 nfsn_dns__username: "{{ vault_nfsn_dns__username }}"

@@ -4,39 +4,20 @@
   shell: mountpoint /srv/commdata
   changed_when: False
 
-# Mechanism for vars/vault separation for role vars
-- include_vars: "{{ role_path }}/vars/vault.yml"
-
 # ----
-
-- name: "Create dyndns updater user with few permissions"
-  user:
-    name: dyndns_upd
-    system: yes
 
 - name: "Directory for dyndns data"
   file:
     state: directory
     path: /srv/commdata/dyndns
 
-- name: "Directory for dyndns secrets"
-  file:
-    state: directory
-    path: /srv/commdata/dyndns/secrets
-    owner: dyndns_upd
-    group: dyndns_upd
-    mode: u=rx,g=,o=
-
-- name: Write afraid.org secret token
+- name: "Dyndns data"
   copy:
-    content: "{{ dyndns_afraidorg_token }}"
-    dest: /srv/commdata/dyndns/secrets/afraid.org-token-home
-    owner: dyndns_upd
-    group: dyndns_upd
-    mode: u=r,g=,o=
-  no_log: true
-
-# ----
+    content: |
+      DYNDNS_BASE_DOMAIN={{ dyndns__base_domain|quote }}
+      DYNDNS_RECORD={{ dyndns__record|quote }}
+      DYNDNS_TTL_S=180 # should be shorter than cron update interval
+    dest: /srv/commdata/dyndns/config
 
 - name: Directory for dyndns scripts
   file:
@@ -51,9 +32,7 @@
 
 - name: "Create log file writeable by dyndns user"
   file:
-    path: /var/log/dyndns-afraid.org-home.log
-    owner: dyndns_upd
-    group: dyndns_upd
+    path: /var/log/dyndns-appux.log
     # This is required in order to ensure the file is *present* and
     # also gets correct mode/owner, but doesn't get touched if already
     # present. Thanks to https://github.com/ansible/ansible/issues/7490
@@ -66,18 +45,16 @@
     content: |
       SHELL=/bin/bash
       PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-      # Randomized [0..59] sleep to reduce impact on afraid.org
-      DYNDNS_SLEEP=20
-      */3 * * * * dyndns_upd /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-afraid.org-home.log 2>&1
-    dest: /etc/cron.d/dyndns-afraid-org-update
+      */4 * * * * root /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-appux.log 2>&1
+    dest: /etc/cron.d/dyndns-appux-update
 
 - name: Rotate logs
   copy:
     content: |
-      /var/log/dyndns-afraid.org-home.log {
+      /var/log/dyndns-appux.log {
         weekly
         rotate 5
         missingok
-        create dyndns_upd dyndns_upd
+        create root root
       }
     dest: /etc/logrotate.d/appux-dyndns

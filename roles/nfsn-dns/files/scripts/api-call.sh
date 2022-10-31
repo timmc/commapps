@@ -33,6 +33,18 @@ auth_header_value="${NFSN_USERNAME};${auth_timestamp};${auth_salt};${auth_hash}"
 
 #====#
 
-curl -sS "https://api.nearlyfreespeech.net${NFSN_REQUEST_PATH}" \
+call_output=$(
+    curl -sS -i "https://api.nearlyfreespeech.net${NFSN_REQUEST_PATH}" \
      -H "X-NFSN-Authentication: ${auth_header_value}" \
      --data-binary "${NFSN_REQUEST_BODY}" -X "${NFSN_REQUEST_METHOD}"
+)
+
+status_line="$(echo "$call_output" | head -n1 )"
+
+re_success="^HTTP/[0-9.]+\s+200\s+"
+if [[ "$status_line" =~ $re_success ]]; then
+    exit 0
+else
+    echo >&2 "$call_output"
+    exit 1
+fi
