@@ -335,6 +335,9 @@
         "brand": {{ matrix__cfg.element.brand|tojson }},
         "features": {
           "feature_thread": true
+        },
+        "settingDefaults": {
+          "UIFeature.registration": false
         }
       }
     dest: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www/config.json"
