@@ -12,7 +12,7 @@ server_location: "http://localhost:{{ matrix__cfg.dendrite_listen_port }}"
 registration_shared_secret: "{{ matrix__cfg.registration_shared_secret }}"
 admin_api_shared_secret: "{{ matrix__cfg.regui.admin_password }}"
 
-client_redirect: "https://app.element.io/#/login"
+client_redirect: "https://{{ matrix__cfg.element.domain }}/#/login"
 client_logo: "static/images/element-logo.png"
 
 # security

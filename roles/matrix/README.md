@@ -1,6 +1,9 @@
 # Matrix
 
 A Matrix server, using Dendrite in monolith mode with Postgres.
+Also includes a registration UI (to support gated registration)
+and an element-web installation that people are redirected to
+after registration.
 
 The homeserver is `https://matrix.appux.com` but users are
 `NAME@appux.com`.
@@ -22,9 +25,12 @@ records).
 
 ### DNS
 
-Add record:
+Add records:
 
-`matrix.appux.com CNAME t.timmc.org.`
+```
+matrix.appux.com CNAME dc.appux.com.
+element.appux.com CNAME dc.appux.com.
+```
 
 ### .well-known
 

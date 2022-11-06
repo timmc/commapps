@@ -143,14 +143,15 @@
         client_max_body_size 15m;
       }
     dest: "/etc/nginx/sites-available/{{ matrix__cfg.domain_host }}.conf"
-  notify: "nginx reload config"
+  notify: "matrix nginx config"
 
 - name: "Enable nginx proxy"
   file:
     src: "/etc/nginx/sites-available/{{ matrix__cfg.domain_host }}.conf"
     dest: "/etc/nginx/sites-enabled/{{ matrix__cfg.domain_host }}.conf"
     state: link
-  notify: "nginx reload config"
+  notify: "matrix nginx config"
+
 
 #== Configuration
 
@@ -261,6 +262,156 @@
     name: "{{ matrix__cfg.service_name }}"
     enabled: yes
     state: started
+
+
+#== Element web client
+
+- name: "Dir for element files"
+  file:
+    path: "{{ matrix__cfg.data_dir }}/element"
+    state: directory
+
+- name: "Element release key"
+  copy:
+    src: "{{ role_path }}/files/element-release-key.asc"
+    dest: "{{ matrix__cfg.data_dir }}/element/element-release-key.asc"
+
+- name: "Make GPG keyring for element key"
+  command:
+    argv:
+      - gpg
+      - '--no-default-keyring'
+      - '--keyring'
+      - "{{ matrix__cfg.data_dir }}/element/release-keys.gpg"
+      - '--import'
+      - "{{ matrix__cfg.data_dir }}/element/element-release-key.asc"
+    creates: "{{ matrix__cfg.data_dir }}/element/release-keys.gpg"
+
+- name: "Dir for element site versions"
+  file:
+    path: "{{ matrix__cfg.data_dir }}/element/site"
+    state: directory
+
+- name: "Dir for configured element version"
+  file:
+    path: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}"
+    state: directory
+
+- name: "Download Element tarball"
+  get_url:
+    url: "https://github.com/vector-im/element-web/releases/download/{{ matrix__cfg.element.version|urlencode }}/element-{{ matrix__cfg.element.version|urlencode }}.tar.gz"
+    dest: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/tarball.tar.gz"
+
+- name: "Download Element signature"
+  get_url:
+    url: "https://github.com/vector-im/element-web/releases/download/{{ matrix__cfg.element.version|urlencode }}/element-{{ matrix__cfg.element.version|urlencode }}.tar.gz.asc"
+    dest: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/tarball.tar.gz.asc"
+
+# Do this all in one step so we can use the "creates" option to skip easily.
+- name: "Verify and extract element tarball"
+  shell:
+    creates: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www"
+    chdir: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}"
+    executable: /bin/bash
+    cmd: |
+      set -eu -o pipefail
+      gpg --no-default-keyring --keyring {{ matrix__cfg.data_dir|quote }}/element/release-keys.gpg \
+          --verify tarball.tar.gz.asc tarball.tar.gz
+      tar xzf tarball.tar.gz -- element-{{ matrix__cfg.element.version|quote }}
+      mv -- element-{{ matrix__cfg.element.version|quote }} www
+
+- name: "Configure element-web"
+  copy:
+    # https://github.com/vector-im/element-web/blob/develop/docs/config.md
+    content: |
+      {
+        "default_server_config": {
+          "m.homeserver": {
+            "base_url": "https://{{ matrix__cfg.domain_host }}",
+            "server_name": "{{ matrix__cfg.domain_identity }}"
+          }
+        },
+        "show_labs_settings": true,
+        "brand": {{ matrix__cfg.element.brand|tojson }},
+        "features": {
+          "feature_thread": true
+        }
+      }
+    dest: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www/config.json"
+
+# Do this after all other setup of the configured version
+- name: "Symlink to current version for ease of reference"
+  file:
+    state: link
+    path: "{{ matrix__cfg.data_dir }}/element/site/current"
+    src: "element-{{ matrix__cfg.element.version }}"
+
+# nginx has weird behavior where using add_header in a location wipes
+# out the server-wide headers for that location...
+- name: "Nginx includes for element-web global headers"
+  copy:
+    content: |
+      add_header X-Frame-Options SAMEORIGIN;
+      add_header X-Content-Type-Options nosniff;
+      add_header X-XSS-Protection "1; mode=block";
+      # The index page declares its own CSP restrictions; this is just
+      # copied from that (in version 1.11.13) but:
+      # - Removes the permission for running Google/reCAPTCHA scripts (won't be using)
+      # - Adds frame-ancestors=none (as recommended in element-web documentation)
+      # - Adds base-uri=none
+      #
+      # There are some errors in the browser console about unsafe-inline scripts being
+      # blocked, but it doesn't seem to cause a problem?
+      add_header Content-Security-Policy "default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src * blob: data:; connect-src *; font-src 'self' data:; media-src * blob: data:; child-src * blob: data:; worker-src 'self' blob:; frame-src * blob: data:; form-action 'self'; manifest-src 'self'; frame-ancestors 'none'; base-uri 'none'";
+      add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+    dest: "{{ matrix__cfg.data_dir }}/element/nginx-global-headers.conf"
+  notify: "matrix nginx config"
+
+# Certs are configured elsewhere in task file, together with dendrite/matreg
+- name: "Install nginx proxy"
+  copy:
+    content: |
+      # Configuration for element-web at {{ matrix__cfg.element.domain }}
+      server {
+        listen 443 ssl;
+        server_name {{ matrix__cfg.element.domain }};
+
+        ssl_certificate /srv/commdata/etc-letsencrypt/live/{{ matrix__cfg.element.domain }}/fullchain.pem;
+        ssl_certificate_key /srv/commdata/etc-letsencrypt/live/{{ matrix__cfg.element.domain }}/privkey.pem;
+
+        root "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www";
+        index index.html;
+
+        include {{ matrix__cfg.data_dir }}/element/nginx-global-headers.conf;
+
+        # Set no-cache for the version, config and index.html
+        # so that browsers always check for a new copy of Element Web.
+        location = /index.html {
+          include {{ matrix__cfg.data_dir }}/element/nginx-global-headers.conf;
+          add_header Cache-Control "no-cache";
+        }
+        location = /version {
+          include {{ matrix__cfg.data_dir }}/element/nginx-global-headers.conf;
+          add_header Cache-Control "no-cache";
+        }
+        # covers config.json and config.hostname.json requests as it is a prefix
+        location /config {
+          include {{ matrix__cfg.data_dir }}/element/nginx-global-headers.conf;
+          add_header Cache-Control "no-cache";
+        }
+
+        error_page 500 502 503 504 /50x.html;
+      }
+    dest: "/etc/nginx/sites-available/{{ matrix__cfg.element.domain }}.conf"
+  notify: "matrix nginx config"
+
+- name: "Enable element-web nginx site"
+  file:
+    src: "/etc/nginx/sites-available/{{ matrix__cfg.element.domain }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ matrix__cfg.element.domain }}.conf"
+    state: link
+  notify: "matrix nginx config"
+
 
 #== Matrix registration frontend
 

@@ -22,6 +22,11 @@ matrix__deployments:
           sub: m.staging
           base: appux.com
           wild: false
+      - filename: stg_element-sub.json
+        config:
+          sub: element.staging
+          base: appux.com
+          wild: false
 
     # Golang package version and hash, from https://go.dev/dl/
     # Use the linux-amd64.tar.gz packages.
@@ -55,6 +60,11 @@ matrix__deployments:
       admin_password: "{{ vault_matrix__stg_regui_admin_password }}"
       service_name: stg_matrix-registration
 
+    element:
+      version: 'v1.11.13'
+      # Remember to add to certificates list as well
+      domain: element.staging.appux.com
+      brand: "[STAGE] Appux chat (matrix)"
 
   production:
     # OS user account
@@ -86,6 +96,11 @@ matrix__deployments:
       - filename: matrix-sub.json
         config:
           sub: matrix
+          base: appux.com
+          wild: false
+      - filename: element-sub.json
+        config:
+          sub: element
           base: appux.com
           wild: false
 
@@ -129,3 +144,8 @@ matrix__deployments:
       admin_password: "{{ vault_matrix__prod_regui_admin_password }}"
 
       service_name: matrix-registration
+
+    element:
+      version: 'v1.11.13'
+      domain: element.appux.com
+      brand: "Appux chat (Matrix)"

@@ -2,7 +2,7 @@
 - name: "certs config update"
   command: /opt/commapps/certbot/scripts/renew-certs.sh
 
-- name: "nginx reload config"
+- name: "matrix nginx config"
   service:
     name: nginx
     state: reloaded
