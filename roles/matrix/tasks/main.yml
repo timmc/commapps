@@ -320,6 +320,31 @@
       tar xzf tarball.tar.gz -- element-{{ matrix__cfg.element.version|quote }}
       mv -- element-{{ matrix__cfg.element.version|quote }} www
 
+# The index files points to a favicon.878a87c.ico (878a87c appears to be an
+# MD5 prefix of the file's contents) but I want a predictable location for
+# overwriting. There's also a regular favicon.ico with the same contents,
+# so make the less predictable name a symlink to that.
+- name: "Make a predictable location for element-web favicon"
+  shell:
+    creates: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www/favicon-replaced.txt"
+    chdir: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www"
+    executable: /bin/bash
+    cmd: |
+      set -eu -o pipefail
+      (
+        cd vector-icons
+        for f in favicon.*.ico; do
+            unlink -- "./$f"
+            ln -ns ./favicon.ico "./$f"
+        done
+      )
+      touch favicon-replaced.txt
+
+- name: "Use own favicon for element-web"
+  copy:
+    src: "{{ role_path }}/files/favicon-ball-matrix.ico"
+    dest: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www/vector-icons/favicon.ico"
+
 - name: "Configure element-web"
   copy:
     # https://github.com/vector-im/element-web/blob/develop/docs/config.md
