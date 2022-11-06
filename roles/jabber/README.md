@@ -43,10 +43,10 @@ router instead.
 DNS:
 
 ```
-_xmpp-client._tcp.appux.com	SRV	10 0 5222 t.timmc.org.
-_xmpp-client._tcp.muc.appux.com	SRV	10 0 5222 t.timmc.org.
-_xmpp-server._tcp.appux.com	SRV	10 0 5269 t.timmc.org.
-_xmpp-server._tcp.muc.appux.com	SRV	10 0 5269 t.timmc.org.
+_xmpp-client._tcp.appux.com	SRV	10 0 5222 dc.appux.com.
+_xmpp-client._tcp.muc.appux.com	SRV	10 0 5222 dc.appux.com.
+_xmpp-server._tcp.appux.com	SRV	10 0 5269 dc.appux.com.
+_xmpp-server._tcp.muc.appux.com	SRV	10 0 5269 dc.appux.com.
 ```
 
 ### Cert oracle

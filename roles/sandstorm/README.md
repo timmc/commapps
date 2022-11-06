@@ -5,8 +5,8 @@
 DNS:
 
 ```
-sandstorm.appux.com CNAME t.timmc.org. 600
-*.sandstorm.appux.com CNAME t.timmc.org. 600
+sandstorm.appux.com CNAME dc.appux.com. 600
+*.sandstorm.appux.com CNAME dc.appux.com. 600
 ```
 
 Login providers:
