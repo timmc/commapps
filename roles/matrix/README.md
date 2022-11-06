@@ -28,12 +28,32 @@ Add record:
 
 ### .well-known
 
-Add file `https://www.appux.com/.well-known/matrix/server`:
+Add file `https://appux.com/.well-known/matrix/client`:
+
+```
+{
+  "m.homeserver": {
+    "base_url": "https://matrix.appux.com"
+  }
+}
+```
+
+And `https://appux.com/.well-known/matrix/server` in case
+federation is enabled at some point:
 
 ```
 {
   "m.server": "matrix.appux.com:443"
 }
+```
+
+The server should also be configured to allow GET requests via CORS
+for these files. For example, `.well-known/matrix/.htaccess` might
+include:
+
+```
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET"
 ```
 
 ## Reset a user password
