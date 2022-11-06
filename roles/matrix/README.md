@@ -73,6 +73,16 @@ A URL like this can now be given to people to allow registration:
 
 `https://matrix.appux.com/regui/register?token=GENERATED_TOKEN`
 
+### Seeing existing tokens
+
+```
+root@toster:~# su matreg
+matreg@toster:/root$ cd
+matreg@toster:~$ sqlite3 db.sqlite3
+sqlite> .headers on
+sqlite> select * from tokens;
+```
+
 ### If a token is compromised
 
 Disable the old token:
