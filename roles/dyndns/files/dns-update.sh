@@ -12,9 +12,14 @@ log "Running dyndns updater"
 source /srv/commdata/dyndns/config
 
 current_public_ip4=`dig +short -4 @resolver1.opendns.com myip.opendns.com`
-dns_ip4=`dig +short "${DYNDNS_RECORD}.${DYNDNS_BASE_DOMAIN}" A`
 
-if [[ "$current_public_ip4" = "$dns_ip4" ]]; then
+dns_listing="$(
+    /opt/commapps/nfsn-dns/scripts/dns-rr-list.sh \
+        -n "$DYNDNS_RECORD" -b "$DYNDNS_BASE_DOMAIN" \
+        -t "A"
+)"
+
+if [[ "$dns_listing" == *"$current_public_ip4"* ]]; then
     log "Record is up to date"
 else
     log "Record is out of date, updating"

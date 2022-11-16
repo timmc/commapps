@@ -16,7 +16,7 @@
     content: |
       DYNDNS_BASE_DOMAIN={{ dyndns__base_domain|quote }}
       DYNDNS_RECORD={{ dyndns__record|quote }}
-      DYNDNS_TTL_S=180 # should be shorter than cron update interval
+      DYNDNS_TTL_S=300 # Should be comparable to router/host reboot time
     dest: /srv/commdata/dyndns/config
 
 - name: Directory for dyndns scripts
@@ -45,7 +45,7 @@
     content: |
       SHELL=/bin/bash
       PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-      */4 * * * * root /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-appux.log 2>&1
+      */5 * * * * root /opt/commapps/dyndns/dns-update.sh >> /var/log/dyndns-appux.log 2>&1
     dest: /etc/cron.d/dyndns-appux-update
 
 - name: Rotate logs
