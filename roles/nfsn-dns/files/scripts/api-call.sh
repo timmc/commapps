@@ -1,21 +1,26 @@
 #!/bin/bash
 # Make an API call to NearlyFreeSpeech.net
 #
-# Usage: $0 <http-method> <uri-path> <req-body>
+# Currently only supports "method-invoke" endpoints.
+# TODO: Support "property-read" and "property-write".
 #
-# - http-method: GET, POST, or PUT
+# Usage: $0 <uri-path> <req-body>
+#
 # - uri-path: Path and query component of API call URL
 # - req-body: Request body, form-encoded (possibly empty)
 #
 # Optional overrides:
 # - NFSN_API_KEY
 # - NFSN_USERNAME
+#
+# Docs:
+# - https://members.nearlyfreespeech.net/wiki/API/Introduction
+# - https://members.nearlyfreespeech.net/wiki/API/Reference
 
 set -eu -o pipefail
 
-NFSN_REQUEST_METHOD="$1"
-NFSN_REQUEST_PATH="$2"
-NFSN_REQUEST_BODY="$3"
+NFSN_REQUEST_PATH="$1"
+NFSN_REQUEST_BODY="$2"
 
 #== Auth header ==#
 
@@ -41,7 +46,7 @@ auth_header_value="${NFSN_USERNAME};${auth_timestamp};${auth_salt};${auth_hash}"
 call_output=$(
     curl -sS -i "https://api.nearlyfreespeech.net${NFSN_REQUEST_PATH}" \
      -H "X-NFSN-Authentication: ${auth_header_value}" \
-     --data-binary "${NFSN_REQUEST_BODY}" -X "${NFSN_REQUEST_METHOD}"
+     --data-binary "${NFSN_REQUEST_BODY}"
 )
 response_status=$(echo "$call_output" | grep -Po '\s[0-9]{3}\s' | head -n1 | tr -dc 0-9)
 

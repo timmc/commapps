@@ -1,5 +1,7 @@
 #!/bin/bash
 # Replace a DNS resource record by name and type.
+#
+# https://members.nearlyfreespeech.net/wiki/API/DNSReplaceRR
 
 set -eu -o pipefail
 
@@ -33,5 +35,5 @@ while getopts "n:b:t:d:l:" opt; do
 done
 
 /opt/commapps/nfsn-dns/scripts/api-call.sh \
-    "POST" "/dns/${BASE_DOMAIN}/replaceRR" \
+    "/dns/${BASE_DOMAIN}/replaceRR" \
     "name=${RECORD_NAME}&type=${RECORD_TYPE}&data=${DATA}&ttl=${TTL}"

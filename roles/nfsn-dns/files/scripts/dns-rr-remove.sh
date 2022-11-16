@@ -1,5 +1,7 @@
 #!/bin/bash
 # Remove a DNS resource record (by name, type, and existing data).
+#
+# https://members.nearlyfreespeech.net/wiki/API/DNSRemoveRR
 
 set -eu -o pipefail
 
@@ -36,5 +38,5 @@ if [[ -z "$DATA" ]]; then
 fi
 
 /opt/commapps/nfsn-dns/scripts/api-call.sh \
-    "POST" "/dns/${BASE_DOMAIN}/removeRR" \
+    "/dns/${BASE_DOMAIN}/removeRR" \
     "name=${RECORD_NAME}&type=${RECORD_TYPE}&data=${DATA}"

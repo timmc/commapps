@@ -1,5 +1,7 @@
 #!/bin/bash
 # Add a DNS resource record.
+#
+# https://members.nearlyfreespeech.net/wiki/API/DNSAddRR
 
 set -eu -o pipefail
 
@@ -39,5 +41,5 @@ if [[ -z "$DATA" ]]; then
 fi
 
 /opt/commapps/nfsn-dns/scripts/api-call.sh \
-    "POST" "/dns/${BASE_DOMAIN}/addRR" \
+    "/dns/${BASE_DOMAIN}/addRR" \
     "name=${RECORD_NAME}&type=${RECORD_TYPE}&data=${DATA}&ttl=${TTL}"
