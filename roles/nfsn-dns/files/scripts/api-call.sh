@@ -33,18 +33,24 @@ auth_header_value="${NFSN_USERNAME};${auth_timestamp};${auth_salt};${auth_hash}"
 
 #====#
 
+# Get the complete headers + body, then separate them afterwards. This
+# was the least worst option I could find for getting both 1) the
+# response body, and 2) the success/failure status. (Curl does not
+# give an error exit for 4xx or 5xx, and trust me, the other options
+# for getting response code aren't very good.)
 call_output=$(
     curl -sS -i "https://api.nearlyfreespeech.net${NFSN_REQUEST_PATH}" \
      -H "X-NFSN-Authentication: ${auth_header_value}" \
      --data-binary "${NFSN_REQUEST_BODY}" -X "${NFSN_REQUEST_METHOD}"
 )
+response_status=$(echo "$call_output" | grep -Po '\s[0-9]{3}\s' | head -n1 | tr -dc 0-9)
 
-status_line="$(echo "$call_output" | head -n1 )"
-
-re_success="^HTTP/[0-9.]+\s+200\s+"
-if [[ "$status_line" =~ $re_success ]]; then
+if [[ "$response_status" == 200 ]]; then
+    # Output the response body (skip over headers)
+    echo "$call_output" | sed -ne $'/^\r$/,$p' | tail -n+2
     exit 0
 else
-    echo >&2 "$call_output"
+    # Output everything on error, including headers
+    echo "$call_output"
     exit 1
 fi
