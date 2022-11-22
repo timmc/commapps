@@ -61,7 +61,7 @@ matrix__deployments:
       service_name: stg_matrix-registration
 
     element:
-      version: 'v1.11.14'
+      version: 'v1.11.15'
       # Remember to add to certificates list as well
       domain: element.staging.appux.com
       brand: "[STAGE] Appux chat (matrix)"
@@ -146,6 +146,6 @@ matrix__deployments:
       service_name: matrix-registration
 
     element:
-      version: 'v1.11.14'
+      version: 'v1.11.15'
       domain: element.appux.com
       brand: "Appux chat (Matrix)"
