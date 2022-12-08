@@ -65,6 +65,9 @@ matrix__deployments:
       # Remember to add to certificates list as well
       domain: element.staging.appux.com
       brand: "[STAGE] Appux chat (matrix)"
+      # Favicon override is optional but recommended. This is a path
+      # relative to the role's `files` directory.
+      favicon_override: favicon-ball-matrix-stage.ico
 
   production:
     # OS user account
@@ -149,3 +152,4 @@ matrix__deployments:
       version: 'v1.11.16'
       domain: element.appux.com
       brand: "Appux chat (Matrix)"
+      favicon_override: favicon-ball-matrix-prod.ico

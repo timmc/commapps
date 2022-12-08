@@ -325,6 +325,7 @@
 # overwriting. There's also a regular favicon.ico with the same contents,
 # so make the less predictable name a symlink to that.
 - name: "Make a predictable location for element-web favicon"
+  when: "matrix__cfg.element.favicon_override|default(None)"
   shell:
     creates: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www/favicon-replaced.txt"
     chdir: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www"
@@ -341,8 +342,9 @@
       touch favicon-replaced.txt
 
 - name: "Use own favicon for element-web"
+  when: "matrix__cfg.element.favicon_override|default(None)"
   copy:
-    src: "{{ role_path }}/files/favicon-ball-matrix.ico"
+    src: "{{ role_path }}/files/{{ matrix__cfg.element.favicon_override }}"
     dest: "{{ matrix__cfg.data_dir }}/element/site/element-{{ matrix__cfg.element.version }}/www/vector-icons/favicon.ico"
 
 - name: "Configure element-web"
